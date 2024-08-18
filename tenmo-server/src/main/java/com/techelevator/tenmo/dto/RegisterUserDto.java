@@ -1,4 +1,6 @@
-package com.techelevator.tenmo.model;
+package com.techelevator.tenmo.dto;
+
+import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotEmpty;
 /*
@@ -7,6 +9,7 @@ import javax.validation.constraints.NotEmpty;
     pass to the server for a login endpoint, and TokenDto represents the object that's returned from the server
     to the client from a login endpoint.
  */
+
 public class RegisterUserDto {
 
     @NotEmpty

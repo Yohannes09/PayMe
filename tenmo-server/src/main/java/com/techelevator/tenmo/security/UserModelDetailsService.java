@@ -1,6 +1,6 @@
 package com.techelevator.tenmo.security;
 
-import com.techelevator.tenmo.dao.UserDao;
+import com.techelevator.tenmo.repository.UserRepository;
 import com.techelevator.tenmo.model.Authority;
 import com.techelevator.tenmo.model.User;
 import org.slf4j.Logger;
@@ -23,16 +23,16 @@ public class UserModelDetailsService implements UserDetailsService {
 
     private final Logger log = LoggerFactory.getLogger(UserModelDetailsService.class);
 
-    private final UserDao userDao;
+    private final UserRepository userRepository;
 
-    public UserModelDetailsService(UserDao userDao) {
-        this.userDao = userDao;
+    public UserModelDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(final String login) {
         log.debug("Authenticating user '{}'", login);
-        return createSpringSecurityUser(login, userDao.getUserByUsername(login));
+        return createSpringSecurityUser(login, userRepository.getUserByUsername(login));
     }
 
     private org.springframework.security.core.userdetails.User createSpringSecurityUser(String login, User user) {

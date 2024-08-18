@@ -86,7 +86,7 @@ public class App {
 
 	private void viewCurrentBalance() {
 		// TODO Auto-generated method stub
-        System.out.println(currentUser.getUser().);
+        System.out.println(currentUser.getUser());
 	}
 
 	private void viewTransferHistory() {

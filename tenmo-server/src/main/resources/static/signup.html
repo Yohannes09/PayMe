@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up</title>
+  <style>
+    h1 {
+        text-align: center;
+    }
+
+    form {
+        max-width: 300px;
+        margin: auto;
+        padding: 2em;
+        border: 2px solid #ccc;
+        border-radius: 1em;
+    }
+
+    div {
+        margin-bottom: 1em;
+    }
+    label {
+        margin-bottom: .5em;
+        color: #333333;
+        display: block;
+    }
+    input {
+        border: 1px solid #CCCCCC;
+        padding: .5em;
+        font-size: 1em;
+        width: 100%;
+        box-sizing: border-box;
+        margin-bottom: 1em;
+        border-radius: .75em;
+    }
+    button {
+        padding: 0.7em;
+        color: #fff;
+        background-color: #007BFF;
+        border: none;
+        border-radius: 0.3em;
+        cursor: pointer;
+        font-size: 1em;
+    }
+    button:hover {
+        background-color: #0056b3;
+    }
+    .signin {
+        text-align: center;
+        color: #007BFF;
+    }
+    .fullname {
+        display: flex;
+        gap: 1em;
+        margin-bottom:0em;
+    }
+    .fullname .form-group {
+        flex: 1;
+    }
+  </style>
+</head>
+
+
+<body>
+
+<h1>Sign Up</h1>
+<hr>
+<form action="/submit" method="post">
+  <div class="fullname">
+    <div class="form-group">
+      <label for="firstname">First name:</label>
+      <input type="text" id="firstname" name="firstname">
+    </div>
+    <div class="form-group">
+      <label for="lastname">Last name:</label>
+      <input type="text" id="lastname" name="lastname">
+    </div>
+  </div>
+  <div>
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username">
+  </div>
+  <div>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password">
+  </div>
+  <div>
+    <label for="confirm-password">Confirm password:</label>
+    <input type="password" id="confirm-password" name="confirm-password">
+  </div>
+  <button type="submit">Sign Up</button>
+</form>
+<div class="signin">
+  <p><a href="login.html">Sign in</a></p>
+</div>
+</body>
+</html>

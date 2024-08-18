@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.techelevator.tenmo.dao.UserDao;
+import com.techelevator.tenmo.repository.UserRepository;
 import com.techelevator.tenmo.dto.LoginDto;
 import com.techelevator.tenmo.dto.RegisterUserDto;
 import com.techelevator.tenmo.model.User;
@@ -30,14 +30,14 @@ public class AuthenticationController {
 
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final UserDao userDao;
+    private final UserRepository userRepository;
 
     public AuthenticationController(TokenProvider tokenProvider,
                                     AuthenticationManagerBuilder authenticationManagerBuilder,
-                                    UserDao userDao) {
+                                    UserRepository userRepository) {
         this.tokenProvider = tokenProvider;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
-        this.userDao = userDao;
+        this.userRepository = userRepository;
     }
 
     @RequestMapping(path = "/login", method = RequestMethod.POST)
@@ -54,7 +54,7 @@ public class AuthenticationController {
 
         User user;
         try {
-            user = userDao.getUserByUsername(loginDto.getUsername());
+            user = userRepository.getUserByUsername(loginDto.getUsername());
         } catch (DaoException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Username or password is incorrect.");
         }
@@ -66,10 +66,10 @@ public class AuthenticationController {
     @RequestMapping(path = "/register", method = RequestMethod.POST)
     public void register(@Valid @RequestBody RegisterUserDto newUser) {
         try {
-            if (userDao.getUserByUsername(newUser.getUsername()) != null) {
+            if (userRepository.getUserByUsername(newUser.getUsername()) != null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already exists.");
             } else {
-                userDao.createUser(newUser);
+                userRepository.createUser(newUser);
             }
         }
         catch (DaoException e) {

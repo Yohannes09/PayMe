@@ -1,14 +1,9 @@
-package com.techelevator.tenmo.dao;
+package com.techelevator.tenmo.repository;
 
 import java.util.Optional;
-import java.util.Properties;
-import java.util.logging.Logger;
 
 import com.techelevator.tenmo.exception.DaoException;
 import com.techelevator.tenmo.model.Account;
-import com.techelevator.tenmo.model.User;
-import com.zaxxer.hikari.util.DriverDataSource;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,20 +14,20 @@ import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
 
 @Component
-public class JdbcAccountDao implements AccountDao {
+public class JdbcAccountRepository implements AccountRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final static String SELECT_SQL = "SELECT * FROM account act ";
 
-    public JdbcAccountDao(JdbcTemplate jdbcTemplate){
+    public JdbcAccountRepository(JdbcTemplate jdbcTemplate){
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public JdbcAccountDao(DataSource dataSource){
+    public JdbcAccountRepository(DataSource dataSource){
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public JdbcAccountDao(){
+    public JdbcAccountRepository(){
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
         dataSource.setUrl("jdbc:postgresql://localhost:5432/tenmo");
@@ -134,6 +129,21 @@ public class JdbcAccountDao implements AccountDao {
     @Override
     public double getAccountBalance(int id) {
         return findByAccountId(id).get().getBalance();
+    }
+
+    @Override
+    public boolean accountExists(int acountId) {
+        String sql = SELECT_SQL + "WHERE act.account_id = ?";
+
+        try{
+            SqlRowSet row = jdbcTemplate.queryForRowSet(sql, acountId);
+            if(row.next())
+                return true;
+
+        }catch (CannotGetJdbcConnectionException e){
+            // log eventually
+        }
+        return false;
     }
 
     public Account mapRowToAccount(SqlRowSet row){

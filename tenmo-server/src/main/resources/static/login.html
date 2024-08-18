@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Log in Screen</title>
+    <style>
+        h1{
+         text-align: center;
+        }
+        form {
+          max-width: 300px;
+          margin: auto;
+          padding: 1em;
+          border: 1px solid #ccc;
+          border-radius: 1em;
+        }
+        div {
+          margin-bottom: 1em;
+        }
+        label {
+          margin-bottom: .5em;
+          color: #333333;
+          display: block;
+        }
+    input {
+        border: 1px solid #CCCCCC;
+        padding: .5em;
+        font-size: 1em;
+        width: 100%;
+        box-sizing: border-box;
+        margin-bottom: 1em;
+        border-radius: .75em;
+    }
+        button {
+          padding: 0.7em;
+          color: #fff;
+          background-color: #007BFF;
+          border: none;
+          border-radius: 0.3em;
+          cursor: pointer;
+          font-size: 1em;
+        }
+        button:hover {
+          background-color: #0056b3;
+        }
+        .signup {
+            text-align: center;
+            color: #007BFF;
+        }
+        </style>
+
+    </head>
+    <body>
+    <h1>Authenticate</h1><hr>
+
+    <form action="/submit" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username"><br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password"><br><br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div class="signup">
+        <p> <a href="signup.html">Don't have an account?</a> </p>
+    </div>
+
+    </body>
+    </html>

@@ -1,11 +1,11 @@
-package com.techelevator.tenmo.dao;
+package com.techelevator.tenmo.repository;
 
 import com.techelevator.tenmo.dto.RegisterUserDto;
 import com.techelevator.tenmo.model.User;
 
 import java.util.List;
 
-public interface UserDao {
+public interface UserRepository {
 
     List<User> getUsers();
 

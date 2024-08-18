@@ -20,4 +20,6 @@ public interface TransferRepository {
 
     int deleteTransfer(int transferId);
 
+    //Optional<Transfer> findTransferById(int id);
+
 }

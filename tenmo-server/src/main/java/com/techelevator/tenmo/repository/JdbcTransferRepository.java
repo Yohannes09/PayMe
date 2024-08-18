@@ -34,12 +34,12 @@ public class JdbcTransferRepository implements TransferRepository {
                                              double amount) {
 
         String sql = "INSERT INTO transfer(transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
-                "VALUES(?, ?, ?, ?, ?);";
+                "VALUES(?, ?, ?, ?, ?) RETURNING transfer_id;";
 
         try{
-            int newTransferId = jdbcTemplate.update(
+            int newTransferId = jdbcTemplate.queryForObject(
                     sql,
-                    int.class,
+                    Integer.class,
                     transfterTypeId,
                     transferStatusId,
                     senderId,
@@ -103,6 +103,13 @@ public class JdbcTransferRepository implements TransferRepository {
     }
 
 
+//    public Transfer(int transferId,
+//                    int typeTypeId,
+//                    int transferStatusId,
+//                    int actSenderId,
+//                    int actRecipientId,
+//                    double amount) {
+
     public Transfer mapTransferToRow(SqlRowSet sqlRow){
         return new Transfer(
                 sqlRow.getInt("transfer_id"),
@@ -110,7 +117,7 @@ public class JdbcTransferRepository implements TransferRepository {
                 sqlRow.getInt("transfer_status_id"),
                 sqlRow.getInt("account_from"),
                 sqlRow.getInt("account_to"),
-                sqlRow.getInt("amount")
+                sqlRow.getDouble("amount")
         );
     }
 

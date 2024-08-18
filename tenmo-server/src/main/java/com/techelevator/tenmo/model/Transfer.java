@@ -1,10 +1,6 @@
 package com.techelevator.tenmo.model;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class Transfer {
-    // private static final Logger log = LoggerFactory.getLogger(Transfer.class);
     private final int transferId;
     private final int typeTypeId;
     private final int transferStatusId;
@@ -26,6 +22,7 @@ public class Transfer {
         this.amount = amount;
     }
 
+
     public int getTransferId() {
         return transferId;
     }
@@ -45,4 +42,6 @@ public class Transfer {
     public int getActRecipientId() {
         return actRecipientId;
     }
+
+    public double getAmount(){return amount;}
 }

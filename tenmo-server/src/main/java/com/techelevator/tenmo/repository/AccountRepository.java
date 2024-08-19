@@ -12,4 +12,8 @@ public interface AccountRepository {
     int deleteById(int id);
     double getAccountBalance(int id);
     boolean accountExists(int id);
+    Optional<Account> getAccountByUserId(int id);
+    //check pending requests
+    //check money sent
+    //
 }

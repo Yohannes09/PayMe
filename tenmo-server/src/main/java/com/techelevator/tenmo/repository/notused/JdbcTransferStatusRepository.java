@@ -1,4 +1,4 @@
-package com.techelevator.tenmo.repository;
+package com.techelevator.tenmo.repository.notused;
 
 import com.techelevator.tenmo.model.TransferStatus;
 import org.springframework.dao.DataIntegrityViolationException;

@@ -103,13 +103,6 @@ public class JdbcTransferRepository implements TransferRepository {
     }
 
 
-//    public Transfer(int transferId,
-//                    int typeTypeId,
-//                    int transferStatusId,
-//                    int actSenderId,
-//                    int actRecipientId,
-//                    double amount) {
-
     public Transfer mapTransferToRow(SqlRowSet sqlRow){
         return new Transfer(
                 sqlRow.getInt("transfer_id"),
@@ -120,8 +113,6 @@ public class JdbcTransferRepository implements TransferRepository {
                 sqlRow.getDouble("amount")
         );
     }
-
-
 
 
     public int getTransferStatusId(String transferStatus){
@@ -148,7 +139,4 @@ public class JdbcTransferRepository implements TransferRepository {
         return -1;
     }
 
-    public static void main(String[] args) {
-        //System.out.println(new JdbcTransferRepository().getTransferStatusId("Send"));
-    }
 }

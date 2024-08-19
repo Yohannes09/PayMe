@@ -17,7 +17,19 @@
         <maven.compiler.source>11</maven.compiler.source>
     </properties>
 
+<!--    <modules>-->
+<!--        <module>../tenmo-server</module>-->
+<!--    </modules>-->
+
+
     <dependencies>
+
+        <dependency>
+            <groupId>com.techelevator</groupId>
+            <artifactId>m02-capstone-server</artifactId>
+            <version>1.0</version>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
@@ -52,3 +64,20 @@
     </dependencies>
 
 </project>
+
+
+
+<!--    <modules>-->
+<!--        <module>../tenmo-server</module>-->
+<!--    </modules>-->
+
+
+
+<!--        <dependency>-->
+<!--            <groupId>com.techelevator</groupId>-->
+<!--            <artifactId>m02-capstone-local-application</artifactId>-->
+<!--            <version>1.0</version>-->
+<!--        </dependency>-->
+
+
+

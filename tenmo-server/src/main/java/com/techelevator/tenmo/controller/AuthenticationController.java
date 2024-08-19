@@ -9,11 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.techelevator.tenmo.repository.UserRepository;
 import com.techelevator.tenmo.dto.LoginDto;
@@ -40,7 +36,13 @@ public class AuthenticationController {
         this.userRepository = userRepository;
     }
 
-    @RequestMapping(path = "/login", method = RequestMethod.POST)
+
+//    @GetMapping
+//    public String loginPage(){
+//        return "login";
+//    }
+    //@RequestMapping(path = "/login", method = RequestMethod.POST)
+    @PostMapping(path = "/login")
     public LoginResponseDto login(@Valid @RequestBody LoginDto loginDto) {
 
         UsernamePasswordAuthenticationToken authenticationToken =
@@ -61,6 +63,8 @@ public class AuthenticationController {
 
         return new LoginResponseDto(jwt, user);
     }
+
+
 
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(path = "/register", method = RequestMethod.POST)

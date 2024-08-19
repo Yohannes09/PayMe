@@ -70,6 +70,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .apply(securityConfigurerAdapter());
+
+
     }
 
     private JWTConfigurer securityConfigurerAdapter() {

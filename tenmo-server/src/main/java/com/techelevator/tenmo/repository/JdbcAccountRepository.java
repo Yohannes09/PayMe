@@ -146,6 +146,21 @@ public class JdbcAccountRepository implements AccountRepository {
         return false;
     }
 
+    @Override
+    public Optional<Account> getAccountByUserId(int id) {
+        String sql = "SELECT * FROM account ac " +
+                "JOIN tenmo_user tu ON tu.user_id = ac.user_id " +
+                "WHERE tu.user_id = ?";
+        try{
+            SqlRowSet sqlRow = jdbcTemplate.queryForRowSet(sql, id);
+            if(sqlRow.next())
+                return Optional.ofNullable(mapRowToAccount(sqlRow));
+        }catch (CannotGetJdbcConnectionException e){
+
+        }
+        return Optional.empty();
+    }
+
     public Account mapRowToAccount(SqlRowSet row){
         return new Account(
                 row.getInt("account_id"),

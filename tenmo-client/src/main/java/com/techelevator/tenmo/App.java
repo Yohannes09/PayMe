@@ -1,9 +1,15 @@
 package com.techelevator.tenmo;
 
+import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
+import com.techelevator.tenmo.service.RestTransferService;
+import com.techelevator.tenmo.service.TransferService;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
+
+import java.util.Optional;
 
 public class App {
 
@@ -11,6 +17,7 @@ public class App {
 
     private final ConsoleService consoleService = new ConsoleService();
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
+    private final TransferService transferService = new RestTransferService();
 
     private AuthenticatedUser currentUser;
 
@@ -86,11 +93,13 @@ public class App {
 
 	private void viewCurrentBalance() {
 		// TODO Auto-generated method stub
-        System.out.println(currentUser.getUser());
+        Optional<Account> account = transferService.getAccountByUserId(currentUser.getUser().getId());
+        System.out.println(account.get().getBalance());
 	}
 
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
+
 		
 	}
 

@@ -6,6 +6,7 @@ import com.techelevator.tenmo.model.User;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class JdbcUserRepository implements UserRepository {
@@ -22,6 +24,13 @@ public class JdbcUserRepository implements UserRepository {
 
     public JdbcUserRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+    public JdbcUserRepository(){
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName("org.postgresql.Driver");
+        dataSource.setUrl("jdbc:postgresql://localhost:5432/tenmo");
+        jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
     @Override
@@ -71,6 +80,14 @@ public class JdbcUserRepository implements UserRepository {
         return user;
     }
 
+//    public Optional<User> getUserByAccountId(int accountId){
+//        String sql = "SELECT tu.user_id FROM tenmo_user tu " +
+//                "JOIN account ac ON ac.user_id = tu.user_id " +
+//                "WHERE tu.user_id = ?";
+//        SqlRowSet sqlRow = jdbcTemplate.queryForRowSet(sql, accountId);
+//        return Optional.ofNullable(mapRowToUser(sqlRow));
+//    }
+
     @Override
     public User createUser(RegisterUserDto user) {
         User newUser = null;
@@ -93,6 +110,7 @@ public class JdbcUserRepository implements UserRepository {
         return newUser;
     }
 
+
     private User mapRowToUser(SqlRowSet rs) {
         User user = new User();
         user.setId(rs.getInt("user_id"));
@@ -101,5 +119,9 @@ public class JdbcUserRepository implements UserRepository {
         user.setActivated(true);
         user.setAuthorities("USER");
         return user;
+    }
+
+    public static void main(String[] args) {
+        //new JdbcUserRepository().getUserByAccountId(2001);
     }
 }

@@ -1,10 +1,9 @@
 package com.techelevator.tenmo.service;
 
+import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.repository.AccountRepository;
-import com.techelevator.tenmo.repository.JdbcAccountRepository;
-import com.techelevator.tenmo.repository.JdbcTransferRepository;
-import com.techelevator.tenmo.repository.TransferRepository;
+import com.techelevator.tenmo.model.User;
+import com.techelevator.tenmo.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -13,22 +12,24 @@ import java.util.Optional;
 public class RestTransferService implements TransferService {
     private final TransferRepository transferRepository;
     private final AccountRepository accountRepository;
+    private final UserRepository userRepository;
 
     public RestTransferService(TransferRepository transferRepository,
-                               AccountRepository accountRepository) {
-
+                               AccountRepository accountRepository,
+                               UserRepository userRepository) {
         this.transferRepository = transferRepository;
         this.accountRepository = accountRepository;
+        this.userRepository = userRepository;
     }
 
     public RestTransferService(){
         this.transferRepository = new JdbcTransferRepository();
         this.accountRepository = new JdbcAccountRepository();
+        this.userRepository = new JdbcUserRepository();
     }
 
     @Override
     public Optional<Transfer> processTransfer(int senderId, int recipientId, double amount){
-        // sender can't send himself money
         if(senderId == recipientId)
             return Optional.empty();
 
@@ -56,5 +57,14 @@ public class RestTransferService implements TransferService {
         return transferRepository.getTransferById(id);
     }
 
+    @Override
+    public Optional<User> getUserByUserId(int id){
+        return Optional.ofNullable(userRepository.getUserById(id));
+    }
+
+    @Override
+    public Optional<Account> getAccountByUserId(int userId) {
+        return accountRepository.getAccountByUserId(userId);
+    }
 
 }

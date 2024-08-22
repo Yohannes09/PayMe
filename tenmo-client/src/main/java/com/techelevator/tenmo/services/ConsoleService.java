@@ -88,4 +88,24 @@ public class ConsoleService {
         System.out.println("An error occurred. Check the log for details.");
     }
 
+    public void printLine(int length, char symbol){
+        int counter = 1;
+        while(counter <= length){
+            System.out.print(symbol);
+            counter++;
+        }
+    }
+
+    public void printTransferScreen(){
+        System.out.println("-------------------------------------------");
+        System.out.println("Transfers");
+        System.out.println("ID          From/To                 Amount");
+        System.out.println("-------------------------------------------");
+
+    }
+
+    public static void main(String[] args) {
+        new ConsoleService().printTransferScreen();
+    }
+
 }

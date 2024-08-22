@@ -26,12 +26,11 @@ public class JdbcTransferRepository implements TransferRepository {
 
 
     @Override
-    public Optional<Transfer> createTransfer(int senderId,
-                                             int recipientId,
-                                             double amountTransfered,
-                                             int transferStatusId,
-                                             int transfterTypeId,
-                                             double amount) {
+    public Optional<Transfer> proccessTransfer(int senderId,
+                                               int recipientId,
+                                               int transferStatusId,
+                                               int transfterTypeId,
+                                               double amount) {
 
         String sql = "INSERT INTO transfer(transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
                 "VALUES(?, ?, ?, ?, ?) RETURNING transfer_id;";
@@ -58,13 +57,34 @@ public class JdbcTransferRepository implements TransferRepository {
     }
 
     @Override
+    public List<Transfer> accountTransferHistory(int accountId) {
+        List<Transfer> transfers = new ArrayList<>();
+        String sql = "SELECT * FROM transfer tr " +
+                "JOIN account ac ON ac.account_id = tr.account_from " +
+                "OR ac.account_id = tr.account_to " +
+                "WHERE ac.account_id = ?; ";
+
+        SqlRowSet sqlRow = jdbcTemplate.queryForRowSet(sql, accountId);
+
+        while(sqlRow.next())
+            transfers.add(mapTransferToRow(sqlRow));
+
+        return transfers;
+    }
+
+    @Override
     public Optional<Transfer> getTransferById(int id) {
-        String sql = "SELECT * FROM transfer WHERE transfer_id = ?";
-        SqlRowSet sqlRow = jdbcTemplate.queryForRowSet(sql, id);
+        String sql = "SELECT * FROM transfer WHERE transfer_id = ?;";
 
-        if(sqlRow.next())
-            return Optional.ofNullable(mapTransferToRow(sqlRow));
+        try{
+            SqlRowSet sqlRow = jdbcTemplate.queryForRowSet(sql, id);
 
+            if(sqlRow.next())
+                return Optional.ofNullable(mapTransferToRow(sqlRow));
+
+        }catch (CannotGetJdbcConnectionException e){
+
+        }
         return Optional.empty();
     }
 
@@ -102,6 +122,25 @@ public class JdbcTransferRepository implements TransferRepository {
         return 0;
     }
 
+    @Override
+    public List<Transfer> getPendingRequests(int accountId) {
+        List<Transfer> transfers = new ArrayList<>();
+        String sql = "SELECT * FROM transfers tr " +
+                "WHERE transfer_type_id = 1 " +
+                "AND account_id = ? " +
+                "AND transfer_status_id = 1";
+        try{
+            SqlRowSet sqlRow = jdbcTemplate.queryForRowSet(sql, accountId);
+
+            while(sqlRow.next())
+                transfers.add(mapTransferToRow(sqlRow));
+
+        }catch (CannotGetJdbcConnectionException e){
+
+        }
+        return transfers;
+    }
+
 
     public Transfer mapTransferToRow(SqlRowSet sqlRow){
         return new Transfer(
@@ -112,31 +151,6 @@ public class JdbcTransferRepository implements TransferRepository {
                 sqlRow.getInt("account_to"),
                 sqlRow.getDouble("amount")
         );
-    }
-
-
-    public int getTransferStatusId(String transferStatus){
-        String sql = "SELECT transfer_status_id FROM transfer_status WHERE LOWER(transfer_status_desc) = LOWER(?);" ;
-        try{
-            SqlRowSet sqlRow = jdbcTemplate.queryForRowSet(sql, transferStatus);
-            if(sqlRow.next())
-                return sqlRow.getInt("transfer_status_id");
-
-
-        }catch (CannotGetJdbcConnectionException e){
-
-        }
-        return -1;
-    }
-
-    public int getTransferTypeId(String transferType){
-        String sql = "SELECT transfer_status_id FROM transfer_status WHERE transfer_status_desc = ?;" ;
-        try{
-            SqlRowSet sqlRow = jdbcTemplate.queryForRowSet(sql, transferType);
-        }catch (CannotGetJdbcConnectionException e){
-
-        }
-        return -1;
     }
 
 }

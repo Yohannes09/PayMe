@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.techelevator.tenmo.exception.DaoException;
 import com.techelevator.tenmo.model.Account;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -35,7 +36,7 @@ public class JdbcAccountRepository implements AccountRepository {
     }
 
     @Override
-    public Optional<Account> findByAccountId(int acountId) {
+    public Optional<Account> getByAccountId(int acountId) {
         String sql = SELECT_SQL + "WHERE act.account_id = ?";
 
         try{
@@ -50,64 +51,36 @@ public class JdbcAccountRepository implements AccountRepository {
     }
 
     @Override
-    public Optional<Account> findByUsername(String username) {
-        String sql = "SELECT * FROM account act " +
-                "JOIN tenmo_user tu ON tu.user_id = act.user_id " +
-                "WHERE LOWER(tu.username) = LOWER(?)";
-
-        try{
-            SqlRowSet row = jdbcTemplate.queryForRowSet(sql, username);
-
-            if(row.next()) {
-                return Optional.ofNullable(mapRowToAccount(row));
-            }
-
-        }catch (CannotGetJdbcConnectionException e){
-            // log eventually
-            throw new DaoException();
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public boolean withdraw(int accountId, double balance) {
-        double previousAccountBalance = findByAccountId(accountId).get().getBalance();
+    public void withdraw(int accountId, double balance) {
         String sql = "UPDATE account " +
                 "SET balance = balance - ? " +
                 "WHERE account_id = ?";
 
         try{
             jdbcTemplate.update(sql, balance, accountId);
-            if(findByAccountId(accountId).get().getBalance() != previousAccountBalance)
-                return true;
 
         }catch (CannotGetJdbcConnectionException e){
 
         }catch (DataIntegrityViolationException e){
 
         }
-        return false;
     }
 
-    // look into changing this. this could be void or return how many rows were updated
     @Override
-    public boolean deposit(int accountId, double balance) {
-        double previousAccountBalance = findByAccountId(accountId).get().getBalance();
+    public void deposit(int accountId, double balance) {
         String sql = "UPDATE account " +
                 "SET balance = balance + ? " +
                 "WHERE account_id = ?";
 
         try{
             jdbcTemplate.update(sql, balance, accountId);
-            if(findByAccountId(accountId).get().getBalance() != previousAccountBalance)
-                return true;
 
         }catch (CannotGetJdbcConnectionException e){
 
         }catch (DataIntegrityViolationException e){
 
         }
-        return false;
+
     }
 
 
@@ -126,10 +99,6 @@ public class JdbcAccountRepository implements AccountRepository {
         return 0;
     }
 
-    @Override
-    public double getAccountBalance(int id) {
-        return findByAccountId(id).get().getBalance();
-    }
 
     @Override
     public boolean accountExists(int acountId) {
@@ -146,26 +115,12 @@ public class JdbcAccountRepository implements AccountRepository {
         return false;
     }
 
-    @Override
-    public Optional<Account> getAccountByUserId(int id) {
-        String sql = "SELECT * FROM account ac " +
-                "JOIN tenmo_user tu ON tu.user_id = ac.user_id " +
-                "WHERE tu.user_id = ?";
-        try{
-            SqlRowSet sqlRow = jdbcTemplate.queryForRowSet(sql, id);
-            if(sqlRow.next())
-                return Optional.ofNullable(mapRowToAccount(sqlRow));
-        }catch (CannotGetJdbcConnectionException e){
-
-        }
-        return Optional.empty();
-    }
-
     public Account mapRowToAccount(SqlRowSet row){
         return new Account(
                 row.getInt("account_id"),
                 row.getInt("user_id"),
                 row.getDouble("balance"));
     }
+
 
 }

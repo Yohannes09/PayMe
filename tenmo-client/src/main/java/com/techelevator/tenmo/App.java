@@ -1,23 +1,24 @@
 package com.techelevator.tenmo;
 
-import com.techelevator.tenmo.model.Account;
-import com.techelevator.tenmo.model.AuthenticatedUser;
-import com.techelevator.tenmo.model.User;
-import com.techelevator.tenmo.model.UserCredentials;
-import com.techelevator.tenmo.service.RestTransferService;
-import com.techelevator.tenmo.service.TransferService;
+import com.techelevator.tenmo.model.*;
+import com.techelevator.tenmo.service.RestTenmoService;
+import com.techelevator.tenmo.service.TenmoService;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
 
+import java.text.NumberFormat;
+import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 public class App {
 
     private static final String API_BASE_URL = "http://localhost:8080/";
+    private static final NumberFormat USD_FOMATTER = NumberFormat.getCurrencyInstance(Locale.US);
 
     private final ConsoleService consoleService = new ConsoleService();
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
-    private final TransferService transferService = new RestTransferService();
+    private final TenmoService tenmoService = new RestTenmoService();
 
     private AuthenticatedUser currentUser;
 
@@ -93,14 +94,24 @@ public class App {
 
 	private void viewCurrentBalance() {
 		// TODO Auto-generated method stub
-        Optional<Account> account = transferService.getAccountByUserId(currentUser.getUser().getId());
-        System.out.println(account.get().getBalance());
+
 	}
 
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
 
-		
+
+        List<Transfer> transfers = tenmoService.accountTransferHistory(2001);
+
+        //consoleService.printLine(30, '-');
+        transfers.forEach(
+                (transfer) -> System.out.println(
+                    String.format("%d %s %f",
+                            transfer.getRecipientAccountId(),
+                            tenmoService.getUserById(transfer.getRecipientAccountId()),
+                            transfer.getAmount())
+                )
+        );
 	}
 
 	private void viewPendingRequests() {

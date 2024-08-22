@@ -80,13 +80,6 @@ public class JdbcUserRepository implements UserRepository {
         return user;
     }
 
-//    public Optional<User> getUserByAccountId(int accountId){
-//        String sql = "SELECT tu.user_id FROM tenmo_user tu " +
-//                "JOIN account ac ON ac.user_id = tu.user_id " +
-//                "WHERE tu.user_id = ?";
-//        SqlRowSet sqlRow = jdbcTemplate.queryForRowSet(sql, accountId);
-//        return Optional.ofNullable(mapRowToUser(sqlRow));
-//    }
 
     @Override
     public User createUser(RegisterUserDto user) {
@@ -121,7 +114,4 @@ public class JdbcUserRepository implements UserRepository {
         return user;
     }
 
-    public static void main(String[] args) {
-        //new JdbcUserRepository().getUserByAccountId(2001);
-    }
 }

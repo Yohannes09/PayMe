@@ -2,23 +2,23 @@ package com.techelevator.tenmo.model;
 
 public class Transfer {
     private final int transferId;
-    private final int typeTypeId;
+    private final int typeId;
     private final int transferStatusId;
-    private final int actSenderId;
-    private final int actRecipientId;
+    private final int senderAccountId;
+    private final int recipientAccountId;
     private final double amount;
 
     public Transfer(int transferId,
-                    int typeTypeId,
+                    int typeId,
                     int transferStatusId,
-                    int actSenderId,
-                    int actRecipientId,
+                    int senderAccountId,
+                    int recipientAccountId,
                     double amount) {
         this.transferId = transferId;
-        this.typeTypeId = typeTypeId;
+        this.typeId = typeId;
         this.transferStatusId = transferStatusId;
-        this.actSenderId = actSenderId;
-        this.actRecipientId = actRecipientId;
+        this.senderAccountId = senderAccountId;
+        this.recipientAccountId = recipientAccountId;
         this.amount = amount;
     }
 
@@ -27,20 +27,20 @@ public class Transfer {
         return transferId;
     }
 
-    public int getTypeTypeId() {
-        return typeTypeId;
+    public int getTypeId() {
+        return typeId;
     }
 
     public int getTransferStatusId() {
         return transferStatusId;
     }
 
-    public int getActSenderId() {
-        return actSenderId;
+    public int getSenderAccountId() {
+        return senderAccountId;
     }
 
-    public int getActRecipientId() {
-        return actRecipientId;
+    public int getRecipientAccountId() {
+        return recipientAccountId;
     }
 
     public double getAmount(){return amount;}

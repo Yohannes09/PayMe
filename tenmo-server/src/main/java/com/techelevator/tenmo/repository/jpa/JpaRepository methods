@@ -1,0 +1,13 @@
+    •	save(S entity) — Saves a given entity.
+	•	saveAll(Iterable<S> entities) — Saves all given entities.
+	•	findById(ID id) — Retrieves an entity by its ID.
+	•	findAll() — Retrieves all entities.
+	•	findAllById(Iterable<ID> ids) — Retrieves all entities by their IDs.
+	•	findAll(Sort sort) — Retrieves all entities sorted by the given sort criteria.
+	•	findAll(Pageable pageable) — Retrieves a page of entities.
+	•	count() — Returns the number of entities.
+	•	deleteById(ID id) — Deletes the entity with the given ID.
+	•	delete(T entity) — Deletes a given entity.
+	•	deleteAll(Iterable<? extends T> entities) — Deletes all given entities.
+	•	deleteAll() — Deletes all entities.
+	•	existsById(ID id) — Checks if an entity with the given ID exists.

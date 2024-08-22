@@ -7,12 +7,13 @@ import java.util.Optional;
 
 public interface TransferRepository {
 
-    Optional<Transfer> createTransfer(int senderId,
-                                      int recipientId,
-                                      double amountTransfered,
-                                      int transferStatus,
-                                      int transferType,
-                                      double amount);
+    Optional<Transfer> proccessTransfer(int senderId,
+                                        int recipientId,
+                                        int transferStatus,
+                                        int transferType,
+                                        double amount);
+
+    List<Transfer> accountTransferHistory(int id);
 
     Optional<Transfer> getTransferById(int id);
 
@@ -20,6 +21,5 @@ public interface TransferRepository {
 
     int deleteTransfer(int transferId);
 
-    //Optional<Transfer> findTransferById(int id);
-
+    List<Transfer> getPendingRequests(int accountId);
 }

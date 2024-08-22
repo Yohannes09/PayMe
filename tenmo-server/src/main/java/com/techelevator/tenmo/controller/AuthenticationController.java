@@ -35,12 +35,7 @@ public class AuthenticationController {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.userRepository = userRepository;
     }
-
-
-//    @GetMapping
-//    public String loginPage(){
-//        return "login";
-//    }
+    
     //@RequestMapping(path = "/login", method = RequestMethod.POST)
     @PostMapping(path = "/login")
     public LoginResponseDto login(@Valid @RequestBody LoginDto loginDto) {

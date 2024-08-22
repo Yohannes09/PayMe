@@ -1,0 +1,13 @@
+Desired features:
+    Working front end. (shouldn't be coupled with backend eventually)
+
+    Ability for logged in users to sort the information (create a more complete banking app)
+        - by date
+        - by name
+
+
+    Refactor repo and reduce repetitive code
+
+    Separate concerns better
+
+    More columns needed in the tables

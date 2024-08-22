@@ -5,30 +5,30 @@ import javax.validation.constraints.NotNull;
 
 public class TransferDto {
     @NotNull
-    private final int accountSenderId;
+    private final int senderAccountId;
     @NotNull
-    private final int accountRecipientId;
+    private final int recipientAccountId;
     @Min(value = 0, message = "Enter amount greater than zero.")
     private final double amount;
 
-    public TransferDto(int accountSenderId,
+    public TransferDto(int senderAccountId,
                        int actRecipientId,
                        double amount) {
 
-        this.accountSenderId = accountSenderId;
-        this.accountRecipientId = actRecipientId;
+        this.senderAccountId = senderAccountId;
+        this.recipientAccountId = actRecipientId;
         this.amount = amount;
     }
 
 
     @NotNull
-    public int getAccountSenderId() {
-        return accountSenderId;
+    public int getSenderAccountId() {
+        return senderAccountId;
     }
 
     @NotNull
-    public int getAccountRecipientId() {
-        return accountRecipientId;
+    public int getRecipientAccountId() {
+        return recipientAccountId;
     }
 
     @Min(value = 0, message = "Enter amount greater than zero.")

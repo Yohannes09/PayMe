@@ -68,6 +68,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
+                // Allows transfer endpoint to be accessible
+//                .and()
+//                .authorizeRequests()
+//                .antMatchers("/api/v1/tenmo/transfer")
+//                .permitAll()
+//                .antMatchers("/api/v1/tenmo/transfer/admin")
+//                .hasRole("Admin")
+
                 .and()
                 .apply(securityConfigurerAdapter());
 

@@ -1,14 +1,25 @@
 package com.techelevator.tenmo.services;
 
 
-import com.techelevator.tenmo.model.UserCredentials;
+import com.techelevator.tenmo.exception.DaoException;
+import com.techelevator.tenmo.model.*;
+import com.techelevator.tenmo.service.*;
 
 import java.math.BigDecimal;
-import java.util.Scanner;
+import java.text.NumberFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ConsoleService {
 
+    private static final NumberFormat USD_FOMATTER = NumberFormat.getCurrencyInstance(Locale.US);
+
     private final Scanner scanner = new Scanner(System.in);
+    private final TransferService transferService = new RestTransferService();
+    private final UserService userService = new RestUserService();
+    private final AccountService accountService = new RestAccountService();
+    private final String redAnsii = "\u001B[31m";
+    private final String resetAnsii = "\u001B[0m";
 
     public int promptForMenuSelection(String prompt) {
         int menuSelection;
@@ -94,18 +105,104 @@ public class ConsoleService {
             System.out.print(symbol);
             counter++;
         }
+        System.out.println();
     }
 
     public void printTransferScreen(){
         System.out.println("-------------------------------------------");
-        System.out.println("Transfers");
-        System.out.println("ID          From/To                 Amount");
+        System.out.println("Transfers                                  ");
+        System.out.println("ID          From/To                  Amount");
         System.out.println("-------------------------------------------");
 
     }
 
-    public static void main(String[] args) {
-        new ConsoleService().printTransferScreen();
+    public boolean sendBucksScreen(int senderUserId){
+        Optional<Account> currentUserAccount = accountService.getAccountByUserId(senderUserId);
+
+        while(true){
+            try {
+                int recipientAccountId = promptForInt("Enter recipient's account ID or username > ");
+
+                if(!accountService.getAccountById(recipientAccountId).isPresent())
+                    throw new DaoException("User does not exist");
+
+                double amountTransfered = promptForBigDecimal("Enter amount > ").doubleValue();
+
+                Optional<Transfer> transfer = transferService.processTransfer(
+                        currentUserAccount.get().getAccountId(),
+                        recipientAccountId,
+                        amountTransfered
+                );
+
+                // Check if transfer was successful
+                return transferService.getTransferById(
+                                transfer.get().getTransferId()
+                ).isPresent();
+
+            } catch (Exception e) {
+                System.out.println("\n" + redAnsii + "Error: " + e.getMessage() + resetAnsii + "\n");
+            }
+        }
+
     }
+
+    // repo needs adjustments to only show pending REQUESTS
+    public void printTransferHistory(int userId, int transferStatus){
+        Optional<Account> account = accountService.getAccountByUserId(userId);
+
+        List<Transfer> transferHistory = transferService.accountTransferHistory(
+                account.get().getAccountId())
+                .stream()
+                .filter(transfer ->
+                                transfer.getTransferStatusId() == transferStatus)
+                .collect(Collectors.toList());
+
+        System.out.println("\nPENDING REQUESTS:");
+        printLine(30, '-');
+
+        transferHistory.forEach(transfer ->
+                System.out.println(USD_FOMATTER.format(transfer.getAmount()))
+        );
+    }
+
+    public void printTransferHistory(int userId){
+        Optional<Account> account = accountService.getAccountByUserId(userId);
+
+        List<Transfer> transferHistory = transferService.accountTransferHistory(account.get().getAccountId());
+        System.out.println("\nTRANSFER HISTORY:");
+        printLine(30, '-');
+
+        transferHistory.forEach(transfer ->
+                System.out.println(String.format(
+                        "%s%16s",
+                        getUserName(transfer.getRecipientAccountId()).orElse("Unkown user. "),
+                        USD_FOMATTER.format(transfer.getAmount())
+                        )
+                )
+
+        );
+    }
+
+    public void getAccountBalance(int userId){
+        double balance = accountService.getAccountByUserId(userId).get().getBalance();
+        System.out.println("\nCURRENT BALANCE:");
+        printLine(30,'-');
+        System.out.println(USD_FOMATTER.format(balance));
+    }
+
+    private Optional<String> getUserName(int accountId){
+        int userId = accountService.getAccountById(accountId).get().getUserId();
+
+        return Optional.ofNullable(redAnsii +
+                userService.getUserById(userId)
+                        .get().getUsername() + resetAnsii
+        );
+    }
+//    public static void main(String[] args) {
+        //System.out.println(new ConsoleService().sendBucksScreen(2001));
+        //new ConsoleService().printTransferHistory(1001);
+        //new ConsoleService().getAccountBalance(1001);
+        //System.out.println(new ConsoleService().getUserName(2001).get());
+//    }
 
 }

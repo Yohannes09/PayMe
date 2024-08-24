@@ -1,35 +1,29 @@
 package com.techelevator.tenmo.service;
 
-import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.User;
-import com.techelevator.tenmo.repository.*;
-import org.springframework.stereotype.Service;
+import com.techelevator.tenmo.repository.AccountRepository;
+import com.techelevator.tenmo.repository.JdbcAccountRepository;
+import com.techelevator.tenmo.repository.JdbcTransferRepository;
+import com.techelevator.tenmo.repository.TransferRepository;
 
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-@Service
-public class RestTenmoService implements TenmoService {
-    private final TransferRepository transferRepository;
+public class RestTransferService implements TransferService{
+    private static final Map<String, Integer> TRANSFER_STATUS = getTransferStatus();
+    private static final Map<String, Integer> TRANASFER_TYPE = getTransferType();
+
     private final AccountRepository accountRepository;
-    private final UserRepository userRepository;
+    private final TransferRepository transferRepository;
 
-    public RestTenmoService(TransferRepository transferRepository,
-                            AccountRepository accountRepository,
-                            UserRepository userRepository) {
-        this.transferRepository = transferRepository;
+    public RestTransferService(AccountRepository accountRepository, TransferRepository transferRepository) {
         this.accountRepository = accountRepository;
-        this.userRepository = userRepository;
+        this.transferRepository = transferRepository;
     }
 
-    public RestTenmoService(){
-        this.transferRepository = new JdbcTransferRepository();
+    public RestTransferService(){
         this.accountRepository = new JdbcAccountRepository();
-        this.userRepository = new JdbcUserRepository();
+        this.transferRepository = new JdbcTransferRepository();
     }
-
 
     @Override
     public Optional<Transfer> processTransfer(int senderAccountId, int recipientId, double amount){
@@ -66,10 +60,11 @@ public class RestTenmoService implements TenmoService {
         return Optional.empty();
     }
 
+    // Will be used for approving or denying transactions
     @Override
     public void processTransferRequest(boolean accepted, int senderAccountId, int recipientAccountId, int transferId) {
 //        if(accepted)
-//            processTransfer(senderAccountId, recipientAccountId)
+//            processTransfer(senderAccountId, recipientAccountId);
     }
 
     @Override
@@ -102,14 +97,29 @@ public class RestTenmoService implements TenmoService {
         return transferRepository.getPendingRequests(accountId);
     }
 
-    @Override
-    public Optional<Account> getAccountById(int accountId) {
-        return accountRepository.getByAccountId(accountId);
+
+    /*There should be a method which calls the transfer_type and transfer_status DBs to get the
+    * correct IDs instead of hard coding them here.
+    *
+    * -Need:
+    *    - Both repo classes complete.
+    * */
+
+    public static Map<String, Integer> getTransferStatus(){
+
+        Map<String, Integer> transferStatusCodes = new HashMap<>();
+        transferStatusCodes.put("pending", 1);
+        transferStatusCodes.put("approved", 2);
+        transferStatusCodes.put("rejected", 3);
+
+        return transferStatusCodes;
     }
 
-    @Override
-    public Optional<User> getUserById(int userId) {
-        return Optional.ofNullable(userRepository.getUserById(userId));
-    }
+    public static Map<String, Integer> getTransferType(){
+        Map<String, Integer> transferTypeCodes = new HashMap<>();
+        transferTypeCodes.put("request", 1);
+        transferTypeCodes.put("send", 2);
 
+        return transferTypeCodes;
+    }
 }

@@ -1,15 +1,11 @@
 package com.techelevator.tenmo.service;
 
-import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.User;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface TenmoService {
-
-    Optional<Transfer> processTransfer(int sendAccountId, int recipientAccountId, double amount);
+public interface TransferService {
 
     Optional<Transfer> requestTransfer(int senderAccountId, int recipientAccountId, double amount);
 
@@ -20,6 +16,8 @@ public interface TenmoService {
             int transferId
     );
 
+    Optional<Transfer> processTransfer(int sendAccountId, int recipientAccountId, double amount);
+
     List<Transfer> accountTransferHistory(int accountId);
 
     Optional<Transfer> getTransferById(int transferId);
@@ -29,8 +27,4 @@ public interface TenmoService {
     void processDeposit(int accountId, double balance);
 
     void processWithdraw(int accountId, double balance);
-
-    Optional<Account> getAccountById(int accountId);
-
-    Optional<User> getUserById(int userId);
 }

@@ -2,9 +2,7 @@ package com.techelevator.tenmo.repository;
 
 import java.util.Optional;
 
-import com.techelevator.tenmo.exception.DaoException;
 import com.techelevator.tenmo.model.Account;
-import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -36,16 +34,33 @@ public class JdbcAccountRepository implements AccountRepository {
     }
 
     @Override
-    public Optional<Account> getByAccountId(int acountId) {
+    public Optional<Account> getByAccountId(int accountId) {
         String sql = SELECT_SQL + "WHERE act.account_id = ?";
 
         try{
-            SqlRowSet row = jdbcTemplate.queryForRowSet(sql, acountId);
+            SqlRowSet row = jdbcTemplate.queryForRowSet(sql, accountId);
             if(row.next())
                 return Optional.ofNullable(mapRowToAccount(row));
 
         }catch (CannotGetJdbcConnectionException e){
             // log eventually
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Account> getByUserId(int userId) {
+        String sql = "SELECT * FROM account ac WHERE user_id = ? ;";
+
+        try{
+            SqlRowSet sqlRow = jdbcTemplate.queryForRowSet(sql, userId);
+
+            if(sqlRow.next())
+                return Optional.ofNullable(
+                        mapRowToAccount(sqlRow)
+                );
+        }catch (CannotGetJdbcConnectionException e){
+
         }
         return Optional.empty();
     }
@@ -117,8 +132,8 @@ public class JdbcAccountRepository implements AccountRepository {
 
     public Account mapRowToAccount(SqlRowSet row){
         return new Account(
-                row.getInt("account_id"),
                 row.getInt("user_id"),
+                row.getInt("account_id"),
                 row.getDouble("balance"));
     }
 

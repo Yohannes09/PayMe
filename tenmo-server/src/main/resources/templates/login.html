@@ -53,13 +53,20 @@
     <body>
     <h1>Authenticate</h1><hr>
 
-    <form th:action="@{/success}" method="post">
+<!--    action="http://localhost:8080/login" method="post"-->
+
+    <form id = "loginFrom" >
         <label for="username">Username:</label>
         <input type="text" id="username" name="username"><br><br>
+
         <label for="password">Password:</label>
         <input type="password" id="password" name="password"><br><br>
+
         <button type="submit">Submit</button>
     </form>
+
+    <!--    -->
+    <script> src="login.js" </script>
 
     <div class="signup">
         <p> <a th:href="@{/signup}">Don't have an account?</a> </p>

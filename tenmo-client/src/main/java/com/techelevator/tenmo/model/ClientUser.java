@@ -2,7 +2,7 @@ package com.techelevator.tenmo.model;
 
 import java.util.Objects;
 
-public class User {
+public class ClientUser {
 
     private int id;
     private String username;
@@ -25,10 +25,10 @@ public class User {
 
     @Override
     public boolean equals(Object other) {
-        if (other instanceof User) {
-            User otherUser = (User) other;
-            return otherUser.getId() == id
-                    && otherUser.getUsername().equals(username);
+        if (other instanceof ClientUser) {
+            ClientUser otherClientUser = (ClientUser) other;
+            return otherClientUser.getId() == id
+                    && otherClientUser.getUsername().equals(username);
         } else {
             return false;
         }

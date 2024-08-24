@@ -5,7 +5,7 @@ node_modules
 *.obj
 *.exe
 *.pdb
-*.user
+*.clientUser
 *.aps
 *.pch
 *.vspscc

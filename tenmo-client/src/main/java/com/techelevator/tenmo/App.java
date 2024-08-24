@@ -1,24 +1,23 @@
 package com.techelevator.tenmo;
 
 import com.techelevator.tenmo.model.*;
-import com.techelevator.tenmo.service.RestTenmoService;
-import com.techelevator.tenmo.service.TenmoService;
+import com.techelevator.tenmo.service.*;
+import com.techelevator.tenmo.service.useless.RestTenmoService;
+import com.techelevator.tenmo.service.useless.TenmoService;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
 
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 public class App {
 
     private static final String API_BASE_URL = "http://localhost:8080/";
-    private static final NumberFormat USD_FOMATTER = NumberFormat.getCurrencyInstance(Locale.US);
 
     private final ConsoleService consoleService = new ConsoleService();
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
-    private final TenmoService tenmoService = new RestTenmoService();
 
     private AuthenticatedUser currentUser;
 
@@ -94,34 +93,28 @@ public class App {
 
 	private void viewCurrentBalance() {
 		// TODO Auto-generated method stub
-
+        consoleService.getAccountBalance(currentUser.getUser().getId());
 	}
 
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
-
-
-        List<Transfer> transfers = tenmoService.accountTransferHistory(2001);
-
-        //consoleService.printLine(30, '-');
-        transfers.forEach(
-                (transfer) -> System.out.println(
-                    String.format("%d %s %f",
-                            transfer.getRecipientAccountId(),
-                            tenmoService.getUserById(transfer.getRecipientAccountId()),
-                            transfer.getAmount())
-                )
-        );
+        consoleService.printTransferHistory(currentUser.getUser().getId());
 	}
 
 	private void viewPendingRequests() {
 		// TODO Auto-generated method stub
-		
+		consoleService.printTransferHistory(currentUser.getUser().getId(), 1);
 	}
 
 	private void sendBucks() {
 		// TODO Auto-generated method stub
-		
+
+        boolean successfulTransfer = consoleService.sendBucksScreen(currentUser.getUser().getId());
+
+        if(successfulTransfer)
+            System.out.println("Transaction successful. ");
+        else
+            System.out.println("Could not process your transfer. ");
 	}
 
 	private void requestBucks() {

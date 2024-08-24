@@ -4,7 +4,9 @@ import com.techelevator.tenmo.security.jwt.JWTConfigurer;
 import com.techelevator.tenmo.security.jwt.TokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -13,6 +15,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
@@ -59,6 +63,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // we don't need CSRF because our token is invulnerable
                 .csrf().disable()
 
+                .authorizeRequests(
+                        authorize ->
+                            authorize.
+                                antMatchers("/login").permitAll().
+                                antMatchers("/success").permitAll().
+                                anyRequest().authenticated()
+                )
+
+//                .formLogin(form ->
+//                        form.loginPage("/login").
+//                        loginProcessingUrl("/login").
+//                        defaultSuccessUrl("/success").
+//                        permitAll()
+//                ).logout(logout ->
+//                        logout.logoutRequestMatcher(new AntPathRequestMatcher("/logout")).
+//                        permitAll()
+//                )
+
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .accessDeniedHandler(jwtAccessDeniedHandler)
@@ -68,17 +90,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
-                // Allows transfer endpoint to be accessible
-//                .and()
-//                .authorizeRequests()
-//                .antMatchers("/api/v1/tenmo/transfer")
-//                .permitAll()
-//                .antMatchers("/api/v1/tenmo/transfer/admin")
-//                .hasRole("Admin")
 
                 .and()
                 .apply(securityConfigurerAdapter());
-
 
     }
 

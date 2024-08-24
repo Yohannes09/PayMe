@@ -31,11 +31,7 @@
     </modules>
 
     <dependencies>
-        <dependency>
-            <groupId>com.techelevator</groupId>
-            <artifactId>m02-capstone-server</artifactId>
-            <version>1.0</version>
-        </dependency>
+
     </dependencies>
 
     <build>

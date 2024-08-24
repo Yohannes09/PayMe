@@ -1,7 +1,5 @@
 package com.techelevator.tenmo.configuration;
 
-import com.techelevator.tenmo.service.RestTenmoService;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /*

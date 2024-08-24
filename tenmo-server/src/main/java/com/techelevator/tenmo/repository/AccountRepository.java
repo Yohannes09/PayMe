@@ -5,7 +5,9 @@ import com.techelevator.tenmo.model.Account;
 import java.util.Optional;
 
 public interface AccountRepository {
-    Optional<Account> getByAccountId(int id);
+    Optional<Account> getByAccountId(int accountId);
+
+    Optional<Account> getByUserId(int userId);
 
     void withdraw(int id, double amountWithdrawn);
 

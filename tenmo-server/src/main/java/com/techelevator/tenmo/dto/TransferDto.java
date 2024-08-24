@@ -3,13 +3,17 @@ package com.techelevator.tenmo.dto;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+/*
+* Fields being final caused issues when being deserialized
+* */
+
 public class TransferDto {
     @NotNull
-    private final int senderAccountId;
+    private int senderAccountId;
     @NotNull
-    private final int recipientAccountId;
+    private int recipientAccountId;
     @Min(value = 0, message = "Enter amount greater than zero.")
-    private final double amount;
+    private double amount;
 
     public TransferDto(int senderAccountId,
                        int actRecipientId,
@@ -18,6 +22,10 @@ public class TransferDto {
         this.senderAccountId = senderAccountId;
         this.recipientAccountId = actRecipientId;
         this.amount = amount;
+    }
+
+    public TransferDto(){
+
     }
 
 
@@ -35,25 +43,16 @@ public class TransferDto {
     public double getAmount() {
         return amount;
     }
-}
-//int transferId,
-//int typeTypeId,
-//int transferStatusId,
 
-// this.transferId = transferId;
-// this.typeTypeId = typeTypeId;
-// this.transferStatusId = transferStatusId;
-//    @NotNull
-////    public int getTransferId() {
-////        return transferId;
-////    }
-////
-////    @NotNull
-////    public int getTypeTypeId() {
-////        return typeTypeId;
-////    }
-////
-////    @NotNull
-////    public int getTransferStatusId() {
-////        return transferStatusId;
-////    }
+    public void setSenderAccountId(@NotNull int senderAccountId) {
+        this.senderAccountId = senderAccountId;
+    }
+
+    public void setRecipientAccountId(@NotNull int recipientAccountId) {
+        this.recipientAccountId = recipientAccountId;
+    }
+
+    public void setAmount(@Min(value = 0, message = "Enter amount greater than zero.") double amount) {
+        this.amount = amount;
+    }
+}

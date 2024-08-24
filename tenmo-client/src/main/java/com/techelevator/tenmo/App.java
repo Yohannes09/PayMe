@@ -2,8 +2,6 @@ package com.techelevator.tenmo;
 
 import com.techelevator.tenmo.model.*;
 import com.techelevator.tenmo.service.*;
-import com.techelevator.tenmo.service.useless.RestTenmoService;
-import com.techelevator.tenmo.service.useless.TenmoService;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
 

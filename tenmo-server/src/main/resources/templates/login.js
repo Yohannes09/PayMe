@@ -38,3 +38,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+//could be useful
+
+//function deleteHandler(event, id) {
+//    fetch(API_BASE + '/' + id, {
+//        method: 'DELETE',
+//    })
+//        .then((response) => {
+//            return response.text();
+//        })
+//        .then((data) => {
+//            console.log(data);
+//            alert('Cat Card deleted!');
+//            refreshCollection();
+//        })
+//        .catch((err) => {
+//            console.error(err);
+//            alert('Could not delete Cat Card!');
+//        });
+//}

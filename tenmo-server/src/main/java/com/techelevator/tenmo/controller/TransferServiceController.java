@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@RequestMapping("api/tenmo")
+@RequestMapping("api/tenmo/transfer")
 @RestController
 public class TransferServiceController {
     private final TransferService transferService;
@@ -58,10 +58,9 @@ public class TransferServiceController {
     }
 
 
-    @PermitAll
-    @GetMapping("/transfers/{id}")
-    public ResponseEntity<List<TransferDto>> accountTransferHistory(@PathVariable("id") int id) {
-        List<Transfer> transfers = transferService.accountTransferHistory(id);
+    @GetMapping("/history/{accountId}")
+    public ResponseEntity<List<TransferDto>> accountTransferHistory(@PathVariable("accountId") int accountId) {
+        List<Transfer> transfers = transferService.accountTransferHistory(accountId);
 
         if (!transfers.isEmpty()) {
             List<TransferDto> transferDtos = transfers.
@@ -76,26 +75,27 @@ public class TransferServiceController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PermitAll
-    @GetMapping("/transfer/{id}")
-    public ResponseEntity<TransferDto> getTransferById(@PathVariable("id") int id) {
-        Optional<Transfer> transfer = transferService.getTransferById(id);
+    @GetMapping("/{transferId}")
+    public ResponseEntity<TransferDto> getTransferById(@PathVariable("transferId") int transferId) {
+        Optional<Transfer> transfer = transferService.getTransferById(transferId);
 
-        if (!transfer.isEmpty()) {
+        if (transfer.isPresent()) {
+
             TransferDto transferDtos = new TransferDto(
                     transfer.get().getSenderAccountId(),
                     transfer.get().getRecipientAccountId(),
-                    transfer.get().getAmount()
-            );
+                    transfer.get().getAmount());
 
             return new ResponseEntity<>(transferDtos, HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("/print/{name}")
-    public ResponseEntity<String> print(@PathVariable String name){
-        return new ResponseEntity<>("hello " + name, HttpStatus.OK);
+
+    @GetMapping("/pending/{accountId}")
+    public ResponseEntity<List<TransferDto>> getPendingTransfer(@PathVariable("accountId") int accountId){
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

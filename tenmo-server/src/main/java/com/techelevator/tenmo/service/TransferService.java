@@ -22,7 +22,7 @@ public interface TransferService {
 
     Optional<Transfer> getTransferById(int transferId);
 
-    List<Transfer> accountPendingTransfers(int accountId);
+    List<Transfer> getAccountTransferStatus(int accountId, int transferStatusId);
 
     void processDeposit(int accountId, double balance);
 

@@ -1,5 +1,8 @@
 package com.techelevator.tenmo.service;
 
+import com.techelevator.tenmo.exception.AccountException;
+import com.techelevator.tenmo.exception.TransferException;
+import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.repository.AccountRepository;
 import com.techelevator.tenmo.repository.JdbcAccountRepository;
@@ -43,19 +46,19 @@ public class RestTransferService implements TransferService{
 
     @Override
     public Optional<Transfer> requestTransfer(int senderAccountId, int recipientAccountId, double amount) {
-        if(senderAccountId == recipientAccountId)
-            return Optional.empty();
+        if (senderAccountId != recipientAccountId) {
 
-        if(accountRepository.accountExists(senderAccountId) &&
-                accountRepository.accountExists(recipientAccountId)){
+            if (accountRepository.accountExists(senderAccountId) &&
+                    accountRepository.accountExists(recipientAccountId)){
 
-            return transferRepository.proccessTransfer(
-                    senderAccountId,
-                    recipientAccountId,
-                    1,
-                    1,
-                    amount
-            );
+                return transferRepository.proccessTransfer(
+                        senderAccountId,
+                        recipientAccountId,
+                        1,
+                        1,
+                        amount
+                );
+            }
         }
         return Optional.empty();
     }
@@ -70,16 +73,40 @@ public class RestTransferService implements TransferService{
     @Override
     public void processDeposit(int accountId, double balance){
         try {
-            if(balance > 0)
-                accountRepository.deposit(accountId, balance);
-        } catch (InputMismatchException e) {
+            if(!accountRepository.accountExists(accountId)) {
+                throw new AccountException("User does not registered. ");
+            }
 
+            if (balance > 0) {
+                accountRepository.deposit(accountId, balance);
+            }
+
+        } catch (InputMismatchException e) {
+            System.out.println("Error: " + e.getMessage());
+        }catch (AccountException accountException){
+            System.out.println("Error: " + accountException.getMessage());
         }
     }
 
     @Override
-    public void processWithdraw(int accountId, double balance) {
-        accountRepository.withdraw(accountId, balance);
+    public void processWithdraw(int accountId, double amountWithdrawn) {
+        Optional<Account> account = accountRepository.getByAccountId(accountId);
+
+        try {
+            if(!account.isPresent())
+                throw new AccountException("Account is not registered. ");
+
+            if(account.get().getAccountId() < amountWithdrawn)
+                throw new TransferException("Account has insufficient funds. ");
+
+            accountRepository.withdraw(accountId, amountWithdrawn);
+
+        } catch (AccountException e) {
+            System.out.println("Error: " + e.getMessage());
+        }catch (TransferException transferException){
+            System.out.println("Error: " + transferException.getMessage());
+        }
+
     }
 
     @Override
@@ -93,10 +120,9 @@ public class RestTransferService implements TransferService{
     }
 
     @Override
-    public List<Transfer> accountPendingTransfers(int accountId) {
-        return transferRepository.getPendingRequests(accountId);
+    public List<Transfer> getAccountTransferStatus(int accountId, int transferStatusId) {
+        return transferRepository.getAccountTransferStatus(accountId, transferStatusId);
     }
-
 
     /*There should be a method which calls the transfer_type and transfer_status DBs to get the
     * correct IDs instead of hard coding them here.

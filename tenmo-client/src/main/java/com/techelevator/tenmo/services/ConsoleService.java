@@ -116,6 +116,17 @@ public class ConsoleService {
 
     }
 
+
+    //*** Many things below should be in their own class ***
+    // console service is only in charge of input and output.
+
+
+    // horrible name. Meant to print any information regarding an object by calling its toString();
+    // hasn't been thought through yet
+    public <T> void printAllTypes(T t){
+
+    }
+
     public boolean sendBucksScreen(int senderUserId){
         Optional<Account> currentUserAccount = accountService.getAccountByUserId(senderUserId);
 
@@ -198,11 +209,5 @@ public class ConsoleService {
                         .get().getUsername() + resetAnsii
         );
     }
-//    public static void main(String[] args) {
-        //System.out.println(new ConsoleService().sendBucksScreen(2001));
-        //new ConsoleService().printTransferHistory(1001);
-        //new ConsoleService().getAccountBalance(1001);
-        //System.out.println(new ConsoleService().getUserName(2001).get());
-//    }
 
 }

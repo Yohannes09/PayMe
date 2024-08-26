@@ -123,14 +123,13 @@ public class JdbcTransferRepository implements TransferRepository {
     }
 
     @Override
-    public List<Transfer> getPendingRequests(int accountId) {
+    public List<Transfer> getAccountTransferStatus(int accountId, int transferStatusId) {
         List<Transfer> transfers = new ArrayList<>();
         String sql = "SELECT * FROM transfers tr " +
-                "WHERE transfer_type_id = 1 " +
-                "AND account_id = ? " +
-                "AND transfer_status_id = 1";
+                "WHERE account_id = ? " +
+                "AND transfer_status_id = ? ; ";
         try{
-            SqlRowSet sqlRow = jdbcTemplate.queryForRowSet(sql, accountId);
+            SqlRowSet sqlRow = jdbcTemplate.queryForRowSet(sql, accountId, transferStatusId);
 
             while(sqlRow.next())
                 transfers.add(mapTransferToRow(sqlRow));

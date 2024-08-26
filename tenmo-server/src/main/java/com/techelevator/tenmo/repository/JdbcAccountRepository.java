@@ -1,5 +1,7 @@
 package com.techelevator.tenmo.repository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import com.techelevator.tenmo.model.Account;
@@ -130,12 +132,25 @@ public class JdbcAccountRepository implements AccountRepository {
         return false;
     }
 
+    @Override
+    public List<Account> getAccounts() {
+        String sql = "SELECT * FROM account; ";
+        List<Account> accounts = new ArrayList<>();
+
+        SqlRowSet sqlRow = jdbcTemplate.queryForRowSet(sql);
+
+        while(sqlRow.next())
+            accounts.add(mapRowToAccount(sqlRow));
+
+
+        return accounts;
+    }
+
     public Account mapRowToAccount(SqlRowSet row){
         return new Account(
                 row.getInt("user_id"),
                 row.getInt("account_id"),
                 row.getDouble("balance"));
     }
-
 
 }

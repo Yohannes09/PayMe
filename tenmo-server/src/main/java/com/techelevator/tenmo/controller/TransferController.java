@@ -2,32 +2,34 @@ package com.techelevator.tenmo.controller;
 
 import com.techelevator.tenmo.dto.TransferDto;
 import com.techelevator.tenmo.dto.TransferResponseDto;
+import com.techelevator.tenmo.exception.AccountException;
+import com.techelevator.tenmo.exception.DaoException;
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.service.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequestMapping("api/tenmo/transfer")
 @RestController
-public class TransferServiceController {
+public class TransferController {
     private final TransferService transferService;
     private final AccountService accountService;
     private final UserService userService;
 
-    public TransferServiceController(TransferService transferService, AccountService accountService, UserService userService) {
+    public TransferController(TransferService transferService, AccountService accountService, UserService userService) {
         this.transferService = transferService;
         this.accountService = accountService;
         this.userService = userService;
     }
 
-    public TransferServiceController() {
+    public TransferController() {
         this.transferService = new RestTransferService();
         this.accountService = new RestAccountService();
         this.userService = new RestUserService();
@@ -35,26 +37,26 @@ public class TransferServiceController {
 
 
     @PostMapping("")
-    public ResponseEntity<TransferResponseDto> processTransfer(@Valid @RequestBody TransferDto transferDto) {
+    public ResponseEntity<TransferDto> processTransfer(@Valid @RequestBody TransferDto transferDto) {
 
-        Optional<Transfer> transfer = transferService.processTransfer(
+        Optional<Transfer> newTransfer = transferService.processTransfer(
                 transferDto.getSenderAccountId(),
                 transferDto.getRecipientAccountId(),
                 transferDto.getAmount()
         );
 
-        if (transfer.isPresent()) {
-            Transfer clientResponse = transfer.get();
+        return newTransfer
+                .map(transfer -> new ResponseEntity<>(
+                        new TransferDto(
+                                transfer.getSenderAccountId(),
+                                transfer.getRecipientAccountId(),
+                                transfer.getTransferStatusId(),
+                                transfer.getTypeId(),
+                                transfer.getAmount()
+                        ), HttpStatus.OK)
+                )
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
-            TransferResponseDto transferResponseDto = new TransferResponseDto(
-                    clientResponse.getSenderAccountId(),
-                    clientResponse.getRecipientAccountId(),
-                    clientResponse.getAmount()
-            );
-            return new ResponseEntity<>(transferResponseDto, HttpStatus.CREATED);
-        }
-
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
 
@@ -68,6 +70,8 @@ public class TransferServiceController {
                     map(transfer -> new TransferDto(
                             transfer.getSenderAccountId(),
                             transfer.getRecipientAccountId(),
+                            transfer.getTransferStatusId(),
+                            transfer.getTypeId(),
                             transfer.getAmount()
                     )).collect(Collectors.toList());
             return new ResponseEntity<>(transferDtos, HttpStatus.OK);
@@ -84,6 +88,8 @@ public class TransferServiceController {
             TransferDto transferDtos = new TransferDto(
                     transfer.get().getSenderAccountId(),
                     transfer.get().getRecipientAccountId(),
+                    transfer.get().getTransferStatusId(),
+                    transfer.get().getTypeId(),
                     transfer.get().getAmount());
 
             return new ResponseEntity<>(transferDtos, HttpStatus.OK);
@@ -93,9 +99,26 @@ public class TransferServiceController {
     }
 
 
-    @GetMapping("/pending/{accountId}")
-    public ResponseEntity<List<TransferDto>> getPendingTransfer(@PathVariable("accountId") int accountId){
-        return new ResponseEntity<>(HttpStatus.OK);
+    @GetMapping("/transfer-status/{accountId}/{transferStatusId}")
+    public ResponseEntity<List<TransferDto>> getAccountTransferStatus(@PathVariable("accountId") int accountId,
+                                                                @PathVariable("transferStatusId") int transferStatusId){
+        if(transferStatusId < 1)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<TransferDto> pendingTransfers = transferService.getAccountTransferStatus(accountId, transferStatusId)
+                .stream()
+                .map(transfer ->
+                        new TransferDto(
+                                transfer.getSenderAccountId(),
+                                transfer.getRecipientAccountId(),
+                                transfer.getTransferStatusId(),
+                                transfer.getTypeId(),
+                                transfer.getAmount()
+                        )
+                ).collect(Collectors.toList());
+
+        return new ResponseEntity<>(pendingTransfers, HttpStatus.OK);
+
     }
 
 }

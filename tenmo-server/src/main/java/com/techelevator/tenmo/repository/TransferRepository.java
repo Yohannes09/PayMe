@@ -21,5 +21,5 @@ public interface TransferRepository {
 
     int deleteTransfer(int transferId);
 
-    List<Transfer> getPendingRequests(int accountId);
+    List<Transfer> getAccountTransferStatus(int accountId, int transferStatusId);
 }

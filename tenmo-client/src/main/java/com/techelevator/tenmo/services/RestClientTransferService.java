@@ -1,18 +1,16 @@
 package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.dto.TransferDto;
-import com.techelevator.tenmo.dto.TransferResponseDto;
-import com.techelevator.tenmo.model.ClientTransfer;
-import com.techelevator.tenmo.model.Transfer;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.NoSuchElementException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class RestClientTransferService {
@@ -34,19 +32,15 @@ public class RestClientTransferService {
         StringBuilder url = new StringBuilder(ENDPOINT);
         url.append(transferId);
 
-        System.out.println(url);
         try {
-            HttpEntity<Void> transferEntity = new HttpEntity<>(getHeaders());
 
             ResponseEntity<TransferDto> response= restTemplate.exchange(
                     url.toString(),
                     HttpMethod.GET,
-                    transferEntity,
+                    getEntityWithBearer(),
                     TransferDto.class);
 
-            return Optional.ofNullable(
-                    response.getBody()
-            );
+            return Optional.ofNullable(response.getBody());
 
         } catch (RestClientException e) {
             System.out.println("\nError connecting to service. " + e.getMessage());
@@ -56,10 +50,33 @@ public class RestClientTransferService {
         return Optional.empty();
     }
 
-    public HttpHeaders getHeaders(){
+    // no idea what a 'ParameterizedTypeReference' is.
+    // https://stackoverflow.com/questions/63281734/how-to-use-resttemplate-to-get-result-in-list-and-put-the-response-into-list
+    public List<TransferDto> getPendingTranfers(int accountId){
+        StringBuilder url = new StringBuilder(ENDPOINT);
+        url.append(accountId + "/" + 1);
+
+        try {
+            ResponseEntity<List<TransferDto>> response= restTemplate.exchange(
+                    url.toString(),
+                    HttpMethod.GET,
+                    getEntityWithBearer(),
+                    new ParameterizedTypeReference<List<TransferDto>>() {});
+
+
+            return response.getBody();
+
+        }catch (RestClientException restClientException){
+            System.out.println("Error: " + restClientException.getMessage());
+            return List.of();
+        }
+    }
+
+    public HttpEntity getEntityWithBearer(){
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setBearerAuth(token);
-        return httpHeaders;
+
+        return new HttpEntity(httpHeaders);
     }
 
     public static void main(String[] args) {

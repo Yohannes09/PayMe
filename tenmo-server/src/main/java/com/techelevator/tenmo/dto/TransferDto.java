@@ -5,22 +5,34 @@ import javax.validation.constraints.NotNull;
 
 /*
 * Fields being final caused issues when being deserialized
+*
+* TransferDto was created to hide sensitive info like transfer ID.
 * */
 
 public class TransferDto {
+
     @NotNull
     private int senderAccountId;
     @NotNull
     private int recipientAccountId;
+    @NotNull
+    private int transferStatusId;
+    @NotNull
+    private int transferTypeId;
     @Min(value = 0, message = "Enter amount greater than zero.")
     private double amount;
 
+
     public TransferDto(int senderAccountId,
-                       int actRecipientId,
+                       int recipientAccounttId,
+                       int transferStatusId,
+                       int transferTypeId,
                        double amount) {
 
         this.senderAccountId = senderAccountId;
-        this.recipientAccountId = actRecipientId;
+        this.recipientAccountId = recipientAccounttId;
+        this.transferStatusId = transferStatusId;
+        this.transferTypeId = transferTypeId;
         this.amount = amount;
     }
 
@@ -55,4 +67,23 @@ public class TransferDto {
     public void setAmount(@Min(value = 0, message = "Enter amount greater than zero.") double amount) {
         this.amount = amount;
     }
+
+    @NotNull
+    public int getTransferStatusId() {
+        return transferStatusId;
+    }
+
+    @NotNull
+    public int getTransferTypeId() {
+        return transferTypeId;
+    }
+
+    public void setTransferStatusId(@NotNull int transferStatusId) {
+        this.transferStatusId = transferStatusId;
+    }
+
+    public void setTransferTypeId(@NotNull int transferTypeId) {
+        this.transferTypeId = transferTypeId;
+    }
+
 }

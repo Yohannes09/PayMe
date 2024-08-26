@@ -3,7 +3,9 @@ package com.techelevator.tenmo.service;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.repository.AccountRepository;
 import com.techelevator.tenmo.repository.JdbcAccountRepository;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
 
+import java.util.List;
 import java.util.Optional;
 
 public class RestAccountService implements AccountService{
@@ -26,5 +28,15 @@ public class RestAccountService implements AccountService{
     @Override
     public Optional<Account> getAccountByUserId(int userId) {
         return accountRepository.getByUserId(userId);
+    }
+
+    @Override
+    public List<Account> getAccounts() {
+        try {
+            return accountRepository.getAccounts();
+        } catch (CannotGetJdbcConnectionException e) {
+            System.out.println("There was an issue getting accounts. ");
+            return List.of();
+        }
     }
 }

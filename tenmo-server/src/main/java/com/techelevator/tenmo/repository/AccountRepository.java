@@ -2,6 +2,7 @@ package com.techelevator.tenmo.repository;
 
 import com.techelevator.tenmo.model.Account;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface AccountRepository {
@@ -16,4 +17,6 @@ public interface AccountRepository {
     int deleteById(int id);
 
     boolean accountExists(int id);
+
+    List<Account> getAccounts();
 }

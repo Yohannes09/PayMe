@@ -36,7 +36,7 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     public User getUserById(int userId) {
         User user = null;
-        String sql = "SELECT user_id, username, password_hash FROM tenmo_user WHERE user_id = ?";
+        String sql = "SELECT * FROM tenmo_user WHERE user_id = ?";
         try {
             SqlRowSet results = jdbcTemplate.queryForRowSet(sql, userId);
             if (results.next()) {

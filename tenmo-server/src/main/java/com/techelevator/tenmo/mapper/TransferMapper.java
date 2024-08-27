@@ -10,6 +10,7 @@ import com.techelevator.tenmo.model.Transfer;
 public class TransferMapper {
     public static TransferDto mapTranferToDto(Transfer transfer){
         return new TransferDto(
+                transfer.getTransferId(),
                 transfer.getSenderAccountId(),
                 transfer.getRecipientAccountId(),
                 transfer.getTransferStatusId(),
@@ -18,10 +19,9 @@ public class TransferMapper {
         );
     }
 
-    // Fix down the line (transferId = 0) dto doesn't have transferId field
     public static Transfer mapDtoToTransfer(TransferDto dto){
         return new Transfer(
-                0,
+                dto.getTransferId(),
                 dto.getSenderAccountId(),
                 dto.getRecipientAccountId(),
                 dto.getTransferStatusId(),

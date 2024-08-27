@@ -12,6 +12,8 @@ import javax.validation.constraints.NotNull;
 public class TransferDto {
 
     @NotNull
+    private int transferId;
+    @NotNull
     private int senderAccountId;
     @NotNull
     private int recipientAccountId;
@@ -23,12 +25,15 @@ public class TransferDto {
     private double amount;
 
 
-    public TransferDto(int senderAccountId,
-                       int recipientAccounttId,
-                       int transferStatusId,
-                       int transferTypeId,
-                       double amount) {
+    public TransferDto(
+                    int transferId,
+                    int senderAccountId,
+                    int recipientAccounttId,
+                    int transferStatusId,
+                    int transferTypeId,
+                    double amount) {
 
+        this.transferId = transferId;
         this.senderAccountId = senderAccountId;
         this.recipientAccountId = recipientAccounttId;
         this.transferStatusId = transferStatusId;
@@ -40,6 +45,13 @@ public class TransferDto {
 
     }
 
+    public void setTransferId(int transferId){
+        this.transferId = transferId;
+    }
+
+    public int getTransferId(){
+        return transferId;
+    }
 
     @NotNull
     public int getSenderAccountId() {

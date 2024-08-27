@@ -49,6 +49,7 @@ public class TransferController {
         return newTransfer
                 .map(transfer -> new ResponseEntity<>(
                         new TransferDto(
+                                transfer.getTransferId(),
                                 transfer.getSenderAccountId(),
                                 transfer.getRecipientAccountId(),
                                 transfer.getTransferStatusId(),
@@ -60,7 +61,7 @@ public class TransferController {
 
     }
 
-
+    /*  Returns an account's transactions. */
     @GetMapping("/history/{accountId}")
     public ResponseEntity<List<TransferDto>> accountTransferHistory(@PathVariable("accountId") int accountId) {
         List<Transfer> transfers = transferService.accountTransferHistory(accountId);
@@ -69,6 +70,7 @@ public class TransferController {
             List<TransferDto> transferDtos = transfers.
                     stream().
                     map(transfer -> new TransferDto(
+                            transfer.getTransferId(),
                             transfer.getSenderAccountId(),
                             transfer.getRecipientAccountId(),
                             transfer.getTransferStatusId(),
@@ -87,6 +89,7 @@ public class TransferController {
         if (transfer.isPresent()) {
 
             TransferDto transferDtos = new TransferDto(
+                    transfer.get().getTransferId(),
                     transfer.get().getSenderAccountId(),
                     transfer.get().getRecipientAccountId(),
                     transfer.get().getTransferStatusId(),
@@ -110,6 +113,7 @@ public class TransferController {
                 .stream()
                 .map(transfer ->
                         new TransferDto(
+                                transfer.getTransferId(),
                                 transfer.getSenderAccountId(),
                                 transfer.getRecipientAccountId(),
                                 transfer.getTransferStatusId(),

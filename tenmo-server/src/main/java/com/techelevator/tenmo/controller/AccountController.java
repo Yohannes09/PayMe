@@ -36,8 +36,8 @@ public class AccountController {
 
             return new ResponseEntity<>(new AccountDto(
                     account.get().getAccountId(),
-                    account.get().getAccountId(),
-                    account.get().getAccountId()
+                    account.get().getUserId(),
+                    account.get().getBalance()
             ), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -51,8 +51,8 @@ public class AccountController {
 
             return new ResponseEntity<>(new AccountDto(
                     account.get().getAccountId(),
-                    account.get().getAccountId(),
-                    account.get().getAccountId()
+                    account.get().getUserId(),
+                    account.get().getBalance()
             ), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

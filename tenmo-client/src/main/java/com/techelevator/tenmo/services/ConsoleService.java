@@ -146,9 +146,9 @@ public class ConsoleService {
                 );
 
                 // Check if transfer was successful
-                return transferService.getTransferById(
-                                transfer.get().getTransferId()
-                ).isPresent();
+                return transferService
+                        .getTransferById(transfer.get().getTransferId())
+                        .isPresent();
 
             } catch (Exception e) {
                 System.out.println("\n" + redAnsii + "Error: " + e.getMessage() + resetAnsii + "\n");

@@ -18,7 +18,7 @@ public class RestClientTransferService {
 
     private final RestTemplate restTemplate;
 
-    private final String token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2bGFkaW1pciIsImF1dGgiOiJST0xFX1VTRVIiLCJleHAiOjE3MjQ2MTgzMDR9.Q-ZYva5uyGiYJzV7z_FiHepIlWW-1TN6TJGuYx8-1ZXh-vd5wZr5Ugo0EWAohF4dyMuL4CEUbj4eMyryUOVBHA";
+    private final String token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2bGFkaW1pciIsImF1dGgiOiJST0xFX1VTRVIiLCJleHAiOjE3MjQ4MzIwMDR9.W6_rtLWs0VpIuu33bc2hpYLJaZXoKUOjGFz1tikdyNeSIUpqI5LUzUAEswcOPijt2Hm5xdZR6jTB5WP2VJSn9A";
 
     public RestClientTransferService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -52,13 +52,15 @@ public class RestClientTransferService {
 
     // no idea what a 'ParameterizedTypeReference' is.
     // https://stackoverflow.com/questions/63281734/how-to-use-resttemplate-to-get-result-in-list-and-put-the-response-into-list
-    public List<TransferDto> getPendingTranfers(int accountId){
-        StringBuilder url = new StringBuilder(ENDPOINT);
-        url.append(accountId + "/" + 1);
+
+    public List<TransferDto> getPendingTranfers(int accountId, int transferStatusId){
+
+        String url = String.format("%s/transfer-status/%d/%d", ENDPOINT, accountId, transferStatusId);
+        //http://localhost:8080/api/tenmo/transfer/transfer-status/2001/1
 
         try {
             ResponseEntity<List<TransferDto>> response= restTemplate.exchange(
-                    url.toString(),
+                    url,
                     HttpMethod.GET,
                     getEntityWithBearer(),
                     new ParameterizedTypeReference<List<TransferDto>>() {});
@@ -80,7 +82,12 @@ public class RestClientTransferService {
     }
 
     public static void main(String[] args) {
-        System.out.println(new RestClientTransferService().getTransferById(3001).get().getAmount());
+        HttpEntity entity = new RestClientTransferService().getEntityWithBearer();
+        RestClientTransferService tester = new RestClientTransferService();
+        //System.out.println(new RestClientTransferService().getTransferById(3001).get().getAmount());
+        tester.getPendingTranfers(2002, 2).forEach(
+                transferDto -> System.out.println("Transfer :" + transferDto.getAmount() + " "  + transferDto.getTransferStatusId() + " " + transferDto.getSenderAccountId() + " " + transferDto.getRecipientAccountId())
+        );
     }
 
 }

@@ -8,6 +8,7 @@ import com.techelevator.tenmo.repository.AccountRepository;
 import com.techelevator.tenmo.repository.JdbcAccountRepository;
 import com.techelevator.tenmo.repository.JdbcTransferRepository;
 import com.techelevator.tenmo.repository.TransferRepository;
+import org.springframework.web.client.RestClientException;
 
 import java.util.*;
 
@@ -116,7 +117,12 @@ public class RestTransferService implements TransferService{
 
     @Override
     public Optional<Transfer> getTransferById(int transferId) {
-        return transferRepository.getTransferById(transferId);
+        try {
+            return transferRepository.getTransferById(transferId);
+        } catch (RestClientException clientException) {
+            System.out.println("Error: " + clientException.getMessage());
+            return Optional.empty();
+        }
     }
 
     @Override

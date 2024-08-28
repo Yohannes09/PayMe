@@ -22,7 +22,8 @@ public class RestClientTransferService implements ClientTransferService{
     private static final String ENDPOINT = "http://localhost:8080/api/tenmo/transfer/";
 
     private final RestTemplate restTemplate;
-    private final String token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2bGFkaW1pciIsImF1dGgiOiJST0xFX1VTRVIiLCJleHAiOjE3MjQ4MzIwMDR9.W6_rtLWs0VpIuu33bc2hpYLJaZXoKUOjGFz1tikdyNeSIUpqI5LUzUAEswcOPijt2Hm5xdZR6jTB5WP2VJSn9A";
+
+    private String token ;
 
     public RestClientTransferService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -98,7 +99,10 @@ public class RestClientTransferService implements ClientTransferService{
         }
     }
 
-    // Hard coded for now
+    public void setToken(String token){
+        this.token = token;
+    }
+
     public HttpEntity getEntityWithBearer(){
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setBearerAuth(token);

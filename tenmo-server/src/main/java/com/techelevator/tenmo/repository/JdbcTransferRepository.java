@@ -1,5 +1,6 @@
 package com.techelevator.tenmo.repository;
 
+import com.techelevator.tenmo.dto.TransferResponseDto;
 import com.techelevator.tenmo.model.Transfer;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
@@ -141,6 +142,44 @@ public class JdbcTransferRepository implements TransferRepository {
         return transfers;
     }
 
+    @Override
+    public List<TransferResponseDto> getTransferHistoryTEST(int accountId) {
+        List<TransferResponseDto> transfers = new ArrayList<>();
+        String sql = "SELECT tr.transfer_id, sender.username AS sender_username, recipient.username AS recipient_username, " +
+                "sender_ac.account_id AS sender_id, recipient_ac.account_id AS recipient_id,  tr.amount " +
+                "FROM transfer tr " +
+                "JOIN account sender_ac ON sender_ac.account_id = tr.account_from " +
+                "JOIN tenmo_user sender ON sender.user_id = sender_ac.user_id " +
+                "JOIN account recipient_ac ON recipient_ac.account_id = tr.account_to " +
+                "JOIN tenmo_user recipient ON recipient.user_id = recipient_ac.user_id " +
+                "WHERE tr.account_from = ? OR tr.account_to = ?";
+
+        try{
+            SqlRowSet sqlRows = jdbcTemplate.queryForRowSet(sql, accountId, accountId);
+
+            while(sqlRows.next())
+                transfers.add(mapTransferResponseToRow(sqlRows));
+
+            return transfers;
+
+        }catch (CannotGetJdbcConnectionException connectionException){
+
+        }
+
+        return List.of();
+    }
+
+
+    public TransferResponseDto mapTransferResponseToRow(SqlRowSet sqlRow){
+        return new TransferResponseDto(
+                sqlRow.getInt("transfer_id"),
+                sqlRow.getInt("sender_id"),
+                sqlRow.getInt("recipient_id"),
+                sqlRow.getString("sender_username"),
+                sqlRow.getString("recipient_username"),
+                sqlRow.getDouble("amount")
+        );
+    }
 
     public Transfer mapTransferToRow(SqlRowSet sqlRow){
         return new Transfer(

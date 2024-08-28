@@ -17,7 +17,7 @@ public class RestClientAccountService implements ClientAccountService{
 
     private final RestTemplate restTemplate;
 
-    private final String token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2bGFkaW1pciIsImF1dGgiOiJST0xFX1VTRVIiLCJleHAiOjE3MjQ4MzIwMDR9.W6_rtLWs0VpIuu33bc2hpYLJaZXoKUOjGFz1tikdyNeSIUpqI5LUzUAEswcOPijt2Hm5xdZR6jTB5WP2VJSn9A";
+    private String token;
 
     public RestClientAccountService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -63,6 +63,9 @@ public class RestClientAccountService implements ClientAccountService{
         }
     }
 
+    public void setToken(String token){
+        this.token = token;
+    }
 
     private HttpEntity getEntityWithBearer(){
         HttpHeaders httpHeaders = new HttpHeaders();

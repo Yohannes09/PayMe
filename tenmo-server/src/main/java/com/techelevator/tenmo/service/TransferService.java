@@ -1,5 +1,6 @@
 package com.techelevator.tenmo.service;
 
+import com.techelevator.tenmo.dto.TransferResponseDto;
 import com.techelevator.tenmo.model.Transfer;
 
 import java.util.List;
@@ -27,4 +28,9 @@ public interface TransferService {
     void processDeposit(int accountId, double balance);
 
     void processWithdraw(int accountId, double balance);
+
+
+
+
+    List<TransferResponseDto> getAccountHistory(int accountId);
 }

@@ -12,7 +12,7 @@ import java.util.Optional;
 public class RestClientUserService implements ClientUserService{
     private static final String ENDPOINT = "http://localhost:8080:api/tenmo/user";
 
-    private final String token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2bGFkaW1pciIsImF1dGgiOiJST0xFX1VTRVIiLCJleHAiOjE3MjQ4MzIwMDR9.W6_rtLWs0VpIuu33bc2hpYLJaZXoKUOjGFz1tikdyNeSIUpqI5LUzUAEswcOPijt2Hm5xdZR6jTB5WP2VJSn9A";
+    private String token;
 
     private final RestTemplate restTemplate;
 
@@ -40,6 +40,10 @@ public class RestClientUserService implements ClientUserService{
             System.out.println("Error: " + clientException.getMessage());
             return Optional.empty();
         }
+    }
+
+    public void setToken(String token){
+        this.token = token;
     }
 
     public HttpEntity getEntityWithBearer(){

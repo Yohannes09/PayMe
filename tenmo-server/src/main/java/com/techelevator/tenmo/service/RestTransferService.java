@@ -1,5 +1,6 @@
 package com.techelevator.tenmo.service;
 
+import com.techelevator.tenmo.dto.TransferResponseDto;
 import com.techelevator.tenmo.exception.AccountException;
 import com.techelevator.tenmo.exception.TransferException;
 import com.techelevator.tenmo.model.Account;
@@ -111,6 +112,11 @@ public class RestTransferService implements TransferService{
     }
 
     @Override
+    public List<TransferResponseDto> getAccountHistory(int accountId) {
+        return transferRepository.getTransferHistoryTEST(accountId);
+    }
+
+    @Override
     public List<Transfer> accountTransferHistory(int accountId) {
         return transferRepository.accountTransferHistory(accountId);
     }
@@ -153,5 +159,11 @@ public class RestTransferService implements TransferService{
         transferTypeCodes.put("send", 2);
 
         return transferTypeCodes;
+    }
+
+    public static void main(String[] args) {
+        RestTransferService service = new RestTransferService();
+
+        service.getAccountHistory(2001).forEach(transfer -> System.out.println(transfer.toString()));
     }
 }

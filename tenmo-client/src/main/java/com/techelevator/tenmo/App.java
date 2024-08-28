@@ -3,10 +3,7 @@ package com.techelevator.tenmo;
 import com.techelevator.tenmo.dto.TransferDto;
 import com.techelevator.tenmo.model.*;
 import com.techelevator.tenmo.service.RestUserService;
-import com.techelevator.tenmo.services.AuthenticationService;
-import com.techelevator.tenmo.services.ConsoleService;
-import com.techelevator.tenmo.services.RestClientAccountService;
-import com.techelevator.tenmo.services.RestClientTransferService;
+import com.techelevator.tenmo.services.*;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -21,7 +18,7 @@ public class App {
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
     private final RestClientTransferService clientTransferServce = new RestClientTransferService();
     private final RestClientAccountService clientAccountService = new RestClientAccountService();
-    private final RestUserService clientUserService = new RestUserService();
+    private final RestClientUserService clientUserService = new RestClientUserService();
 
     private AuthenticatedUser currentUser;
     private Optional<Account> currentAccount;
@@ -68,7 +65,14 @@ public class App {
         UserCredentials credentials = consoleService.promptForCredentials();
         currentUser = authenticationService.login(credentials);
 
+        String token = currentUser.getToken();
+
+        clientTransferServce.setToken(token);
+        clientAccountService.setToken(token);
+        clientUserService.setToken(token);
+
         currentAccount = clientAccountService.getAccountByUserId(currentUser.getUser().getId());
+
         if (currentUser == null) {
             consoleService.printErrorMessage();
         }
@@ -118,24 +122,26 @@ public class App {
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
 
-        List<TransferDto> transfers = clientTransferServce.getTransferByAccountId(currentAccount.get().getAccountId());
         consoleService.printTransferScreen();
 
-        for(TransferDto dto: transfers){
+//        List<TransferDto> transferHistory = clientTransferServce.getTransferByAccountId(currentAccount.get().getAccountId());
+//
+//        for(Map.Entry<String, List<TransferDto>> mappedTransfers: mapTransfers(transferHistory).entrySet()){
+//
+//            for(TransferDto dto: mappedTransfers.getValue()){
+//
+//                // Check if the current user is the sender in order to print the correct message.
+//                String fromOrTo = dto.getSenderAccountId() == currentAccount.get().getAccountId() ? "To" : "From";
+//
+//                String.format("%d %6s: %s %10f",
+//                        dto.getTransferId(),
+//                        fromOrTo ,
+//                        mappedTransfers.getKey(),
+//                        dto.getAmount());
+//            }
+//
+//        }
 
-            // Check if the current user is the sender in order to print the correct message.
-            String fromOrTo = dto.getSenderAccountId() == currentAccount.get().getAccountId() ? "To" : "From";
-
-            // Get the ID of the other person involved in the transfer.
-            int transferParticipantId = dto.getSenderAccountId() != currentAccount.get().getAccountId() ?
-                    dto.getRecipientAccountId(): dto.getSenderAccountId();
-
-            String.format("%d %6s: %s %10f",
-                    dto.getTransferId(),
-                    fromOrTo ,
-                    clientUserService.getUserById(transferParticipantId),
-                    dto.getAmount());
-        }
         consoleService.printLine(15, '-');
 	}
 
@@ -164,38 +170,39 @@ public class App {
 	}
 
 
-    private Map<String , List<TransferDto>> mapTransfers(List<TransferDto> transfers){
-        Map<String, List<TransferDto>> mapTransferByParticipant = new HashMap<>();
+//    private Map<String , List<TransferDto>> mapTransfers(List<TransferDto> transfers){
+//        Map<String, List<TransferDto>> mapTransferByParticipant = new HashMap<>();
+//
+//        for(TransferDto dto: transfers){
+//
+//            // Get the ID of the other person involved in the transfer.
+//            int transferParticipantId = dto.getSenderAccountId() != currentAccount.get().getAccountId() ?
+//                    dto.getRecipientAccountId(): dto.getSenderAccountId();
+//
+//
+//            // stores the user fields for the transferParticipant
+//            Optional<User> user = clientUserService.getUserById(
+//                    clientAccountService.getAccountById( transferParticipantId).get().getUserId() );
+//
+//            String participantUsername = user.get().getUsername();
+//
+//            // Check if the other person is in the map.
+//            if( mapTransferByParticipant.containsKey(participantUsername) ){
+//                mapTransferByParticipant
+//                        .get( participantUsername )
+//                        .add(dto);
+//            }else{
+//                // Check if map contains the other user, if not, give the key a new list then add the dto to the list.
+//                mapTransferByParticipant.put( participantUsername, new ArrayList<>() );
+//                mapTransferByParticipant
+//                        .get(participantUsername)
+//                        .add(dto);
+//            }
+//
+//        }
+//
+//        return mapTransferByParticipant;
+//    }
 
-        for(TransferDto dto: transfers){
-
-            // Get the ID of the other person involved in the transfer.
-            int transferParticipantId = dto.getSenderAccountId() != currentAccount.get().getAccountId() ?
-                    dto.getRecipientAccountId(): dto.getSenderAccountId();
-
-
-            // stores the user fields for the transferParticipant
-            Optional<User> user = clientUserService.getUserById(
-                    clientAccountService.getAccountById( transferParticipantId).get().getUserId() );
-
-            String participantUsername = user.get().getUsername();
-
-            // Check if the other person is in the map.
-            if( mapTransferByParticipant.containsKey(participantUsername) ){
-                mapTransferByParticipant
-                        .get( participantUsername )
-                        .add(dto);
-            }else{
-                // Check if map contains the other user, if not, give the key a new list then add the dto to the list.
-                mapTransferByParticipant.put( participantUsername, new ArrayList<>() );
-                mapTransferByParticipant
-                        .get(participantUsername)
-                        .add(dto);
-            }
-
-        }
-
-        return null;
-    }
 
 }

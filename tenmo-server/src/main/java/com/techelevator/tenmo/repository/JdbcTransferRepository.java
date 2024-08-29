@@ -158,6 +158,16 @@ public class JdbcTransferRepository implements TransferRepository {
         return Optional.empty();
     }
 
+    @Override
+    public List<TransferHistoryDto> accountTransferTypeHistory() {
+        return List.of();
+    }
+
+    @Override
+    public List<TransferHistoryDto> accountTransferStatusHistory() {
+        return List.of();
+    }
+
 
     public TransferHistoryDto mapTransferResponseToRow(SqlRowSet sqlRow){
         return new TransferHistoryDto(

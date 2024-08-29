@@ -73,10 +73,4 @@ public class RestClientAccountService implements ClientAccountService{
         return new HttpEntity(httpHeaders);
     }
 
-    public static void main(String[] args) {
-        RestClientAccountService service = new RestClientAccountService();
-        Optional<Account> account = service.getAccountByUserId(1001);
-
-        System.out.println(account.get().getAccountId() + " " + account.get().getBalance() + " " + account.get().getUserId() + " " );
-    }
 }

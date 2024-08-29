@@ -31,11 +31,9 @@ public class RestTransferService implements TransferService{
         this.transferRepository = new JdbcTransferRepository();
     }
 
-
     /**
-     * @param transferTypeId  the type of transfer; 1 represents a request, and 2 represents a send. <br>
-     * @param transferStatusId  the status of the transfer; 1 is pending, 2 is accepted, and 3 is rejected.
-     */
+     * @param transferTypeId  the type of transfer; 1 represents a request, and 2 represents a send.
+     * @param transferStatusId  the status of the transfer; 1 is pending, 2 is accepted, and 3 is rejected.*/
 
     @Override
     public List<TransferHistoryDto> getAccountHistory(int accountId) {

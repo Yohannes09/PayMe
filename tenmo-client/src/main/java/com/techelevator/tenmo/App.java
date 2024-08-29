@@ -1,11 +1,9 @@
 package com.techelevator.tenmo;
 
-import com.techelevator.tenmo.dto.TransferDto;
+import com.techelevator.tenmo.dto.TransferHistoryDto;
 import com.techelevator.tenmo.model.*;
-import com.techelevator.tenmo.service.RestUserService;
 import com.techelevator.tenmo.services.*;
 
-import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.*;
 
@@ -16,12 +14,14 @@ public class App {
 
     private final ConsoleService consoleService = new ConsoleService();
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
+
     private final RestClientTransferService clientTransferServce = new RestClientTransferService();
     private final RestClientAccountService clientAccountService = new RestClientAccountService();
     private final RestClientUserService clientUserService = new RestClientUserService();
 
     private AuthenticatedUser currentUser;
     private Optional<Account> currentAccount;
+    private int currentUserAcccountId;
 
     public static void main(String[] args) {
         App app = new App();
@@ -72,6 +72,7 @@ public class App {
         clientUserService.setToken(token);
 
         currentAccount = clientAccountService.getAccountByUserId(currentUser.getUser().getId());
+        currentUserAcccountId = currentAccount.get().getAccountId();
 
         if (currentUser == null) {
             consoleService.printErrorMessage();
@@ -104,14 +105,30 @@ public class App {
 
 	private void viewCurrentBalance() {
 		// TODO Auto-generated method stub
-
+        System.out.println(
+                USD_FOMATTER.format(clientAccountService.getAccountById(currentUserAcccountId).get().getBalance()));
 	}
 
 
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
 
+        List<TransferHistoryDto> transfers = clientTransferServce.accountTransferHistory(currentUserAcccountId);
         consoleService.printTransferScreen();
+
+        transfers.forEach(
+                transfer -> {
+                    String transferParticipant = transfer.getSenderAccountId() == currentUserAcccountId ?
+                            transfer.getRecipientUsername() : transfer.getSenderUsername();
+
+                    String toOrFrom = transfer.getSenderAccountId() == currentUserAcccountId ? "To:" : "From:";
+                    System.out.println(String.format("%-6d %-6s %-15s %13s",
+                            transfer.getTransferId(),
+                            toOrFrom,
+                            transferParticipant,
+                            USD_FOMATTER.format(transfer.getAmount() )));
+                }
+        );
 
         consoleService.printLine(15, '-');
 	}

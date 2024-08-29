@@ -79,13 +79,9 @@ public class RestClientTransferService implements ClientTransferService{
         }
     }
 
-    // no idea what a 'ParameterizedTypeReference' is.
-    // https://stackoverflow.com/questions/63281734/how-to-use-resttemplate-to-get-result-in-list-and-put-the-response-into-list
-
     public List<TransferDto> getTransfersByStatusId(int accountId, int transferStatusId){
 
         String url = String.format("%s/transfer-status/%d/%d", ENDPOINT, accountId, transferStatusId);
-        //http://localhost:8080/api/tenmo/transfer/transfer-status/2001/1
 
         try {
             ResponseEntity<List<TransferDto>> response= restTemplate.exchange(
@@ -111,13 +107,6 @@ public class RestClientTransferService implements ClientTransferService{
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setBearerAuth(token);
         return new HttpEntity(httpHeaders);
-    }
-
-    public static void main(String[] args) {
-        RestClientTransferService tester = new RestClientTransferService();
-        tester.setToken("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2bGFkaW1pciIsImF1dGgiOiJST0xFX1VTRVIiLCJleHAiOjE3MjQ5MjI0Mjd9.nZbI0mNIeJIDMQbzQBjiWl_9lDHLnPLHb8Xbt6jgM2H3QgK-eWVwe1xNlUQuW96z54qYvAG1zEWs1O7YU7RR4A");
-        //System.out.println(new RestClientTransferService().getTransferById(3001).get().getAmount());
-        tester.accountTransferHistory(2001).forEach(transferResponseDto -> System.out.println(transferResponseDto.toString()));
     }
 
 }

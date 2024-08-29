@@ -3,39 +3,31 @@ package com.techelevator.tenmo.dto;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-// Used to store different variables of a transfer, like the usernames.
 public class TransferResponseDto {
+
     @NotNull
     private int transferId;
-
     @NotNull
     private int senderAccountId;
-
     @NotNull
     private int recipientAccountId;
-
     @NotNull
-    private String senderUsername;
-
+    private int transferStatusId;
     @NotNull
-    private String recipientUsername;
-
+    private int transferTypeId;
     @Min(value = 0, message = "Enter amount greater than zero.")
-    private final double amount;
+    private double amount;
 
-    public TransferResponseDto(
-                        int transferId,
-                        int senderAccountId,
-                        int recipientAccountId,
-                        String senderUsername,
-                        String recipientUsername,
-                        double amount) {
 
+    public TransferResponseDto() {
+    }
+
+    public TransferResponseDto(int transferId, int senderAccountId, int recipientAccountId, int transferStatusId, int transferTypeId, double amount) {
         this.transferId = transferId;
         this.senderAccountId = senderAccountId;
         this.recipientAccountId = recipientAccountId;
-        this.senderUsername = senderUsername;
-        this.recipientUsername = recipientUsername;
+        this.transferStatusId = transferStatusId;
+        this.transferTypeId = transferTypeId;
         this.amount = amount;
     }
 
@@ -44,12 +36,8 @@ public class TransferResponseDto {
         return transferId;
     }
 
-    public @NotNull String getSenderUsername() {
-        return senderUsername;
-    }
-
-    public @NotNull String getRecipientUsername() {
-        return recipientUsername;
+    public void setTransferId(@NotNull int transferId) {
+        this.transferId = transferId;
     }
 
     @NotNull
@@ -57,14 +45,44 @@ public class TransferResponseDto {
         return senderAccountId;
     }
 
+    public void setSenderAccountId(@NotNull int senderAccountId) {
+        this.senderAccountId = senderAccountId;
+    }
+
     @NotNull
     public int getRecipientAccountId() {
         return recipientAccountId;
     }
 
+    public void setRecipientAccountId(@NotNull int recipientAccountId) {
+        this.recipientAccountId = recipientAccountId;
+    }
+
+    @NotNull
+    public int getTransferStatusId() {
+        return transferStatusId;
+    }
+
+    public void setTransferStatusId(@NotNull int transferStatusId) {
+        this.transferStatusId = transferStatusId;
+    }
+
+    @NotNull
+    public int getTransferTypeId() {
+        return transferTypeId;
+    }
+
+    public void setTransferTypeId(@NotNull int transferTypeId) {
+        this.transferTypeId = transferTypeId;
+    }
+
     @Min(value = 0, message = "Enter amount greater than zero.")
     public double getAmount() {
         return amount;
+    }
+
+    public void setAmount(@Min(value = 0, message = "Enter amount greater than zero.") double amount) {
+        this.amount = amount;
     }
 
     @Override
@@ -73,8 +91,8 @@ public class TransferResponseDto {
                 "transferId=" + transferId +
                 ", senderAccountId=" + senderAccountId +
                 ", recipientAccountId=" + recipientAccountId +
-                ", senderUsername='" + senderUsername + '\'' +
-                ", recipientUsername='" + recipientUsername + '\'' +
+                ", transferStatusId=" + transferStatusId +
+                ", transferTypeId=" + transferTypeId +
                 ", amount=" + amount +
                 '}';
     }

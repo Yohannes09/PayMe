@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.dto.TransferDto;
+import com.techelevator.tenmo.dto.TransferHistoryDto;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -57,16 +58,18 @@ public class RestClientTransferService implements ClientTransferService{
 
 
     @Override
-    public List<TransferDto> getTransferByAccountId(int accountId) {
+    public List<TransferHistoryDto> accountTransferHistory(int accountId) {
+
         String url = String.format("%s/history/%d", ENDPOINT, accountId);
         //http://localhost:8080/api/tenmo/transfer/transfer-status/2001/1
 
         try {
-            ResponseEntity<List<TransferDto>> response= restTemplate.exchange(
+            ResponseEntity<List<TransferHistoryDto>> response = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
                     getEntityWithBearer(),
-                    new ParameterizedTypeReference<List<TransferDto>>() {});
+                    new ParameterizedTypeReference<List<TransferHistoryDto>>() {}
+            );
 
             return response.getBody();
 
@@ -99,6 +102,7 @@ public class RestClientTransferService implements ClientTransferService{
         }
     }
 
+
     public void setToken(String token){
         this.token = token;
     }
@@ -110,12 +114,10 @@ public class RestClientTransferService implements ClientTransferService{
     }
 
     public static void main(String[] args) {
-        HttpEntity entity = new RestClientTransferService().getEntityWithBearer();
         RestClientTransferService tester = new RestClientTransferService();
+        tester.setToken("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2bGFkaW1pciIsImF1dGgiOiJST0xFX1VTRVIiLCJleHAiOjE3MjQ5MjI0Mjd9.nZbI0mNIeJIDMQbzQBjiWl_9lDHLnPLHb8Xbt6jgM2H3QgK-eWVwe1xNlUQuW96z54qYvAG1zEWs1O7YU7RR4A");
         //System.out.println(new RestClientTransferService().getTransferById(3001).get().getAmount());
-        tester.getTransfersByStatusId(2002, 2).forEach(
-                transferDto -> System.out.println("Transfer :" + transferDto.getAmount() + " "  + transferDto.getTransferStatusId() + " " + transferDto.getSenderAccountId() + " " + transferDto.getRecipientAccountId())
-        );
+        tester.accountTransferHistory(2001).forEach(transferResponseDto -> System.out.println(transferResponseDto.toString()));
     }
 
 }

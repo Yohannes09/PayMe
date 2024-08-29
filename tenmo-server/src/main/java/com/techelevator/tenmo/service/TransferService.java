@@ -1,6 +1,6 @@
 package com.techelevator.tenmo.service;
 
-import com.techelevator.tenmo.dto.TransferResponseDto;
+import com.techelevator.tenmo.dto.TransferHistoryDto;
 import com.techelevator.tenmo.model.Transfer;
 
 import java.util.List;
@@ -8,29 +8,16 @@ import java.util.Optional;
 
 public interface TransferService {
 
-    Optional<Transfer> requestTransfer(int senderAccountId, int recipientAccountId, double amount);
-
-    void processTransferRequest(
-            boolean accepted,
-            int senderAccountId,
-            int recipientAccountId,
-            int transferId
-    );
-
-    Optional<Transfer> processTransfer(int sendAccountId, int recipientAccountId, double amount);
-
-    List<Transfer> accountTransferHistory(int accountId);
-
     Optional<Transfer> getTransferById(int transferId);
 
-    List<Transfer> getAccountTransferStatus(int accountId, int transferStatusId);
+    // Obtain a list of an accounts transfer history.
+    List<TransferHistoryDto> getAccountHistory(int accountId);
 
-    void processDeposit(int accountId, double balance);
+    //
+    Optional<Transfer> processTransfer(
+            int transferTypeId, int senderAccountId, int recipientAccountId, double amount);
 
-    void processWithdraw(int accountId, double balance);
+    Optional<Transfer> acceptTransfer(int transferId);
 
-
-
-
-    List<TransferResponseDto> getAccountHistory(int accountId);
+    Optional<Transfer> declineTransfer(int transferId);
 }

@@ -1,10 +1,8 @@
 package com.techelevator.tenmo.controller;
 
 import com.techelevator.tenmo.dto.TransferDto;
+import com.techelevator.tenmo.dto.TransferHistoryDto;
 import com.techelevator.tenmo.dto.TransferResponseDto;
-import com.techelevator.tenmo.exception.AccountException;
-import com.techelevator.tenmo.exception.DaoException;
-import com.techelevator.tenmo.mapper.TransferMapper;
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.service.*;
 import org.springframework.http.HttpStatus;
@@ -12,14 +10,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RequestMapping("api/tenmo/transfer")
 @RestController
 public class TransferController {
+    private static final Map<Integer, String> VALID_TYPE_IDS = getValidTransferTypes();
+    private static final Map<Integer, String> VALID_STATUS_IDS = getValidTransferStatus();
+
     private final TransferService transferService;
     private final AccountService accountService;
     private final UserService userService;
@@ -37,19 +38,26 @@ public class TransferController {
     }
 
 
-    @PostMapping("")
-    public ResponseEntity<TransferDto> processTransfer(@Valid @RequestBody TransferDto transferDto) {
+    @PostMapping("/{transferTypeId}")
+    public ResponseEntity<TransferResponseDto> processTransfer(@Valid @RequestBody TransferDto transferDto,
+                                                               @PathVariable("transferTypeId") int transferTypeId) {
+        if(!VALID_TYPE_IDS.containsKey(transferTypeId))
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Optional<Transfer> newTransfer = transferService.processTransfer(
+                transferTypeId,
                 transferDto.getSenderAccountId(),
                 transferDto.getRecipientAccountId(),
                 transferDto.getAmount()
         );
 
+        if(newTransfer.isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
         return newTransfer
                 .map(transfer -> new ResponseEntity<>(
-                        new TransferDto(
-                                transfer.getTransferId(),
+                        new TransferResponseDto(
+                                newTransfer.get().getTransferId(),
                                 transfer.getSenderAccountId(),
                                 transfer.getRecipientAccountId(),
                                 transfer.getTransferStatusId(),
@@ -57,38 +65,28 @@ public class TransferController {
                                 transfer.getAmount()
                         ), HttpStatus.OK)
                 )
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .orElse(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
 
     }
 
     /*  Returns an account's transactions. */
     @GetMapping("/history/{accountId}")
-    public ResponseEntity<List<TransferDto>> accountTransferHistory(@PathVariable("accountId") int accountId) {
-        List<Transfer> transfers = transferService.accountTransferHistory(accountId);
+    public ResponseEntity<List<TransferHistoryDto>> accountTransferHistory(@PathVariable("accountId") int accountId) {
+        List<TransferHistoryDto> transfers = transferService.getAccountHistory(accountId);
 
         if (!transfers.isEmpty()) {
-            List<TransferDto> transferDtos = transfers.
-                    stream().
-                    map(transfer -> new TransferDto(
-                            transfer.getTransferId(),
-                            transfer.getSenderAccountId(),
-                            transfer.getRecipientAccountId(),
-                            transfer.getTransferStatusId(),
-                            transfer.getTypeId(),
-                            transfer.getAmount()
-                    )).collect(Collectors.toList());
-            return new ResponseEntity<>(transferDtos, HttpStatus.OK);
+            return new ResponseEntity<>(transfers, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/{transferId}")
-    public ResponseEntity<TransferDto> getTransferById(@PathVariable("transferId") int transferId) {
+    public ResponseEntity<TransferResponseDto> getTransferById(@PathVariable("transferId") int transferId) {
         Optional<Transfer> transfer = transferService.getTransferById(transferId);
 
         if (transfer.isPresent()) {
 
-            TransferDto transferDtos = new TransferDto(
+            TransferResponseDto transferDtos = new TransferResponseDto(
                     transfer.get().getTransferId(),
                     transfer.get().getSenderAccountId(),
                     transfer.get().getRecipientAccountId(),
@@ -109,21 +107,24 @@ public class TransferController {
         if(transferStatusId < 1)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        List<TransferDto> pendingTransfers = transferService.getAccountTransferStatus(accountId, transferStatusId)
-                .stream()
-                .map(transfer ->
-                        new TransferDto(
-                                transfer.getTransferId(),
-                                transfer.getSenderAccountId(),
-                                transfer.getRecipientAccountId(),
-                                transfer.getTransferStatusId(),
-                                transfer.getTypeId(),
-                                transfer.getAmount()
-                        )
-                ).collect(Collectors.toList());
+        return new ResponseEntity<>(HttpStatus.OK);
 
-        return new ResponseEntity<>(pendingTransfers, HttpStatus.OK);
+    }
 
+    private static Map<Integer, String> getValidTransferTypes(){
+        Map<Integer, String> validTransferIds = new HashMap<>();
+        validTransferIds.put(1, null);
+        validTransferIds.put(2, null);
+        validTransferIds.put(3, null);
+        return validTransferIds;
+    }
+
+    private static Map<Integer, String> getValidTransferStatus(){
+        Map<Integer, String> validTransferStatusId = new HashMap<>();
+        validTransferStatusId.put(1, null);
+        validTransferStatusId.put(2, null);
+        validTransferStatusId.put(3, null);
+        return validTransferStatusId;
     }
 
 }

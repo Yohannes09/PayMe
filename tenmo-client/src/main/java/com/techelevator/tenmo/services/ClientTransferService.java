@@ -1,11 +1,11 @@
 package com.techelevator.tenmo.services;
 
-import com.techelevator.tenmo.dto.TransferDto;
+import com.techelevator.tenmo.dto.TransferHistoryDto;
 
 import java.util.List;
 
 public interface ClientTransferService {
-    List<TransferDto> getTransferByAccountId(int accountId);
+    List<TransferHistoryDto> accountTransferHistory(int accountId);
 
 
 }

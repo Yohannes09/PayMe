@@ -1,6 +1,6 @@
 package com.techelevator.tenmo.repository;
 
-import com.techelevator.tenmo.dto.TransferResponseDto;
+import com.techelevator.tenmo.dto.TransferHistoryDto;
 import com.techelevator.tenmo.model.Transfer;
 
 import java.util.List;
@@ -8,22 +8,29 @@ import java.util.Optional;
 
 public interface TransferRepository {
     //  USEFUL
-    Optional<Transfer> proccessTransfer(int senderId,
-                                        int recipientId,
-                                        int transferStatus,
-                                        int transferType,
+    Optional<Transfer> proccessTransfer(
+                                        int transferTypeId,
+                                        int transferStatusId,
+                                        int senderAccountId,
+                                        int recipientAccountId,
                                         double amount);
 
     Optional<Transfer> getTransferById(int id);
 
     List<Transfer> getTransfers();
 
-    int deleteTransfer(int transferId);
+    int deleteTransferById(int transferId);
 
-    List<TransferResponseDto> getTransferHistoryTEST(int accountId); // not too sure yet
+    List<TransferHistoryDto> getTransferHistory(int accountId);
 
-    //useless
-    List<Transfer> accountTransferHistory(int id);
-    List<Transfer> getAccountTransferStatus(int accountId, int transferStatusId);
+    Optional<Transfer> updateTransferStatus(int transferId, int newTransferStatusId);
+
+
+    // Hasn't been though out, but use these to get transactions by their type or status.
+
+    // My idea, combine both into 1. Ie, you can view different status on either sent or requested transfers.
+    List<TransferHistoryDto> accountTransferTypeHistory();
+
+    List<TransferHistoryDto> accountTransferStatusHistory();
 
 }

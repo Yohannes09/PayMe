@@ -10,7 +10,6 @@ import com.techelevator.tenmo.model.Transfer;
 public class TransferMapper {
     public static TransferDto mapTranferToDto(Transfer transfer){
         return new TransferDto(
-                transfer.getTransferId(),
                 transfer.getSenderAccountId(),
                 transfer.getRecipientAccountId(),
                 transfer.getTransferStatusId(),
@@ -19,14 +18,4 @@ public class TransferMapper {
         );
     }
 
-    public static Transfer mapDtoToTransfer(TransferDto dto){
-        return new Transfer(
-                dto.getTransferId(),
-                dto.getSenderAccountId(),
-                dto.getRecipientAccountId(),
-                dto.getTransferStatusId(),
-                dto.getTransferTypeId(),
-                dto.getAmount()
-        );
-    }
 }

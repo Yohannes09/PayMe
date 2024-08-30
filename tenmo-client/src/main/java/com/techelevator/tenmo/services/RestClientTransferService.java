@@ -2,6 +2,7 @@ package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.dto.TransferDto;
 import com.techelevator.tenmo.dto.TransferHistoryDto;
+import com.techelevator.tenmo.dto.TransferResponseDto;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -34,17 +35,18 @@ public class RestClientTransferService implements ClientTransferService{
         this.restTemplate = new RestTemplate();
     }
 
-    public Optional<TransferDto> getTransferById(int transferId){
+    @Override
+    public Optional<TransferResponseDto> getTransferById(int transferId){
         StringBuilder url = new StringBuilder(ENDPOINT);
         url.append(transferId);
 
         try {
 
-            ResponseEntity<TransferDto> response= restTemplate.exchange(
+            ResponseEntity<TransferResponseDto> response= restTemplate.exchange(
                     url.toString(),
                     HttpMethod.GET,
                     getEntityWithBearer(),
-                    TransferDto.class);
+                    TransferResponseDto.class);
 
             return Optional.ofNullable(response.getBody());
 
@@ -61,7 +63,6 @@ public class RestClientTransferService implements ClientTransferService{
     public List<TransferHistoryDto> accountTransferHistory(int accountId) {
 
         String url = String.format("%s/history/%d", ENDPOINT, accountId);
-        //http://localhost:8080/api/tenmo/transfer/transfer-status/2001/1
 
         try {
             ResponseEntity<List<TransferHistoryDto>> response = restTemplate.exchange(
@@ -79,24 +80,24 @@ public class RestClientTransferService implements ClientTransferService{
         }
     }
 
-    public List<TransferDto> getTransfersByStatusId(int accountId, int transferStatusId){
-
-        String url = String.format("%s/transfer-status/%d/%d", ENDPOINT, accountId, transferStatusId);
-
-        try {
-            ResponseEntity<List<TransferDto>> response= restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    getEntityWithBearer(),
-                    new ParameterizedTypeReference<List<TransferDto>>() {});
-
-            return response.getBody();
-
-        }catch (RestClientException restClientException){
-            System.out.println("Error: " + restClientException.getMessage());
-            return List.of();
-        }
-    }
+//    public List<TransferDto> getTransfersByStatusId(int accountId, int transferStatusId){
+//
+//        String url = String.format("%s/transfer-status/%d/%d", ENDPOINT, accountId, transferStatusId);
+//
+//        try {
+//            ResponseEntity<List<TransferDto>> response= restTemplate.exchange(
+//                    url,
+//                    HttpMethod.GET,
+//                    getEntityWithBearer(),
+//                    new ParameterizedTypeReference<List<TransferDto>>() {});
+//
+//            return response.getBody();
+//
+//        }catch (RestClientException restClientException){
+//            System.out.println("Error: " + restClientException.getMessage());
+//            return List.of();
+//        }
+//    }
 
 
     public void setToken(String token){

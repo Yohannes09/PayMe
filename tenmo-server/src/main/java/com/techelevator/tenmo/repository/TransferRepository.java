@@ -7,30 +7,23 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TransferRepository {
-    //  USEFUL
-    Optional<Transfer> proccessTransfer(
-                                        int transferTypeId,
-                                        int transferStatusId,
-                                        int senderAccountId,
-                                        int recipientAccountId,
-                                        double amount);
+    //C
+    Optional<Transfer> processTransfer(
+            int transferTypeId, int transferStatusId, int senderAccountId, int recipientAccountId, double amount);
 
-    Optional<Transfer> getTransferById(int id);
-
+    //R
+    Optional<Transfer> getTransferById(int transferId);
     List<Transfer> getTransfers();
 
-    int deleteTransferById(int transferId);
-
+    /** View an account's transfer history */
     List<TransferHistoryDto> getTransferHistory(int accountId);
 
+    /** View the status of requested transfers*/
+    List<TransferHistoryDto> accountTransferStatus(int transferStatusId, int accountId);
+
+    //U
     Optional<Transfer> updateTransferStatus(int transferId, int newTransferStatusId);
 
-
-    // Hasn't been though out, but use these to get transactions by their type or status.
-
-    // My idea, combine both into 1. Ie, you can view different status on either sent or requested transfers.
-    List<TransferHistoryDto> accountTransferTypeHistory();
-
-    List<TransferHistoryDto> accountTransferStatusHistory();
-
+    //D
+    int deleteTransferById(int transferId);
 }

@@ -30,7 +30,7 @@ public class JdbcTransferRepository implements TransferRepository {
     }
 
     @Override
-    public Optional<Transfer> proccessTransfer(
+    public Optional<Transfer> processTransfer(
             int transferTypeId, int transferStatusId, int senderAccountId, int recipientAccountId, double amount) {
 
         String sql = "INSERT INTO transfer(transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
@@ -58,11 +58,11 @@ public class JdbcTransferRepository implements TransferRepository {
 
 
     @Override
-    public Optional<Transfer> getTransferById(int id) {
+    public Optional<Transfer> getTransferById(int transferId) {
         String sql = "SELECT * FROM transfer WHERE transfer_id = ?;";
 
         try{
-            SqlRowSet sqlRow = jdbcTemplate.queryForRowSet(sql, id);
+            SqlRowSet sqlRow = jdbcTemplate.queryForRowSet(sql, transferId);
 
             if(sqlRow.next())
                 return Optional.ofNullable(mapTransferToRow(sqlRow));
@@ -107,25 +107,6 @@ public class JdbcTransferRepository implements TransferRepository {
         return 0;
     }
 
-//    @Override
-//    public List<Transfer> getAccountTransferStatus(int accountId, int transferStatusId) {
-//        List<Transfer> transfers = new ArrayList<>();
-//        String sql = "SELECT * FROM transfer tr " +
-//                "WHERE (account_from = ? " +
-//                "OR account_to = ?) " +
-//                "AND transfer_status_id = ? ; ";
-//        try{
-//            SqlRowSet sqlRow = jdbcTemplate.queryForRowSet(sql, accountId, accountId, transferStatusId);
-//
-//            while(sqlRow.next())
-//                transfers.add(mapTransferToRow(sqlRow));
-//
-//        }catch (CannotGetJdbcConnectionException e){
-//
-//        }
-//        return transfers;
-//    }
-
     @Override
     public List<TransferHistoryDto> getTransferHistory(int accountId) {
         List<TransferHistoryDto> transfers = new ArrayList<>();
@@ -155,21 +136,51 @@ public class JdbcTransferRepository implements TransferRepository {
 
     @Override
     public Optional<Transfer> updateTransferStatus(int transferId, int newTransferStatusId) {
+        String sql = "UPDATE transfer SET transfer_status_id = ? WHERE transfer_id = ?";
+
+        try {
+            Optional<Transfer> transfer = getTransferById(transferId);
+
+            if(!transfer.isPresent())
+                return Optional.empty();
+
+            jdbcTemplate.update(sql, newTransferStatusId, transferId);
+            return getTransferById(transferId);
+        }catch (CannotGetJdbcConnectionException connectionException){
+
+        }
         return Optional.empty();
     }
 
     @Override
-    public List<TransferHistoryDto> accountTransferTypeHistory() {
+    public List<TransferHistoryDto> accountTransferStatus(int transferStatusId, int accountId) {
+        List<TransferHistoryDto> transfers = new ArrayList<>();
+        String sql = "SELECT tr.transfer_id, sender.username AS sender_username, recipient.username AS recipient_username, " +
+                "sender_ac.account_id AS sender_id, recipient_ac.account_id AS recipient_id,  tr.amount " +
+                "FROM transfer tr " +
+                "JOIN account sender_ac ON sender_ac.account_id = tr.account_from " +
+                "JOIN tenmo_user sender ON sender.user_id = sender_ac.user_id " +
+                "JOIN account recipient_ac ON recipient_ac.account_id = tr.account_to " +
+                "JOIN tenmo_user recipient ON recipient.user_id = recipient_ac.user_id " +
+                "WHERE tr.transfer_type_id = 1 " +
+                "AND tr.transfer_status_id = ? " +
+                "AND tr.account_to = ? ;";
+        try {
+            SqlRowSet sqlRows = jdbcTemplate.queryForRowSet(sql, transferStatusId, accountId);
+
+            while(sqlRows.next())
+                transfers.add(mapTransferResponseToRow(sqlRows));
+
+            return transfers;
+        }catch (CannotGetJdbcConnectionException connectionException){
+
+        }
+
         return List.of();
     }
 
-    @Override
-    public List<TransferHistoryDto> accountTransferStatusHistory() {
-        return List.of();
-    }
 
-
-    public TransferHistoryDto mapTransferResponseToRow(SqlRowSet sqlRow){
+    private TransferHistoryDto mapTransferResponseToRow(SqlRowSet sqlRow){
         return new TransferHistoryDto(
                 sqlRow.getInt("transfer_id"),
                 sqlRow.getInt("sender_id"),
@@ -180,7 +191,7 @@ public class JdbcTransferRepository implements TransferRepository {
         );
     }
 
-    public Transfer mapTransferToRow(SqlRowSet sqlRow){
+    private Transfer mapTransferToRow(SqlRowSet sqlRow){
         return new Transfer(
                 sqlRow.getInt("transfer_id"),
                 sqlRow.getInt("transfer_type_id"),

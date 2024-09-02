@@ -11,12 +11,13 @@ import com.techelevator.tenmo.repository.TransferRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 
 import java.util.*;
 
-//@Component
+@Service
 public class RestTransferService implements TransferService{
     private static final Logger LOGGER = LoggerFactory.getLogger(RestTransferService.class);
     private static final Set<Integer> VALID_TYPE_IDS = Set.of(1,2);

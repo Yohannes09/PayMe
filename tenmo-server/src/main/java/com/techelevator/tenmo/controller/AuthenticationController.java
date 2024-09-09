@@ -14,7 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import com.techelevator.tenmo.repository.UserRepository;
+import com.techelevator.tenmo.repository.notused.UserRepository;
 import com.techelevator.tenmo.dto.LoginDto;
 import com.techelevator.tenmo.dto.RegisterUserDto;
 import com.techelevator.tenmo.model.User;

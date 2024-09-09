@@ -1,8 +1,7 @@
 package com.techelevator.tenmo.services;
 
-import com.techelevator.tenmo.dto.TransferDto;
-import com.techelevator.tenmo.dto.TransferHistoryDto;
 import com.techelevator.tenmo.dto.TransferResponseDto;
+import com.techelevator.tenmo.dto.TransferResponseDtoOLD;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -36,17 +35,17 @@ public class RestClientTransferService implements ClientTransferService{
     }
 
     @Override
-    public Optional<TransferResponseDto> getTransferById(int transferId){
+    public Optional<TransferResponseDtoOLD> getTransferById(int transferId){
         StringBuilder url = new StringBuilder(ENDPOINT);
         url.append(transferId);
 
         try {
 
-            ResponseEntity<TransferResponseDto> response= restTemplate.exchange(
+            ResponseEntity<TransferResponseDtoOLD> response= restTemplate.exchange(
                     url.toString(),
                     HttpMethod.GET,
                     getEntityWithBearer(),
-                    TransferResponseDto.class);
+                    TransferResponseDtoOLD.class);
 
             return Optional.ofNullable(response.getBody());
 
@@ -60,16 +59,16 @@ public class RestClientTransferService implements ClientTransferService{
 
 
     @Override
-    public List<TransferHistoryDto> accountTransferHistory(int accountId) {
+    public List<TransferResponseDto> accountTransferHistory(int accountId) {
 
         String url = String.format("%s/history/%d", ENDPOINT, accountId);
 
         try {
-            ResponseEntity<List<TransferHistoryDto>> response = restTemplate.exchange(
+            ResponseEntity<List<TransferResponseDto>> response = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
                     getEntityWithBearer(),
-                    new ParameterizedTypeReference<List<TransferHistoryDto>>() {}
+                    new ParameterizedTypeReference<List<TransferResponseDto>>() {}
             );
 
             return response.getBody();

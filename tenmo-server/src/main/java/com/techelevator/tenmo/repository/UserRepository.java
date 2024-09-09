@@ -1,17 +1,8 @@
 package com.techelevator.tenmo.repository;
 
-import com.techelevator.tenmo.dto.RegisterUserDto;
-import com.techelevator.tenmo.model.User;
+import com.techelevator.tenmo.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+public interface UserRepository extends JpaRepository<User, Long> {
 
-public interface UserRepository {
-
-    List<User> getUsers();
-
-    User getUserById(int id);
-
-    User getUserByUsername(String username);
-
-    User createUser(RegisterUserDto user);
 }

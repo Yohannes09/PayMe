@@ -1,6 +1,6 @@
 package com.techelevator.tenmo.service;
 
-import com.techelevator.tenmo.dto.TransferHistoryDto;
+import com.techelevator.tenmo.dto.TransferResponseDto;
 import com.techelevator.tenmo.model.Transfer;
 
 import java.util.List;
@@ -11,9 +11,9 @@ public interface TransferService {
 
 
     // Obtain a list of an accounts transfer history.
-    List<TransferHistoryDto> getAccountHistory(int accountId);
+    List<TransferResponseDto> getAccountHistory(int accountId);
     Optional<Transfer> getTransferById(int transferId);
-    List<TransferHistoryDto> accountTransferStatus(int transferStatusId, int accountId);
+    List<TransferResponseDto> accountTransferStatus(int transferStatusId, int accountId);
 
     Optional<Transfer> updatePendingTransfer(int transferId, int newTransferStatusId);
 }

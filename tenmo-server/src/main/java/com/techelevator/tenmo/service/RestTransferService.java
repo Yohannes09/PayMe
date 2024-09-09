@@ -1,16 +1,15 @@
 package com.techelevator.tenmo.service;
 
-import com.techelevator.tenmo.dto.TransferHistoryDto;
+import com.techelevator.tenmo.dto.TransferResponseDto;
 import com.techelevator.tenmo.exception.AccountException;
 import com.techelevator.tenmo.exception.TransferException;
 import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.repository.AccountRepository;
-import com.techelevator.tenmo.repository.JdbcAccountRepository;
-import com.techelevator.tenmo.repository.JdbcTransferRepository;
-import com.techelevator.tenmo.repository.TransferRepository;
+import com.techelevator.tenmo.repository.notused.AccountRepository;
+import com.techelevator.tenmo.repository.notused.JdbcAccountRepository;
+import com.techelevator.tenmo.repository.notused.JdbcTransferRepository;
+import com.techelevator.tenmo.repository.notused.TransferRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
@@ -42,7 +41,7 @@ public class RestTransferService implements TransferService{
      * transferStatusId:    1 is pending, 2 is accepted, and 3 is rejected.*/
 
     @Override
-    public List<TransferHistoryDto> getAccountHistory(int accountId) {
+    public List<TransferResponseDto> getAccountHistory(int accountId) {
 
         return transferRepository.getTransferHistory(accountId);
     }
@@ -58,7 +57,7 @@ public class RestTransferService implements TransferService{
     }
 
     @Override
-    public List<TransferHistoryDto> accountTransferStatus(int transferStatusId, int accountId) {
+    public List<TransferResponseDto> accountTransferStatus(int transferStatusId, int accountId) {
         return accountRepository.accountExists(accountId)?
                 transferRepository.accountTransferStatus(transferStatusId, accountId):List.of();
     }

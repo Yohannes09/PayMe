@@ -1,6 +1,6 @@
 package com.techelevator.dao;
 
-import com.techelevator.tenmo.repository.JdbcUserRepository;
+import com.techelevator.tenmo.repository.notused.JdbcUserRepository;
 import com.techelevator.tenmo.exception.DaoException;
 import com.techelevator.tenmo.dto.RegisterUserDto;
 import com.techelevator.tenmo.model.User;

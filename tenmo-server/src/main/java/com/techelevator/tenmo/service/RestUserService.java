@@ -1,8 +1,8 @@
 package com.techelevator.tenmo.service;
 
 import com.techelevator.tenmo.model.User;
-import com.techelevator.tenmo.repository.JdbcUserRepository;
-import com.techelevator.tenmo.repository.UserRepository;
+import com.techelevator.tenmo.repository.notused.JdbcUserRepository;
+import com.techelevator.tenmo.repository.notused.UserRepository;
 
 import java.util.Optional;
 

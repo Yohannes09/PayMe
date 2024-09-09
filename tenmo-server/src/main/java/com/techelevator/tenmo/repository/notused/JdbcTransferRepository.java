@@ -1,6 +1,6 @@
-package com.techelevator.tenmo.repository;
+package com.techelevator.tenmo.repository.notused;
 
-import com.techelevator.tenmo.dto.TransferHistoryDto;
+import com.techelevator.tenmo.dto.TransferResponseDto;
 import com.techelevator.tenmo.model.Transfer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,8 +108,8 @@ public class JdbcTransferRepository implements TransferRepository {
     }
 
     @Override
-    public List<TransferHistoryDto> getTransferHistory(int accountId) {
-        List<TransferHistoryDto> transfers = new ArrayList<>();
+    public List<TransferResponseDto> getTransferHistory(int accountId) {
+        List<TransferResponseDto> transfers = new ArrayList<>();
         String sql = "SELECT tr.transfer_id, sender.username AS sender_username, recipient.username AS recipient_username, " +
                 "sender_ac.account_id AS sender_id, recipient_ac.account_id AS recipient_id,  tr.amount " +
                 "FROM transfer tr " +
@@ -153,8 +153,8 @@ public class JdbcTransferRepository implements TransferRepository {
     }
 
     @Override
-    public List<TransferHistoryDto> accountTransferStatus(int transferStatusId, int accountId) {
-        List<TransferHistoryDto> transfers = new ArrayList<>();
+    public List<TransferResponseDto> accountTransferStatus(int transferStatusId, int accountId) {
+        List<TransferResponseDto> transfers = new ArrayList<>();
         String sql = "SELECT tr.transfer_id, sender.username AS sender_username, recipient.username AS recipient_username, " +
                 "sender_ac.account_id AS sender_id, recipient_ac.account_id AS recipient_id,  tr.amount " +
                 "FROM transfer tr " +
@@ -180,14 +180,14 @@ public class JdbcTransferRepository implements TransferRepository {
     }
 
 
-    private TransferHistoryDto mapTransferResponseToRow(SqlRowSet sqlRow){
-        return new TransferHistoryDto(
-                sqlRow.getInt("transfer_id"),
-                sqlRow.getInt("sender_id"),
-                sqlRow.getInt("recipient_id"),
+    private TransferResponseDto mapTransferResponseToRow(SqlRowSet sqlRow){
+        return new TransferResponseDto(
+                sqlRow.getLong("transfer_id"),
+                sqlRow.getLong("sender_id"),
+                sqlRow.getLong("recipient_id"),
                 sqlRow.getString("sender_username"),
                 sqlRow.getString("recipient_username"),
-                sqlRow.getDouble("amount")
+                sqlRow.getBigDecimal("amount")
         );
     }
 

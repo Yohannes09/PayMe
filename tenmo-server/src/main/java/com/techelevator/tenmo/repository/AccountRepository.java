@@ -1,22 +1,15 @@
 package com.techelevator.tenmo.repository;
 
 import com.techelevator.tenmo.model.Account;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-import java.util.Optional;
-
-public interface AccountRepository {
-    Optional<Account> getByAccountId(int accountId);
-
-    Optional<Account> getByUserId(int userId);
-
-    void withdraw(int id, double amountWithdrawn);
-
-    void deposit(int id, double amountDeposited);
-
-    int deleteById(int id);
-
-    boolean accountExists(int id);
-
-    List<Account> getAccounts();
+/**
+ *  <p>
+ *      - Extending <b>JpaRepository</b> interface allows for full CRUD operation
+ *      functionality.
+ *      <br>
+ *      - No need to create a class and provide the implementations.
+ *  </p>*/
+public interface AccountRepository extends JpaRepository<Account, Long> {
+    // If more functionality is needed, define in the child interface.
 }

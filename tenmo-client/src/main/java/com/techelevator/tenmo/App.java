@@ -1,6 +1,6 @@
 package com.techelevator.tenmo;
 
-import com.techelevator.tenmo.dto.TransferHistoryDto;
+//import com.techelevator.tenmo.dto.TransferResponseDto;
 import com.techelevator.tenmo.model.*;
 import com.techelevator.tenmo.services.*;
 
@@ -113,7 +113,7 @@ public class App {
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
 
-        List<TransferHistoryDto> transfers = clientTransferServce.accountTransferHistory(currentUserAcccountId);
+        List<TransferResponseDto> transfers = clientTransferServce.accountTransferHistory(currentUserAcccountId);
         consoleService.printTransferScreen();
 
         transfers.forEach(

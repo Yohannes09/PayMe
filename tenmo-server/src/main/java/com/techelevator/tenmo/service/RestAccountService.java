@@ -1,8 +1,8 @@
 package com.techelevator.tenmo.service;
 
 import com.techelevator.tenmo.model.Account;
-import com.techelevator.tenmo.repository.AccountRepository;
-import com.techelevator.tenmo.repository.JdbcAccountRepository;
+import com.techelevator.tenmo.repository.notused.AccountRepository;
+import com.techelevator.tenmo.repository.notused.JdbcAccountRepository;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 
 import java.util.List;

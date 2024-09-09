@@ -1,4 +1,4 @@
-package com.techelevator.tenmo.repository;
+package com.techelevator.tenmo.repository.notused;
 
 import com.techelevator.tenmo.exception.DaoException;
 import com.techelevator.tenmo.dto.RegisterUserDto;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class JdbcUserRepository implements UserRepository {

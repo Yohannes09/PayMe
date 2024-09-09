@@ -1,14 +1,10 @@
 package com.techelevator.tenmo.controller;
 
 import com.techelevator.tenmo.dto.TransferDto;
-import com.techelevator.tenmo.dto.TransferHistoryDto;
 import com.techelevator.tenmo.dto.TransferResponseDto;
-import com.techelevator.tenmo.exception.AccountException;
-import com.techelevator.tenmo.exception.DaoException;
+import com.techelevator.tenmo.dto.TransferResponseDtoOLD;
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.service.*;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +33,7 @@ public class TransferController {
 
     @PostMapping("/{transferTypeId}")
     public ResponseEntity<TransferResponseDto> processTransfer(@Valid @RequestBody TransferDto transferDto,
-                                                               @PathVariable("transferTypeId") int transferTypeId) {
+                                                                  @PathVariable("transferTypeId") int transferTypeId) {
         Optional<Transfer> transfer = transferService.processTransfer(
                 transferTypeId,
                 transferDto.getSenderAccountId(),
@@ -59,11 +55,11 @@ public class TransferController {
     }
 
     @GetMapping("/{transferId}")
-    public ResponseEntity<TransferResponseDto> getTransferById(@PathVariable("transferId") int transferId) {
+    public ResponseEntity<TransferResponseDtoOLD> getTransferById(@PathVariable("transferId") int transferId) {
         Optional<Transfer> transfer = transferService.getTransferById(transferId);
 
         return transfer.map(t -> {
-            TransferResponseDto transferDtos = new TransferResponseDto(
+            TransferResponseDtoOLD transferDtos = new TransferResponseDtoOLD(
                     t.getTransferId(),
                     t.getSenderAccountId(),
                     t.getRecipientAccountId(),
@@ -76,17 +72,17 @@ public class TransferController {
 
     /*  Returns an account's transactions. */
     @GetMapping("/history/{accountId}")
-    public ResponseEntity<List<TransferHistoryDto>> accountTransferHistory(@PathVariable("accountId") int accountId) {
-        List<TransferHistoryDto> transfers = transferService.getAccountHistory(accountId);
+    public ResponseEntity<List<TransferResponseDto>> accountTransferHistory(@PathVariable("accountId") int accountId) {
+        List<TransferResponseDto> transfers = transferService.getAccountHistory(accountId);
 
         return transfers.isEmpty() ?
                 ResponseEntity.badRequest().build(): ResponseEntity.ok(transfers);
     }
 
     @GetMapping("/transfer-status/{accountId}/{transferStatusId}")
-    public ResponseEntity<List<TransferHistoryDto>> getAccountTransferStatus(@PathVariable("accountId") int accountId,
-                                                                @PathVariable("transferStatusId") int transferStatusId){
-        List<TransferHistoryDto> transfers = transferService.accountTransferStatus(transferStatusId, accountId);
+    public ResponseEntity<List<TransferResponseDto>> getAccountTransferStatus(@PathVariable("accountId") int accountId,
+                                                                              @PathVariable("transferStatusId") int transferStatusId){
+        List<TransferResponseDto> transfers = transferService.accountTransferStatus(transferStatusId, accountId);
         return transfers.isEmpty() ? ResponseEntity.badRequest().build() : ResponseEntity.ok(transfers);
     }
 

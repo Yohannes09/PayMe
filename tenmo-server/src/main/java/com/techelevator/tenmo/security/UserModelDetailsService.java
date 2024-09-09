@@ -1,6 +1,6 @@
 package com.techelevator.tenmo.security;
 
-import com.techelevator.tenmo.repository.UserRepository;
+import com.techelevator.tenmo.repository.notused.UserRepository;
 import com.techelevator.tenmo.model.Authority;
 import com.techelevator.tenmo.model.User;
 import org.slf4j.Logger;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Authenticate a user from the database.

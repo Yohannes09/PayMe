@@ -3,17 +3,16 @@ package com.techelevator.tenmo.service;
 import com.techelevator.tenmo.dto.TransferResponseDto;
 import com.techelevator.tenmo.exception.AccountException;
 import com.techelevator.tenmo.exception.TransferException;
-import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.repository.notused.AccountRepository;
-import com.techelevator.tenmo.repository.notused.JdbcAccountRepository;
-import com.techelevator.tenmo.repository.notused.JdbcTransferRepository;
-import com.techelevator.tenmo.repository.notused.TransferRepository;
+import com.techelevator.tenmo.entity.Transfer;
+import com.techelevator.tenmo.repository.AccountRepository;
+import com.techelevator.tenmo.repository.TransferRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -30,26 +29,20 @@ public class RestTransferService implements TransferService{
         this.transferRepository = transferRepository;
     }
 
-    public RestTransferService(){
-        this.accountRepository = new JdbcAccountRepository();
-        this.transferRepository = new JdbcTransferRepository();
-    }
-
 
     /*
      * transferTypeId:  1 a request, and 2 a send.
      * transferStatusId:    1 is pending, 2 is accepted, and 3 is rejected.*/
 
     @Override
-    public List<TransferResponseDto> getAccountHistory(int accountId) {
-
+    public List<TransferResponseDto> getAccountHistory(Long accountId) {
         return transferRepository.getTransferHistory(accountId);
     }
 
     @Override
-    public Optional<Transfer> getTransferById(int transferId) {
+    public Optional<Transfer> getTransferById(Long transferId) {
         try {
-            return transferRepository.getTransferById(transferId);
+            return Optional.ofNullable(transferRepository.findTransferById(transferId));
         }catch (RestClientException clientException) {
             System.out.println("Error: " + clientException.getMessage());
         }
@@ -57,27 +50,26 @@ public class RestTransferService implements TransferService{
     }
 
     @Override
-    public List<TransferResponseDto> accountTransferStatus(int transferStatusId, int accountId) {
-        return accountRepository.accountExists(accountId)?
+    public List<TransferResponseDto> accountTransferStatus(Integer transferStatusId, Long accountId) {
+        return accountRepository.existsById(accountId)?
                 transferRepository.accountTransferStatus(transferStatusId, accountId):List.of();
     }
 
     @Transactional
     @Override
-    public Optional<Transfer> processTransfer(int transferTypeId, int senderAccountId, int recipientAccountId, double amount){
+    public Optional<Transfer> processTransfer(
+            Integer transferTypeId, Long accountFromId, Long accountToId, BigDecimal amount, String transferMessage){
 
         try {
-            validateTransfer(transferTypeId, senderAccountId, recipientAccountId, amount);
+            validateTransfer(null, transferTypeId, accountFromId, accountToId, amount);
 
-            // Handle transfer requests.
-            if(transferTypeId == 1)
-                return transferRepository.processTransfer(1, 1, senderAccountId, recipientAccountId, amount);
+            if(transferTypeId == 1) {
+                return handleTransferRequest(accountFromId, accountToId, amount, transferMessage);
+            }
+            else if (transferTypeId == 2) {
+                return handleDirectTransfer(accountFromId, accountToId, amount, transferMessage);
+            }
 
-            // Handle direct transfer.
-            accountRepository.withdraw(senderAccountId, amount);
-            accountRepository.deposit(recipientAccountId, amount);
-
-            return transferRepository.processTransfer(2, 2, senderAccountId, recipientAccountId, amount);
         }catch (TransferException transferException){
             LOGGER.error("TransferException: " , transferException);
             System.out.println(transferException.getMessage());
@@ -91,43 +83,68 @@ public class RestTransferService implements TransferService{
 
     @Transactional
     @Override
-    public Optional<Transfer> updatePendingTransfer(int transferId, int newTransferStatusId) {
-        Optional<Transfer> transferOpt = transferRepository.getTransferById(transferId);
-
+    public Optional<Transfer> updatePendingTransfer(Long transferId, Integer newTransferStatusId) {
+        Integer requestId = 1;
+        Optional<Transfer> transferOpt = Optional.ofNullable(transferRepository.findTransferById(transferId));
         try {
-            if(!VALID_STATUS_IDS.contains(newTransferStatusId))
-                throw new TransferException("Invalid transfer status ");
-            if (transferOpt.isEmpty())
-                throw new TransferException("Transfer not found.");
+            validateTransfer(transferId, requestId, transferOpt.get().getAccountFrom(), transferOpt.get().getAccountTo(), transferOpt.get().getTransferAmount());
             Transfer transfer = transferOpt.get();
-            if (transfer.getTransferStatusId() == 2 || transfer.getTransferStatusId() == 3)
-                throw new TransferException("Transfer already processed.");
-
 
             if (newTransferStatusId == 2) {
-                accountRepository.withdraw(transfer.getSenderAccountId(), transfer.getAmount());
-                accountRepository.deposit(transfer.getRecipientAccountId(), transfer.getAmount());
+                handleAccountBalances(transfer.getAccountFrom(), transfer.getAccountTo(), transfer.getTransferAmount());
             }
-            return transferRepository.updateTransferStatus(transferId, newTransferStatusId);
+            return Optional.ofNullable(transferRepository.updateTransferStatus(transferId, newTransferStatusId));
         } catch (TransferException e) {
             throw new RuntimeException(e);
+        }catch (AccountException accountException){
+            throw new RuntimeException(accountException);
         }
     }
 
-    private void validateTransfer
-            (int transferTypeId, int senderAccountId, int recipientAccountId, double amount) throws TransferException, AccountException{
+    //************* Helper methods***********
+    private Optional<Transfer> handleTransferRequest(Long accountFromId, Long accountToId, BigDecimal amount, String transferMessage){
+        return Optional.ofNullable(transferRepository.processTransfer(1, 1, accountFromId, accountToId, amount, transferMessage));
+    }
 
-        if(senderAccountId == recipientAccountId)
+    private Optional<Transfer> handleDirectTransfer(Long accountFromId, Long accountToId, BigDecimal amount, String transferMessage){
+        handleAccountBalances(accountFromId, accountToId, amount);
+        return Optional.ofNullable(transferRepository.processTransfer(2, 2, accountFromId, accountToId, amount, transferMessage));
+    }
+
+    private void handleAccountBalances(Long accountFromId, Long accountToId, BigDecimal amount){
+        accountRepository.updateBalance(accountFromId, amount.negate());
+        accountRepository.updateBalance(accountToId, amount);
+    }
+
+    private void validateTransfer
+            (Long transferId, Integer transferTypeId, Long accountFromId, Long accountToId, BigDecimal amount) throws TransferException, AccountException{
+
+        if(accountFromId.equals(accountToId))
             throw new TransferException("Sender and recipient IDs cannot be the same. ");
 
-        if(amount <= 0)
+        if(amount.compareTo(BigDecimal.ZERO) <= 0)
             throw new TransferException("Amount must be greater than zero. ");
 
-        if(VALID_TYPE_IDS.contains(transferTypeId))
+        if(!VALID_TYPE_IDS.contains(transferTypeId))
             throw new TransferException("Invalid transfer type ID. ");
 
-        if(!accountRepository.accountExists(senderAccountId) || !accountRepository.accountExists(recipientAccountId))
+        if(!accountRepository.existsById(accountFromId) || !accountRepository.existsById(accountToId))
             throw new AccountException("One or both accounts do not exist. ");
+
+        if(transferId != null){
+            Optional<Transfer> transferOptional = Optional.ofNullable(transferRepository.findTransferById(transferId));
+            if(transferOptional.isEmpty())
+                throw new TransferException("Transfer does not exist. ");
+
+            Transfer transfer = transferOptional.get();
+
+            // If a transfer was Sent
+            if ((transfer.getTransferTypeId() == 2 || transfer.getTransferStatusId() == 2) ||
+                    (transfer.getTransferTypeId() == 1 && transfer.getTransferStatusId() == 3)) {
+                throw new TransferException("Transfer already processed");
+            }
+
+        }
     }
 
 }

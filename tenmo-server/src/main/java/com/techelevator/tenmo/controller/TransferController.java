@@ -14,18 +14,18 @@ import java.util.*;
 @RequestMapping("api/tenmo/transfer")
 @RestController
 public class TransferController {
-    private final TransferService transferService;
+    //private final TransferService transferService;
     private final AccountService accountService;
     private final UserService userService;
 
     public TransferController(TransferService transferService, AccountService accountService, UserService userService) {
-        this.transferService = transferService;
+        //this.transferService = transferService;
         this.accountService = accountService;
         this.userService = userService;
     }
 
     public TransferController() {
-        this.transferService = new RestTransferService();
+        //this.transferService = new RestTransferService();
         this.accountService = new RestAccountService();
         this.userService = new RestUserService();
     }
@@ -80,7 +80,7 @@ public class TransferController {
     }
 
     @GetMapping("/transfer-status/{accountId}/{transferStatusId}")
-    public ResponseEntity<List<TransferResponseDto>> getAccountTransferStatus(@PathVariable("accountId") int accountId,
+    public ResponseEntity<List<TransferResponseDto>> getAccountTransferStatus(@PathVariable("accountId") Long accountId,
                                                                               @PathVariable("transferStatusId") int transferStatusId){
         List<TransferResponseDto> transfers = transferService.accountTransferStatus(transferStatusId, accountId);
         return transfers.isEmpty() ? ResponseEntity.badRequest().build() : ResponseEntity.ok(transfers);

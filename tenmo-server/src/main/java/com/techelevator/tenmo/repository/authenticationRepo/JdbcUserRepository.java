@@ -1,4 +1,4 @@
-package com.techelevator.tenmo.repository.notused;
+package com.techelevator.tenmo.repository.authenticationRepo;
 
 import com.techelevator.tenmo.exception.DaoException;
 import com.techelevator.tenmo.dto.RegisterUserDto;

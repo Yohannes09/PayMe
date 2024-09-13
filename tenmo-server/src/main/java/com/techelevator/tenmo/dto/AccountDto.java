@@ -1,51 +1,28 @@
 package com.techelevator.tenmo.dto;
 
-import javax.validation.constraints.NotNull;
+import com.techelevator.tenmo.entity.AccountType;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+@AllArgsConstructor
+@Getter
 public class AccountDto {
-    @NotNull
-    private int accountId;
 
-    @NotNull
-    private int userId;
+    private Integer accountId;
 
-    private double balance;
+    private Integer userId;
 
-    public AccountDto(int accountId, int userId, double balance) {
-        this.accountId = accountId;
-        this.userId = userId;
-        this.balance = balance;
-    }
+    private BigDecimal balance;
 
-    public AccountDto() {
+    private AccountType accountType;
 
-    }
+    private String currency;
 
+    private boolean isActive;
 
-    @NotNull
-    public int getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(@NotNull int accountId) {
-        this.accountId = accountId;
-    }
-
-    @NotNull
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(@NotNull int userId) {
-        this.userId = userId;
-    }
-
-    public double getBalance() {
-        return balance;
-    }
-
-    public void setBalance(double balance) {
-        this.balance = balance;
-    }
+    private LocalDateTime createdAt;
 
 }

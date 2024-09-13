@@ -1,7 +1,7 @@
 package com.techelevator.tenmo.services;
 
+import com.techelevator.tenmo.dto.TransferRequestDto;
 import com.techelevator.tenmo.dto.TransferResponseDto;
-import com.techelevator.tenmo.dto.TransferResponseDtoOLD;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -35,17 +35,17 @@ public class RestClientTransferService implements ClientTransferService{
     }
 
     @Override
-    public Optional<TransferResponseDtoOLD> getTransferById(int transferId){
+    public Optional<TransferRequestDto> getTransferById(int transferId){
         StringBuilder url = new StringBuilder(ENDPOINT);
         url.append(transferId);
 
         try {
 
-            ResponseEntity<TransferResponseDtoOLD> response= restTemplate.exchange(
+            ResponseEntity<TransferRequestDto> response= restTemplate.exchange(
                     url.toString(),
                     HttpMethod.GET,
                     getEntityWithBearer(),
-                    TransferResponseDtoOLD.class);
+                    TransferRequestDto.class);
 
             return Optional.ofNullable(response.getBody());
 

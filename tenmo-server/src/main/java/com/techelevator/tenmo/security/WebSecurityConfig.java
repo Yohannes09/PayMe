@@ -11,7 +11,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,7 +19,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig{
 
     private final TokenProvider tokenProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -49,37 +48,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      * @param web
      */
     public void configure(WebSecurity web) {
-        web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**");
+        web.ignoring().requestMatchers(HttpMethod.OPTIONS, "/**");
     }
 
-    /**
-     * Configure com.techelevator.auctions.security settings
-     * @param httpSecurity
-     * @throws Exception
-     */
-    @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
+    @Bean
+    protected SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 // we don't need CSRF because our token is invulnerable
                 .csrf().disable()
 
                 .authorizeRequests(
                         authorize ->
-                            authorize.
-                                antMatchers("/login").permitAll().
-                                antMatchers("/success").permitAll().
-                                anyRequest().authenticated()
+                            authorize.requestMatchers("/login", "/success").permitAll()
+                                            .anyRequest().authenticated()
                 )
-
-//                .formLogin(form ->
-//                        form.loginPage("/login").
-//                        loginProcessingUrl("/login").
-//                        defaultSuccessUrl("/success").
-//                        permitAll()
-//                ).logout(logout ->
-//                        logout.logoutRequestMatcher(new AntPathRequestMatcher("/logout")).
-//                        permitAll()
-//                )
 
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
@@ -90,10 +72,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
-
                 .and()
                 .apply(securityConfigurerAdapter());
 
+        return httpSecurity.build();
     }
 
     private JWTConfigurer securityConfigurerAdapter() {

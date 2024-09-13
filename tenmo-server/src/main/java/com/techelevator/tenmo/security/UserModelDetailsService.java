@@ -1,6 +1,6 @@
 package com.techelevator.tenmo.security;
 
-import com.techelevator.tenmo.repository.notused.UserRepository;
+import com.techelevator.tenmo.repository.authenticationRepo.UserRepository;
 import com.techelevator.tenmo.model.Authority;
 import com.techelevator.tenmo.model.User;
 import org.slf4j.Logger;

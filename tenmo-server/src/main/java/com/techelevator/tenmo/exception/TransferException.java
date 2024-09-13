@@ -1,6 +1,6 @@
 package com.techelevator.tenmo.exception;
 
-public class TransferException extends Exception{
+public class TransferException extends RuntimeException{
     public TransferException(){
         super();
     }

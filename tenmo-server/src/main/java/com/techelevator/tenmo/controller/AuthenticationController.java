@@ -1,6 +1,6 @@
 package com.techelevator.tenmo.controller;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import com.techelevator.tenmo.exception.DaoException;
 import com.techelevator.tenmo.dto.LoginResponseDto;
@@ -14,7 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import com.techelevator.tenmo.repository.notused.UserRepository;
+import com.techelevator.tenmo.repository.authenticationRepo.UserRepository;
 import com.techelevator.tenmo.dto.LoginDto;
 import com.techelevator.tenmo.dto.RegisterUserDto;
 import com.techelevator.tenmo.model.User;
@@ -40,8 +40,6 @@ public class AuthenticationController {
         this.userRepository = userRepository;
     }
 
-
-    //@RequestMapping(path = "/login", method = RequestMethod.POST)
     @PostMapping(path = "/login")
     public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginDto loginDto) {
 
@@ -65,8 +63,6 @@ public class AuthenticationController {
         }
 
     }
-
-
 
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(path = "/register", method = RequestMethod.POST)

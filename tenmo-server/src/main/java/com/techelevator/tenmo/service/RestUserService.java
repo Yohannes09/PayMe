@@ -1,17 +1,14 @@
 package com.techelevator.tenmo.service;
 
-import com.techelevator.tenmo.model.User;
-import com.techelevator.tenmo.repository.notused.JdbcUserRepository;
-import com.techelevator.tenmo.repository.notused.UserRepository;
+import com.techelevator.tenmo.entity.User;
+import com.techelevator.tenmo.repository.UserRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Service
 public class RestUserService implements UserService{
     private final UserRepository userRepository;
-
-    public RestUserService(){
-        this.userRepository = new JdbcUserRepository();
-    }
 
     public RestUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -19,7 +16,12 @@ public class RestUserService implements UserService{
 
 
     @Override
-    public Optional<User> getUserById(int userId) {
-        return Optional.ofNullable(userRepository.getUserById(userId));
+    public Optional<User> getUserById(Long userId) {
+        return userRepository.findById(userId);
+    }
+
+    @Override
+    public Optional<User> createNewUser(String username, String passwordHash, String email, String role) {
+        return Optional.empty();
     }
 }

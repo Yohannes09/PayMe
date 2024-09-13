@@ -1,18 +1,31 @@
 package com.techelevator.tenmo.repository;
 
-import com.techelevator.tenmo.model.Account;
+import com.techelevator.tenmo.entity.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 
 /**
- *  <p>
- *      - Extending <b>JpaRepository</b> interface allows for full CRUD operation
- *      functionality.
- *      <br>
- *      - No need to create a class and provide the implementations.
- *  </p>*/
+ * <p>
+ *  Repository for managing account entities.
+ * <ul>
+ *   <li>Provides CRUD operations for account data.</li>
+ *   <li>Handles account balance updates.</li>
+ * </ul>
+ * <p>
+ */
+@Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
-    // If more functionality is needed, define in the child interface.
-    void updateBalance(Long accountId, BigDecimal amount);
+
+    @Modifying
+    @Query(value = "UPDATE account ac " +
+            "SET ac.balance = ac.balance + :amount " +
+            "WHERE ac.account_id = :accountId", nativeQuery = true)
+    void updateBalance(@Param("accountId") Long accountId,
+                       @Param("amount") BigDecimal amount);
+
 }

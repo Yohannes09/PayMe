@@ -1,4 +1,0 @@
-All should follow convention (Might be Hibernate ORM so this convention is probably correct for this application)
--Repository as the package name
--Classes end With Repository
--Make Generic Base Repository <T, Integer> for more reusable code

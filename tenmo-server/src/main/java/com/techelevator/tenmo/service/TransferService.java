@@ -13,7 +13,7 @@ public interface TransferService {
 
     // Obtain a list of an accounts transfer history.
     List<TransferResponseDto> getAccountHistory(Long accountId);
-    Optional<Transfer> getTransferById(Long transferId);
+    Optional<TransferResponseDto> getTransferById(Long transferId);
     List<TransferResponseDto> accountTransferStatus(Integer transferStatusId, Long accountId);
 
     Optional<Transfer> updatePendingTransfer(Long transferId, Integer newTransferStatusId);

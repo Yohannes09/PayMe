@@ -1,12 +1,8 @@
 package com.techelevator.tenmo.services;
 
-import com.techelevator.tenmo.exception.AccountException;
-import com.techelevator.tenmo.model.Account;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 

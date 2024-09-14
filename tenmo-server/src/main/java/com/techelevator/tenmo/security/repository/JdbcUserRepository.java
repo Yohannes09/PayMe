@@ -1,12 +1,11 @@
-package com.techelevator.tenmo.repository.authenticationRepo;
+package com.techelevator.tenmo.security.repository;
 
 import com.techelevator.tenmo.exception.DaoException;
 import com.techelevator.tenmo.dto.RegisterUserDto;
-import com.techelevator.tenmo.model.User;
+import com.techelevator.tenmo.security.model.User;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -25,25 +24,19 @@ public class JdbcUserRepository implements UserRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public JdbcUserRepository(){
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/tenmo");
-        jdbcTemplate = new JdbcTemplate(dataSource);
-    }
 
     @Override
     public User getUserById(int userId) {
         User user = null;
-        String sql = "SELECT * FROM tenmo_user WHERE user_id = ?";
-        try {
-            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, userId);
-            if (results.next()) {
-                user = mapRowToUser(results);
-            }
-        } catch (CannotGetJdbcConnectionException e) {
-            throw new DaoException("Unable to connect to server or database", e);
-        }
+//        String sql = "SELECT * FROM tenmo_user WHERE user_id = ?";
+//        try {
+//            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, userId);
+//            if (results.next()) {
+//                user = mapRowToUser(results);
+//            }
+//        } catch (CannotGetJdbcConnectionException e) {
+//            throw new DaoException("Unable to connect to server or database", e);
+//        }
         return user;
     }
 
@@ -51,15 +44,15 @@ public class JdbcUserRepository implements UserRepository {
     public List<User> getUsers() {
         List<User> users = new ArrayList<>();
         String sql = "SELECT user_id, username, password_hash FROM tenmo_user";
-        try {
-            SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
-            while (results.next()) {
-                User user = mapRowToUser(results);
-                users.add(user);
-            }
-        } catch (CannotGetJdbcConnectionException e) {
-            throw new DaoException("Unable to connect to server or database", e);
-        }
+//        try {
+//            SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
+//            while (results.next()) {
+//                User user = mapRowToUser(results);
+//                users.add(user);
+//            }
+//        } catch (CannotGetJdbcConnectionException e) {
+//            throw new DaoException("Unable to connect to server or database", e);
+//        }
         return users;
     }
 
@@ -105,11 +98,11 @@ public class JdbcUserRepository implements UserRepository {
 
     private User mapRowToUser(SqlRowSet rs) {
         User user = new User();
-        user.setId(rs.getInt("user_id"));
-        user.setUsername(rs.getString("username"));
-        user.setPassword(rs.getString("password_hash"));
-        user.setActivated(true);
-        user.setAuthorities("USER");
+//        user.setUserId(rs.getInt("user_id"));
+//        user.setUsername(rs.getString("username"));
+//        user.setPassword(rs.getString("password_hash"));
+//        user.setActivated(true);
+//        user.setAuthorities("USER");
         return user;
     }
 

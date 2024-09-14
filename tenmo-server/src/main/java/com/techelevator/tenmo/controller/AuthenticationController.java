@@ -14,10 +14,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import com.techelevator.tenmo.repository.authenticationRepo.UserRepository;
+import com.techelevator.tenmo.security.repository.UserRepository;
 import com.techelevator.tenmo.dto.LoginDto;
 import com.techelevator.tenmo.dto.RegisterUserDto;
-import com.techelevator.tenmo.model.User;
+import com.techelevator.tenmo.security.model.User;
 import com.techelevator.tenmo.security.jwt.TokenProvider;
 import org.springframework.web.server.ResponseStatusException;
 

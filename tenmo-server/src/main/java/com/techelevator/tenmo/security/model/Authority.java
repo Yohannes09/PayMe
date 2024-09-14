@@ -1,40 +1,33 @@
-package com.techelevator.tenmo.model;
+package com.techelevator.tenmo.security.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.util.Objects;
 
+@Getter
+@AllArgsConstructor
 public class Authority {
 
-   private String name;
-
-   public String getName() {
-      return name;
-   }
-
-   public void setName(String name) {
-      this.name = name;
-   }
-
-   public Authority(String name) {
-      this.name = name;
-   }
+   private String role;
 
    @Override
    public boolean equals(Object o) {
       if (this == o) return true;
       if (o == null || getClass() != o.getClass()) return false;
       Authority authority = (Authority) o;
-      return name.equals(authority.name);
+      return role.equals(authority.role);
    }
 
    @Override
    public int hashCode() {
-      return Objects.hash(name);
+      return Objects.hash(role);
    }
 
    @Override
    public String toString() {
       return "Authority{" +
-         "name=" + name +
+         "name=" + role +
          '}';
    }
 }

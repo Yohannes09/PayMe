@@ -1,7 +1,9 @@
 package com.techelevator.tenmo;
 
 //import com.techelevator.tenmo.dto.TransferResponseDto;
-import com.techelevator.tenmo.model.*;
+import com.techelevator.tenmo.entity.*;
+import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.*;
 
 import java.text.NumberFormat;
@@ -67,12 +69,7 @@ public class App {
 
         String token = currentUser.getToken();
 
-        clientTransferServce.setToken(token);
-        clientAccountService.setToken(token);
-        clientUserService.setToken(token);
 
-        currentAccount = clientAccountService.getAccountByUserId(currentUser.getUser().getId());
-        currentUserAcccountId = currentAccount.get().getAccountId();
 
         if (currentUser == null) {
             consoleService.printErrorMessage();
@@ -105,32 +102,13 @@ public class App {
 
 	private void viewCurrentBalance() {
 		// TODO Auto-generated method stub
-        System.out.println(
-                USD_FOMATTER.format(clientAccountService.getAccountById(currentUserAcccountId).get().getBalance()));
+
 	}
 
 
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
 
-        List<TransferResponseDto> transfers = clientTransferServce.accountTransferHistory(currentUserAcccountId);
-        consoleService.printTransferScreen();
-
-        transfers.forEach(
-                transfer -> {
-                    String transferParticipant = transfer.getSenderAccountId() == currentUserAcccountId ?
-                            transfer.getRecipientUsername() : transfer.getSenderUsername();
-
-                    String toOrFrom = transfer.getSenderAccountId() == currentUserAcccountId ? "To:" : "From:";
-                    System.out.println(String.format("%-6d %-6s %-15s %13s",
-                            transfer.getTransferId(),
-                            toOrFrom,
-                            transferParticipant,
-                            USD_FOMATTER.format(transfer.getAmount() )));
-                }
-        );
-
-        consoleService.printLine(15, '-');
 	}
 
 	private void viewPendingRequests() {

@@ -1,9 +1,9 @@
 package com.techelevator.dao;
 
-import com.techelevator.tenmo.repository.authenticationRepo.JdbcUserRepository;
+import com.techelevator.tenmo.security.repository.JdbcUserRepository;
 import com.techelevator.tenmo.exception.DaoException;
 import com.techelevator.tenmo.dto.RegisterUserDto;
-import com.techelevator.tenmo.model.User;
+import com.techelevator.tenmo.security.model.User;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +50,7 @@ public class JdbcUserRepositoryTests extends BaseDaoTests {
 
     @Test
     public void getUserById_given_valid_user_id_returns_user() {
-        User actualUser = sut.getUserById(USER_1.getId());
+        User actualUser = sut.getUserById(USER_1.getUserId());
 
         Assert.assertEquals(USER_1, actualUser);
     }

@@ -1,8 +1,8 @@
 package com.techelevator.tenmo.security;
 
-import com.techelevator.tenmo.repository.authenticationRepo.UserRepository;
-import com.techelevator.tenmo.model.Authority;
-import com.techelevator.tenmo.model.User;
+import com.techelevator.tenmo.repository.UserRepository;
+import com.techelevator.tenmo.security.model.Authority;
+import com.techelevator.tenmo.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,6 +18,7 @@ import java.util.Set;
 /**
  * Authenticate a user from the database.
  */
+
 @Component("userDetailsService")
 public class UserModelDetailsService implements UserDetailsService {
 
@@ -36,18 +37,19 @@ public class UserModelDetailsService implements UserDetailsService {
     }
 
     private org.springframework.security.core.userdetails.User createSpringSecurityUser(String login, User user) {
-        if (!user.isActivated()) {
+        if (!user.isActive()) {
             throw new UserNotActivatedException("User " + login + " was not activated");
         }
 
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-        Set<Authority> userAuthorities = user.getAuthorities();
+        Set<Authority> userAuthorities = Set.of(new Authority(user.getRole()));
+
         for (Authority authority : userAuthorities) {
-            grantedAuthorities.add(new SimpleGrantedAuthority(authority.getName()));
+            grantedAuthorities.add(new SimpleGrantedAuthority(authority.getRole()));
         }
 
         return new org.springframework.security.core.userdetails.User(user.getUsername(),
-                user.getPassword(),
+                user.getPasswordHash(),
                 grantedAuthorities);
     }
 }

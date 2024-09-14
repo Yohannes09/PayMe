@@ -8,12 +8,15 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TransferService {
-    Optional<Transfer> processTransfer(Integer transferTypeId, Long accountFromId, Long accountToId, BigDecimal amount, String transferMessage);
+    Optional<Transfer> processTransfer(
+            Integer transferTypeId, Long accountFromId, Long accountToId, BigDecimal amount, String transferMessage);
 
-
-    // Obtain a list of an accounts transfer history.
     List<TransferResponseDto> getAccountHistory(Long accountId);
-    Optional<TransferResponseDto> getTransferById(Long transferId);
+
+    Optional<TransferResponseDto> getDetailedTransfer(Long transferId);
+
+    Optional<Transfer> getTransfer(Long transferId);
+
     List<TransferResponseDto> accountTransferStatus(Integer transferStatusId, Long accountId);
 
     Optional<Transfer> updatePendingTransfer(Long transferId, Integer newTransferStatusId);

@@ -1,5 +1,6 @@
 package com.techelevator.tenmo.services;
 
+import com.techelevator.tenmo.entity.Account;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -45,18 +46,19 @@ public class RestClientAccountService implements ClientAccountService{
     public Optional<Account> getAccountByUserId(int userId) {
         String url = String.format("%s/user/%d" , ENDPOINT, userId);
 
-        try {
-            return Optional.ofNullable(restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    getEntityWithBearer(),
-                    Account.class
-            ).getBody());
-
-        }catch (RestClientException clientException){
-            System.out.println("Error: " + clientException.getMessage());
-            return Optional.empty();
-        }
+//        try {
+//            return Optional.ofNullable(restTemplate.exchange(
+//                    url,
+//                    HttpMethod.GET,
+//                    getEntityWithBearer(),
+//                    Account.class
+//            ).getBody());
+//
+//        }catch (RestClientException clientException){
+//            System.out.println("Error: " + clientException.getMessage());
+//
+//        }
+        return Optional.empty();
     }
 
     public void setToken(String token){

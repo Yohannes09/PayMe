@@ -38,7 +38,7 @@ public class TransferController {
         );
 
         return newTransfer
-                .map(transfer -> transferService.getTransferById(transfer.getTransferId()).orElseThrow(() -> new DaoException("")))
+                .map(transfer -> transferService.getDetailedTransfer(transfer.getTransferId()).orElseThrow(() -> new DaoException("")))
                 .map(responseDto -> ResponseEntity.ok(responseDto))
                 .orElseGet(()-> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
@@ -46,7 +46,7 @@ public class TransferController {
 
     public ResponseEntity<TransferResponseDto> getTransferById(@PathVariable("transferId") Long transferId) {
 
-        return transferService.getTransferById(transferId)
+        return transferService.getDetailedTransfer(transferId)
                 .map(dto -> ResponseEntity.ok(dto))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }

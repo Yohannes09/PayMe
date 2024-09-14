@@ -1,6 +1,6 @@
 package com.techelevator.tenmo.dto;
 
-import com.techelevator.tenmo.model.User;
+import com.techelevator.tenmo.security.model.User;
 
 /*
     The acronym DTO is being used for "data transfer object". It means that this type of class is specifically

@@ -30,7 +30,7 @@ public class Transfer {
     @Column(name = "account_to", nullable = false)
     private Long accountTo;
 
-    @Column(name = "amount", nullable = false)
+    @Column(name = "amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;
 
     @Column(name = "transfer_message")
@@ -44,6 +44,26 @@ public class Transfer {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+
+    //Needed when creating a new transfer.
+    public Transfer(
+            Integer transferTypeId,
+            Integer transferStatusId,
+            Long accountFrom,
+            Long accountTo,
+            BigDecimal amount,
+            String transferMessage,
+            String currency){
+
+        this.transferTypeId = transferTypeId;
+        this.transferStatusId = transferStatusId;
+        this.accountFrom = accountFrom;
+        this.accountTo = accountTo;
+        this.amount = amount;
+        this.transferMessage = transferMessage;
+        this.currency = currency != null ? currency.toUpperCase() : "na";
+    }
 
     @PrePersist //ensures createdAt and updatedAt are set during the entity's initial creation.
     public void prePersist() {

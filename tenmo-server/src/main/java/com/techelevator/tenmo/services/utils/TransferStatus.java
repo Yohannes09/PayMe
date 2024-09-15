@@ -1,4 +1,4 @@
-package com.techelevator.tenmo.service;
+package com.techelevator.tenmo.services.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +12,8 @@ import java.util.stream.Stream;
 public enum TransferStatus {
     PENDING("Pending", 1),
     APPROVED("Approved", 2),
-    REJECTED("Rejected", 3);
+    REJECTED("Rejected", 3),
+    COMPLETED("COMPLETED", 4);
 
     private static final Set<Integer> transferStatusIds = Stream.of(TransferStatus.values())
             .map(TransferStatus::getStatusId)
@@ -21,7 +22,7 @@ public enum TransferStatus {
     private final String statusDescription;
     private final Integer statusId;
 
-    public static Set<Integer> validTransferIds(){
+    public static Set<Integer> getValidTransferStatus(){
         return transferStatusIds;
     }
 }

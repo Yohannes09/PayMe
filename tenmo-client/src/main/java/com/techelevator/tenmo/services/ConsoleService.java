@@ -1,14 +1,11 @@
 package com.techelevator.tenmo.services;
 
 
-import com.techelevator.tenmo.exception.DaoException;
 import com.techelevator.tenmo.model.*;
-import com.techelevator.tenmo.service.*;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ConsoleService {
 

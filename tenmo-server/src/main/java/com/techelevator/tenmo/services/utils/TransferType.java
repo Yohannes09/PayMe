@@ -1,4 +1,4 @@
-package com.techelevator.tenmo.service;
+package com.techelevator.tenmo.services.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,5 +26,10 @@ public enum TransferType {
 
     public static boolean validateTypeId(Integer id){
         return transferTypeIds.contains(id);
+    }
+
+
+    public static Set<Integer> getValidTransferTypes(){
+        return transferTypeIds;
     }
 }

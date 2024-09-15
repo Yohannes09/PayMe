@@ -1,7 +1,7 @@
 package com.techelevator.tenmo.controller;
 
 import com.techelevator.tenmo.entity.User;
-import com.techelevator.tenmo.service.UserService;
+import com.techelevator.tenmo.services.main.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

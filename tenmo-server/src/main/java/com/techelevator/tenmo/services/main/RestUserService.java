@@ -1,4 +1,4 @@
-package com.techelevator.tenmo.service;
+package com.techelevator.tenmo.services.main;
 
 import com.techelevator.tenmo.entity.User;
 import com.techelevator.tenmo.repository.UserRepository;

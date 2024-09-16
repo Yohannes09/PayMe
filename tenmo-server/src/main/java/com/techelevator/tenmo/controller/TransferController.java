@@ -28,18 +28,16 @@ public class TransferController {
 
 
     @PostMapping("/{transferTypeId}")
-    public ResponseEntity<TransferResponseDto> processTransfer(@RequestBody @Valid TransferRequestDto requestDto,
+    public ResponseEntity<Transfer> processTransfer(@RequestBody @Valid TransferRequestDto requestDto,
                                                                @PathVariable("transferTypeId") Integer transferTypeId) {
-        transferService.processTransferRequest(requestDto);
-        return ResponseEntity.ok(transferService.);
+        return ResponseEntity.ok(
+                transferService.processTransferRequest(requestDto));
     }
 
 
-    public ResponseEntity<TransferResponseDto> getTransferById(@PathVariable("transferId") Long transferId) {
+    public ResponseEntity<Transfer> findTransferById(@PathVariable("transferId") Long transferId) {
 
-        return transferService.getDetailedTransfer(transferId)
-                .map(dto -> ResponseEntity.ok(dto))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+        return ResponseEntity.ok(transferService.findTransferById());
     }
 
     /*  Returns an account's transactions. */
@@ -54,15 +52,14 @@ public class TransferController {
     @GetMapping("/transfer-status/{accountId}/{transferStatusId}")
     public ResponseEntity<List<TransferResponseDto>> getAccountTransferStatus(@PathVariable("accountId") Long accountId,
                                                                               @PathVariable("transferStatusId") Integer transferStatusId){
-        List<TransferResponseDto> transfers = transferService.accountTransferStatus(transferStatusId, accountId);
-        return transfers.isEmpty() ? ResponseEntity.badRequest().build() : ResponseEntity.ok(transfers);
+        return null;
     }
 
     @PostMapping("/pending/{transferId}/{transferStatusId}")
     public ResponseEntity<Optional<Transfer>> updatePendingTransfer(@PathVariable("transferId") Long transferId,
                                                                     @PathVariable("transferStatusId") Integer newTransferStatusId){
 
-        return transfer.isPresent() ? ResponseEntity.ok(transfer) : ResponseEntity.badRequest().build();
+        return null;
     }
 
 

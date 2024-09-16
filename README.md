@@ -229,9 +229,9 @@ public class JdbcUserDao implements UserDao {
 
 ### DAO integration tests
 
-`com.techelevator.dao.BaseDaoTests` has been provided for you to use as a base class for any DAO integration test. It initializes a Datasource for testing and manages rollback of database changes between tests.
+`com.techelevator.tests.BaseDaoTests` has been provided for you to use as a base class for any DAO integration test. It initializes a Datasource for testing and manages rollback of database changes between tests.
 
-`com.techelevator.dao.JdbUserDaoTests` has been provided for you as an example for writing your own DAO integration tests.
+`com.techelevator.tests.JdbUserDaoTests` has been provided for you as an example for writing your own DAO integration tests.
 
 Remember that when testing, you're using a copy of the real database. The schema and data for the test database are defined in `/src/test/resources/test-data.sql`. The schema in this file matches the schema defined in `database/tenmo.sql`.
 

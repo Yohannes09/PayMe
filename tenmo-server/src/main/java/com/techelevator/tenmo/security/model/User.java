@@ -2,6 +2,7 @@ package com.techelevator.tenmo.security.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import com.techelevator.tenmo.util.TenmoRoles;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

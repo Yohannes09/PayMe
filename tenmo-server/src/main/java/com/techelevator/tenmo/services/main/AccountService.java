@@ -13,4 +13,5 @@ public interface AccountService {
 
     List<TransferResponseDto> getAccountTransferHistory(Long accountId);
 
+    List<Account> findByAccountId(List<Long> accountIds);
 }

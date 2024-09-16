@@ -1,5 +1,6 @@
 package com.techelevator.tenmo.entity;
 
+import com.techelevator.tenmo.util.AccountType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -5,10 +5,6 @@ import com.techelevator.tenmo.entity.Transfer;
 
 import java.util.Optional;
 
-/*
-* In an effort to concise the code and abstract some details, this mapper will be used.
-* Specifically in lambda expressions to make them easier to read.
-* */
 public class TransferMapper {
     public static Transfer mapDtoToTransfer(TransferRequestDto requestDto){
 

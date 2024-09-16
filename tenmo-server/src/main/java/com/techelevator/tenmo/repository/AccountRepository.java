@@ -2,6 +2,7 @@ package com.techelevator.tenmo.repository;
 
 import com.techelevator.tenmo.dto.TransferResponseDto;
 import com.techelevator.tenmo.entity.Account;
+import com.techelevator.tenmo.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -12,15 +13,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * <p>
- *  Repository for managing account entities.
- * <ul>
- *   <li></li>
- *   <li>Handles account balance updates.</li>
- * </ul>
- * <p>
- */
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
@@ -28,8 +20,8 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     @Query(value = "UPDATE account ac " +
             "SET ac.balance = ac.balance + :amount " +
             "WHERE ac.account_id = :accountId", nativeQuery = true)
-    void updateBalance(@Param("accountId") Long accountId,
-                       @Param("amount") BigDecimal amount);
+    void updateAccountBalance(@Param("accountId") Long accountId,
+                              @Param("amount") BigDecimal amount);
 
 
     @Query(value = "SELECT " +
@@ -51,9 +43,11 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
             "JOIN transfer_status ts ON ts.transfer_status_id = tr.transfer_status_id" +
             "WHERE tr.account_from = :accountId OR tr.account_to = :accountId"
             , nativeQuery = true)
-    List<TransferResponseDto> getAccountTransferHistory(@Param("accountId") Long accountId);
+    List<TransferResponseDto> accountTransferHistory(@Param("accountId") Long accountId);
 
-    @Query(value = "SELECT ac FROM account ac WHERE account_id IN :accountIds")
-    List<Account> findAccountsById(@Param("accountsIds") List<Long> accountIds);
+    @Query(value = "SELECT * FROM tenmo_user tu " +
+            "JOIN account ac ON ac.user_id = tu.user_id " +
+            "WHERE account_id = :accountId LIMIT 1; ", nativeQuery = true)
+    Optional<User> findUserByAccountId(@Param("accountId")Long accountId);
 
 }

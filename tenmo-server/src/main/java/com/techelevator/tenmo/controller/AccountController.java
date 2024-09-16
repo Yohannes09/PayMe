@@ -1,35 +1,26 @@
 package com.techelevator.tenmo.controller;
 
+import com.techelevator.tenmo.dto.AccountDto;
+import com.techelevator.tenmo.dto.TransferResponseDto;
+import com.techelevator.tenmo.services.main.AccountService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequestMapping("api/tenmo/account")
 @RestController
 public class AccountController {
-//    private final AccountService accountService;
-//
-//    public AccountController(AccountService accountService) {
-//        this.accountService = accountService;
-//    }
-//
-//    public AccountController() {
-//        this.accountService = new RestAccountService();
-//    }
-//
-//
-//    @GetMapping("/{accountId}")
-//    public ResponseEntity<AccountDto> getAccountByid(@PathVariable("accountId") int accountId) {
-//        Optional <Account> account = accountService.getAccountById(accountId);
-//
-//        if (account.isPresent()) {
-//
-//            return new ResponseEntity<>(new AccountDto(
-//                    account.get().getAccountId(),
-//                    account.get().getUserId(),
-//                    account.get().getBalance()
-//            ), HttpStatus.OK);
-//        }
-//        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//    }
+    private final AccountService accountService;
+
+    public AccountController(AccountService accountService) {
+        this.accountService = accountService;
+    }
+
+    @GetMapping("/{accountId}")
+    public ResponseEntity<AccountDto> getAccountByid(@PathVariable("accountId") int accountId) {
+        return accountService.findAccountById();
+    }
 //
 //    @GetMapping("/user/{userId}")
 //    public ResponseEntity<AccountDto> getAccountByUserId(@PathVariable("userId") int userId) {
@@ -63,6 +54,12 @@ public class AccountController {
 //                        ).collect(Collectors.toList()), HttpStatus.OK);
 //    }
 
-//    @PostMapping("")
-//    public boolean create
+    /*  Returns an account's transactions. */
+    @GetMapping("/history/{accountId}")
+    public ResponseEntity<List<TransferResponseDto>> accountTransferHistory(@PathVariable("accountId") Long accountId) {
+        List<TransferResponseDto> transfers = List.of();// = accountService.getAccountHistory(accountId);
+
+        return transfers.isEmpty() ?
+                ResponseEntity.badRequest().build(): ResponseEntity.ok(transfers);
+    }
 }

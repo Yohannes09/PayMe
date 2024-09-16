@@ -1,35 +1,26 @@
 package com.techelevator.tenmo.dto;
 
-import org.springframework.stereotype.Component;
-
+import com.techelevator.tenmo.util.TenmoRoles;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.NotEmpty;
-/*
-    The acronym DTO is being used for "data transfer object". It means that this type of class is specifically
-    created to transfer data between the client and the server. For example, CredentialsDto represents the data a client must
-    pass to the server for a login endpoint, and TokenDto represents the object that's returned from the server
-    to the client from a login endpoint.
- */
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@AllArgsConstructor
+@Getter
 public class RegisterUserDto {
-
     @NotEmpty
     private String username;
+
+    @Pattern(regexp = "\"^(?=.*[A-Z])(?=.*[0-9!@#$%^&*]).{6,}$\"",
+            message = "Password must")
     @NotEmpty
     private String password;
 
-    public String getUsername() {
-        return username;
-    }
+    @Email
+    private String email;
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    private final String role = TenmoRoles.USER.getRole();
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }

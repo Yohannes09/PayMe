@@ -2,7 +2,6 @@ package com.techelevator.tenmo.controller;
 
 import jakarta.validation.Valid;
 
-import com.techelevator.tenmo.exception.DaoException;
 import com.techelevator.tenmo.dto.LoginResponseDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

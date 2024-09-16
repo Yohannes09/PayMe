@@ -1,4 +1,4 @@
-package com.techelevator.tenmo.security.model;
+package com.techelevator.tenmo.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

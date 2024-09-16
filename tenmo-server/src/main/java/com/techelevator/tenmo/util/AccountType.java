@@ -1,4 +1,4 @@
-package com.techelevator.tenmo.entity;
+package com.techelevator.tenmo.util;
 
 public enum AccountType {
     PERSONAL,

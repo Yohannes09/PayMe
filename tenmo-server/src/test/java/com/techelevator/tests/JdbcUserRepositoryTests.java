@@ -1,7 +1,6 @@
-package com.techelevator.dao;
+package com.techelevator.tests;
 
 import com.techelevator.tenmo.security.repository.JdbcUserRepository;
-import com.techelevator.tenmo.exception.DaoException;
 import com.techelevator.tenmo.dto.RegisterUserDto;
 import com.techelevator.tenmo.security.model.User;
 import org.junit.Assert;

@@ -1,10 +1,10 @@
 package com.techelevator.tests.service;
 
-import com.techelevator.tenmo.repository.AccountRepository;
-import com.techelevator.tenmo.repository.TransferRepository;
-import com.techelevator.tenmo.services.main.RestTransferService;
-import com.techelevator.tenmo.services.main.TransferService;
-import com.techelevator.tenmo.services.validation.ValidatorService;
+import com.tenmo.repository.AccountRepository;
+import com.tenmo.repository.TransferRepository;
+import com.tenmo.services.main.RestTransferService;
+import com.tenmo.services.main.TransferService;
+import com.tenmo.services.validation.ValidatorService;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;

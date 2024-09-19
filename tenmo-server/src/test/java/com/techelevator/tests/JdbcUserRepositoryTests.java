@@ -1,8 +1,8 @@
 package com.techelevator.tests;
 
 import com.techelevator.tenmo.security.repository.JdbcUserRepository;
-import com.techelevator.tenmo.dto.RegisterUserDto;
-import com.techelevator.tenmo.security.model.User;
+import com.tenmo.dto.RegisterUserDto;
+import com.tenmo.security.model.User;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

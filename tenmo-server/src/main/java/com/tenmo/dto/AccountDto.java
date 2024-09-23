@@ -11,9 +11,9 @@ import java.time.LocalDateTime;
 @Getter
 public class AccountDto {
 
-    private Integer accountId;
+    private Long accountId;
 
-    private Integer userId;
+    private Long userId;
 
     private BigDecimal balance;
 

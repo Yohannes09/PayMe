@@ -29,37 +29,23 @@ public class TransferController {
     @PostMapping("/{transferTypeId}")
     public ResponseEntity<Transfer> processTransfer(@RequestBody @Valid TransferRequestDto requestDto,
                                                     @PathVariable("transferTypeId") Integer transferTypeId) {
-        return ResponseEntity.ok(
-                transferService.processTransferRequest(requestDto));
+        return ResponseEntity.ok(transferService.processTransferRequest(requestDto));
     }
 
 
     public ResponseEntity<Transfer> findTransferById(@PathVariable("transferId") Long transferId) {
-
         return ResponseEntity.ok(transferService.findTransferById());
     }
 
-    /*  Returns an account's transactions. */
-    @GetMapping("/history/{accountId}")
-    public ResponseEntity<List<TransferResponseDto>> accountTransferHistory(@PathVariable("accountId") Long accountId) {
-        List<TransferResponseDto> transfers = transferService.getAccountHistory(accountId);
 
-        return transfers.isEmpty() ?
-                ResponseEntity.badRequest().build(): ResponseEntity.ok(transfers);
-    }
-
-    @GetMapping("/transfer-status/{accountId}/{transferStatusId}")
-    public ResponseEntity<List<TransferResponseDto>> getAccountTransferStatus(@PathVariable("accountId") Long accountId,
-                                                                              @PathVariable("transferStatusId") Integer transferStatusId){
-        return null;
-    }
-
+    // Maybe this should be approvePendingTransfer maybe deny shoud be here.
+    // client shouldn't be able to update the status directly
+    // just approve and deny a transer
     @PostMapping("/pending/{transferId}/{transferStatusId}")
     public ResponseEntity<Optional<Transfer>> updatePendingTransfer(@PathVariable("transferId") Long transferId,
                                                                     @PathVariable("transferStatusId") Integer newTransferStatusId){
 
         return null;
     }
-
 
 }

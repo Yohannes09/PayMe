@@ -7,7 +7,6 @@ import com.tenmo.exception.NotFoundException;
 import com.tenmo.repository.AccountRepository;
 import com.tenmo.repository.TransferStatusRepository;
 import com.tenmo.repository.TransferTypeRepository;
-import com.tenmo.util.TransferType;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,22 +39,23 @@ public class RestAccountService implements AccountService {
     }
 
     @Override
-    public List<TransferResponseDto> getAccountTransferHistory(Long accountId) {
+    public Optional<List<Account>> findByAccountId(List<Long> accountIds) {
+        if(accountIds.isEmpty() || accountIds == null)
+            return Optional.empty();
+        return Optional.ofNullable(accountRepository.findAllById(accountIds));
+    }
+
+    @Override
+    public List<TransferResponseDto> accountTransferHistory(Long accountId) {
         return Optional.ofNullable(
                 accountRepository.accountTransferHistory(accountId)
         ).orElseThrow(()-> new NotFoundException(""));
     }
 
     @Override
-    public List<Account> findByAccountId(List<Long> accountIds) {
-        if(accountIds.isEmpty() || accountIds == null)
-            return List.of();
-        return accountRepository.findAllById(accountIds);
-    }
-
-    public List<TransferResponseDto> accountSentTransfers(Long accountId,
-                                                          Optional<String> statusDescription,
-                                                          Optional<String> typeDescription){
+    public List<TransferResponseDto> accountTransferHistory(Long accountId,
+                                                            Optional<String> statusDescription,
+                                                            Optional<String> typeDescription){
 
         User user = accountRepository.findUserByAccountId(accountId)
                 .orElseThrow(() -> new NotFoundException("A user could not be found with the given account ID: " + accountId));
@@ -65,7 +65,8 @@ public class RestAccountService implements AccountService {
 
         List<TransferResponseDto> transfers = accountRepository.accountTransferHistory(accountId);
 
-        return transfers.stream()
+        return transfers
+                .stream()
                 .filter(transfer -> typeId
                         .map(id -> transfer.getTypeId().equals(id))
                         .orElse(true)
@@ -76,6 +77,7 @@ public class RestAccountService implements AccountService {
                         .orElse(true)
                 ).collect(Collectors.toList());
     }
+
 
     private Integer mapStatusDescriptionToId(String statusDescription) {
         return statusRepository.findByStatusDescription(statusDescription)

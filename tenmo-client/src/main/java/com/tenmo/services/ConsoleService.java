@@ -1,7 +1,7 @@
 package com.tenmo.services;
 
 
-import com.techelevator.tenmo.model.*;
+import com.tenmo.model.*;
 import com.tenmo.model.UserCredentials;
 
 import java.math.BigDecimal;

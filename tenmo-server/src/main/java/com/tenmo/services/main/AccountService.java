@@ -11,7 +11,11 @@ public interface AccountService {
 
     List<Account> getAccounts();
 
-    List<TransferResponseDto> getAccountTransferHistory(Long accountId);
+    List<TransferResponseDto> accountTransferHistory(Long accountId);
 
-    List<Account> findByAccountId(List<Long> accountIds);
+    List<TransferResponseDto> accountTransferHistory(Long accountId,
+                                                   Optional<String> statusDescription,
+                                                   Optional<String> typeDescription);
+
+    Optional<List<Account>> findByAccountId(List<Long> accountIds);
 }

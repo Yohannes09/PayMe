@@ -18,9 +18,13 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     @Modifying
     @Query(value = "UPDATE account ac " +
-            "SET ac.balance = ac.balance + :amount " +
-            "WHERE ac.account_id = :accountId", nativeQuery = true)
-    void updateAccountBalance(@Param("accountId") Long accountId,
+            "SET ac.balance = CASE " +
+            "   WHEN ac.account_id = :accountFromId THEN ac.balance - :amount " +
+            "   WHEN ac.account_id = :accountToId THEN ac.balance + :amount " +
+            "END " +
+            "WHERE ac.account_id IN (:accountFromId, :accountToId) ", nativeQuery = true)
+    void handleDirectTransfer(@Param("accountFromId") Long accountFromId,
+                              @Param("accountToId") Long accountToId,
                               @Param("amount") BigDecimal amount);
 
 

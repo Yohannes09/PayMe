@@ -12,5 +12,5 @@ import java.util.Optional;
 public interface TransferStatusRepository extends JpaRepository<TransferStatus, Integer> {
     @Query(value = "SELECT * FROM transfer_status " +
             "WHERE LOWER(transfer_status_desc) = LOWER(:statusDescription); ", nativeQuery = true)
-    Optional<TransferStatus> findByStatusDescription(@Param("statusDescription")String statusDescription);
+    Optional<TransferStatus> findByDescription(@Param("statusDescription")String statusDescription);
 }

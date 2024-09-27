@@ -11,9 +11,9 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.techelevator</groupId>
+    <groupId>com.tenmo</groupId>
 
-    <artifactId>m02-capstone-parent</artifactId>
+    <artifactId>tenmo-parent</artifactId>
 
     <version>1.0</version>
     <name>tenmo</name>
@@ -26,6 +26,8 @@
         <java.version>11</java.version>
         <jjwt.version>0.11.1</jjwt.version>
     </properties>
+
+
 
     <modules>
         <module>tenmo-server</module>

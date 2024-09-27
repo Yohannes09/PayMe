@@ -18,8 +18,6 @@ import java.util.Optional;
 @AllArgsConstructor
 public class TransferDto {
     private @NotNull(message = "Transfer Id cannot be null. ") Long transferId;
-    private @NotNull Integer transferTypeId;
-    private @NotNull Integer transferStatusId;
     private @NotNull(message = "Sender ID cannot be null. ") Long accountFromId;
     private @NotNull(message = "Recipient ID cannot be null. ") Long accountToId;
     private @Min(value = 0, message = "Enter amount greater than zero.") BigDecimal amount;

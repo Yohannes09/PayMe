@@ -26,15 +26,11 @@ public class TransferController {
     }
 
 
-    @PostMapping("/{transferTypeId}")
-    public ResponseEntity<Transfer> processTransfer(@RequestBody @Valid TransferRequestDto requestDto,
-                                                    @PathVariable("transferTypeId") Integer transferTypeId) {
-        return ResponseEntity.ok(transferService.processTransferRequest(requestDto));
-    }
+
 
 
     public ResponseEntity<Transfer> findTransferById(@PathVariable("transferId") Long transferId) {
-        return ResponseEntity.ok(transferService.findTransferById());
+        return ResponseEntity.ok(transferService.findTransferById(transferId));
     }
 
 

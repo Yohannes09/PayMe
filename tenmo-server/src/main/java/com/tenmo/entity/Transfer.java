@@ -48,16 +48,16 @@ public class Transfer {
 
     //Needed when creating a new transfer.
     public Transfer(
-            Integer typeId,
-            Integer statusId,
+//            Integer typeId,
+//            Integer statusId,
             Long accountFrom,
             Long accountTo,
             BigDecimal amount,
             String transferMessage,
             String currency){
 
-        this.typeId = typeId;
-        this.statusId = statusId;
+//        this.typeId = typeId;
+//        this.statusId = statusId;
         this.accountFrom = accountFrom;
         this.accountTo = accountTo;
         this.amount = amount;

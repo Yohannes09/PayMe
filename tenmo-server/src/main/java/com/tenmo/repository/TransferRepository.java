@@ -15,13 +15,11 @@ import java.util.Optional;
 public interface TransferRepository extends JpaRepository<Transfer, Long> {
 
     @Query(value = "SELECT * FROM transfer tr " +
-            "WHERE tr.transfer_id = :transferId", nativeQuery = true)
-    Optional<Transfer> findTransferById(Long transferId);
-
-
-    @Query(value = "",
-            nativeQuery = true)
-    List<TransferResponseDto> getFilteredTransfers(Long accountId, Integer transferType, Integer transferStatus);
+            "JOIN transfer_type tt ON tt.transfer_type_id = tr.transfer_type_id " +
+            "JOIN transfer_status ts ON ts.transfer_status_id = tr.transfer_status_id " +
+            "WHERE LOWER(tt.transfer_type_desc) = 'request' " +
+            "AND LOWER(ts.transfer_status_desc) = 'approved' ", nativeQuery = true)
+    List<Transfer> getApprovedRequests();
 
 
     @Modifying
@@ -33,25 +31,5 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
                                   @Param("newTransferStatusId") Integer newTransferStatusId
     );
 
-    @Query(value = "SELECT " +
-            "tr.transfer_id AS transferId, " +
-            "sender.username AS accountFromUsername, " +
-            "recipient.username AS accountToUsername, " +
-            "tr.amount, " +
-            "tr.transfer_message AS transferMessage, " +
-            "tr.currency, " +
-            "tr.created_at AS createdAt, " +
-            "tt.transfer_type_desc AS transferTypeDescription," +
-            "ts.transfer_status_desc AS transferStatusDescription" +
-            "FROM transfer tr " +
-            "JOIN account sender_ac ON sender_ac.account_id = tr.account_from " +
-            "JOIN tenmo_user sender ON sender.user_id = sender_ac.user_id " +
-            "JOIN account recipient_ac ON recipient_ac.account_id = tr.account_to " +
-            "JOIN tenmo_user recipient ON recipient.user_id = recipient_ac.user_id " +
-            "JOIN transfer_type tt ON tt.transfer_type_id = tr.transfer_type_id " +
-            "JOIN transfer_status ts ON ts.transfer_status_id = tr.transfer_status_id" +
-            "WHERE tr.transfer_id = :transferId",
-            nativeQuery = true)
-    Optional<TransferResponseDto> getDetailedTransfer(@Param("transferId") Long transferId);
 
 }

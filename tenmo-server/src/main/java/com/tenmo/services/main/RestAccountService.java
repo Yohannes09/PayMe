@@ -80,9 +80,9 @@ public class RestAccountService implements AccountService {
 
 
     private Integer mapStatusDescriptionToId(String statusDescription) {
-        return statusRepository.findByStatusDescription(statusDescription)
+        return statusRepository.findByDescription(statusDescription)
                 .orElseThrow(() -> new NotFoundException("Status not found for description: " + statusDescription))
-                .getTransferStatusId();
+                .getStatusId();
     }
 
     private Integer mapTypeDescriptionToId(String typeDescription) {

@@ -1,7 +1,6 @@
 package com.tenmo.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,10 +14,15 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class TransferStatus {
 
-    private Integer transferStatusId;
+    @Column(name = "transfer_status_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    private Integer statusId;
 
+    @Column(name = "status_desc")
     private String statusDescription;
 
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     public TransferStatus(String statusDescription){

@@ -4,18 +4,19 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.techelevator</groupId>
-        <artifactId>m02-capstone-parent</artifactId>
+        <groupId>com.tenmo</groupId>
+        <artifactId>tenmo-parent</artifactId>
         <version>1.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>com.techelevator</groupId>
-    <artifactId>m02-capstone-server</artifactId>
+    <groupId>com.tenmo</groupId>
+    <artifactId>tenmo-server</artifactId>
     <version>1.0</version>
     <name>tenmo</name>
-    <description>TE Bucks Payment System</description>
-    <packaging>jar</packaging>
+    <description>Peer-to-peer Payment System</description>
+
+<packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

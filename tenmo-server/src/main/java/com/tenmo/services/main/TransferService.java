@@ -6,9 +6,9 @@ import com.tenmo.entity.Transfer;
 import java.util.List;
 
 public interface TransferService {
-    Transfer processTransferRequest(TransferRequestDto transferRequest);
+    Transfer findTransferById(Long transferId);
 
-    List<Transfer> completeAcceptedTransfers();
+    public Transfer handleDirectTransfer(TransferRequestDto request);
 
-    Transfer findTransferById();
+    public Transfer handleTransferRequest(TransferRequestDto request);
 }

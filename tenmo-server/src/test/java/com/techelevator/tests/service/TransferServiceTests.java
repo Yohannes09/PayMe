@@ -16,12 +16,12 @@ public class TransferServiceTests {
     @Mock private TransferRepository transferRepository;
     @Mock private AccountRepository accountRepository;
 
-    @BeforeEach
-    void setUp(){
-        MockitoAnnotations.openMocks(this);
-        transferService = new RestTransferService(
-                accountRepository,
-                transferRepository,
-                validatorService);
-    }
+//    @BeforeEach
+//    void setUp(){
+//        MockitoAnnotations.openMocks(this);
+//        transferService = new RestTransferService(
+//                accountRepository,
+//                transferRepository,
+//                validatorService);
+//    }
 }

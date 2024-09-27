@@ -1,10 +1,10 @@
 
 FROM openjdk:11-jdk-slim
 
-WORKDIR /Tenmo
+WORKDIR /app
 
-COPY target/Tenmo.jar Tenmo/Tenmo.jar
+COPY target/Tenmo.jar Tenmo.jar
 
 EXPOSE 8084
 
-ENTRYPOINT ["java", "-jar","Tenmo/Tenmo.jar"]
+ENTRYPOINT ["java", "-jar","Tenmo.jar"]

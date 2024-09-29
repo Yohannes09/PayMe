@@ -15,8 +15,7 @@ public class RestUserService implements UserService{
     }
 
 
-    @Override
-    public Optional<User> getUserById(Long userId) {
+    public Optional<User> findById(Long userId) {
         return userRepository.findById(userId);
     }
 

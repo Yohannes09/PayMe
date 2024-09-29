@@ -33,7 +33,7 @@ public class UserModelDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(final String login) {
         log.debug("Authenticating user '{}'", login);
-        return createSpringSecurityUser(login, userRepository.getUserByUsername(login));
+        return createSpringSecurityUser(login, userRepository.findByUsernameOrEmail(login));
     }
 
     private org.springframework.security.core.userdetails.User createSpringSecurityUser(String login, User user) {

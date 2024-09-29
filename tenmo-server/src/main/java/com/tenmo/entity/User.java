@@ -44,4 +44,11 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Account> accounts;
+
+    public User(
+            String username,
+            String email,
+            String passwordHash){
+
+    }
 }

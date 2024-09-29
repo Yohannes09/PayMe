@@ -1,11 +1,10 @@
 package com.tenmo.controller;
 
-import com.tenmo.dto.AccountDto;
+import com.tenmo.dto.account.AccountDto;
 import com.tenmo.dto.transfer.TransferResponseDto;
 import com.tenmo.entity.Account;
 import com.tenmo.exception.NotFoundException;
 import com.tenmo.mapper.AccountMapper;
-import com.tenmo.mapper.TransferMapper;
 import com.tenmo.services.main.AccountService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

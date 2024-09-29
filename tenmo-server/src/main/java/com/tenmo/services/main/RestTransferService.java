@@ -1,20 +1,18 @@
 package com.tenmo.services.main;
 
-import com.tenmo.dto.transfer.TransferDto;
 import com.tenmo.dto.transfer.TransferRequestDto;
+import com.tenmo.dto.transfer.TransferResponseDto;
+import com.tenmo.util.TransferTypeEnum;
 import com.tenmo.exception.BadRequestException;
 import com.tenmo.exception.NotFoundException;
 import com.tenmo.entity.Transfer;
 import com.tenmo.mapper.TransferMapper;
 import com.tenmo.repository.AccountRepository;
 import com.tenmo.repository.TransferRepository;
-import com.tenmo.repository.TransferStatusRepository;
-import com.tenmo.repository.TransferTypeRepository;
 import com.tenmo.services.validation.ValidatorService;
+import com.tenmo.util.TransferStatusEnum;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
 
 @Transactional
 @Service
@@ -22,21 +20,16 @@ public class RestTransferService implements TransferService {
     private final AccountRepository accountRepository;
     private final TransferRepository transferRepository;
     private final ValidatorService validatorService;
-    private final TransferTypeRepository typeRepository;
-    private final TransferStatusRepository statusRepository;
 
     public RestTransferService(
             AccountRepository accountRepository,
             TransferRepository transferRepository,
-            ValidatorService validatorService,
-            TransferTypeRepository typeRepository,
-            TransferStatusRepository statusRepository) {
+            ValidatorService validatorService) {
         this.accountRepository = accountRepository;
         this.transferRepository = transferRepository;
         this.validatorService = validatorService;
-        this.typeRepository = typeRepository;
-        this.statusRepository = statusRepository;
     }
+
 
     @Override
     public Transfer findTransferById(Long transferId) {
@@ -44,55 +37,85 @@ public class RestTransferService implements TransferService {
                 .orElseThrow(() -> new NotFoundException("Could not find a tranfer with ID: " + transferId));
     }
 
-    @Override
-    public Transfer handleDirectTransfer(TransferRequestDto request){
-        Transfer newTransfer = createTransfer(request, "send", "completed");
-        accountRepository.handleDirectTransfer(request.getAccountFromId(), request.getAccountToId(), request.getAmount());
-        return transferRepository.save(newTransfer);
-    }
 
-    @Override
-    public Transfer handleTransferRequest(TransferRequestDto request){
-        Transfer newTransfer = createTransfer(request, "request", "pending");
-        return transferRepository.save(newTransfer);
-    }
+    /** @param  */
 
-//    public TransferDto handleApprovedTransferRequest(Long tranferId){
-//        Transfer transfer = updatePendingTransfer(tranferId, getStatusId("completed"));
-//        accountRepository.handleDirectTransfer(transfer.getAccountFrom(), transfer.getAccountTo(), transfer.getAmount());
-//        return
-//    }
-//
-//    public TransferDto handleDeclinedTransferRequest(Long transferId){
-//
-//    }
+    private TransferResponseDto processTransferRequest(
+            TransferRequestDto request,
+            TransferTypeEnum type,
+            TransferStatusEnum status){
 
-    private Transfer updatePendingTransfer(Long transferId, Integer newStatusId) {
-        //validatorService.validateExistingTransfer();
-        Transfer transfer = transferRepository.findById(transferId)
-                .orElseThrow(() -> new NotFoundException("Transfer with ID: " + transferId + " could not be found. "));
-        transferRepository.updateTransferStatus(transfer.getTransferId(), newStatusId);
-        return transfer;
-    }
-
-    private Transfer createTransfer(TransferRequestDto request, String typeDescription, String statusDescription){
         validatorService.validateNewTransfer(request);
-        Transfer newTransfer = TransferMapper.mapDtoToTransfer(request);
-        newTransfer.setTypeId(getTypeId(typeDescription));
-        newTransfer.setStatusId(getStatusId(statusDescription));
+
+        Transfer newTransfer = TransferMapper.mapRequestToTransfer(request);
+        newTransfer.setTypeId(type.getId());
+        newTransfer.setStatusId(status.getId());
+
+        transferRepository.save(newTransfer);
+
+        return transferRepository.transferResponse(newTransfer.getTransferId()).
+                orElseThrow(() -> new BadRequestException("An issue occured with your transfer "));
+    }
+
+    @Override
+    public TransferResponseDto handleDirectTransfer(TransferRequestDto request){
+        TransferResponseDto newTransfer = processTransferRequest(
+                request,
+                TransferTypeEnum.SEND,
+                TransferStatusEnum.COMPLETED);
+
+        accountRepository.handleDirectTransfer(
+                request.getAccountFromId(),
+                request.getAccountToId(),
+                request.getAmount());
+
         return newTransfer;
     }
 
-    private Integer getTypeId(String typeDescription){
-        return typeRepository.findByDescription(typeDescription)
-                .orElseThrow(() -> new BadRequestException("Invalid transfer type: " + typeDescription))
-                .getTypeId();
+    @Override
+    public TransferResponseDto handleTransferRequest(TransferRequestDto request){
+        return processTransferRequest(
+                request,
+                TransferTypeEnum.REQUEST,
+                TransferStatusEnum.PENDING);
     }
 
-    private Integer getStatusId(String statusDescription){
-        return statusRepository.findByDescription(statusDescription)
-                .orElseThrow(() -> new BadRequestException("Invalid transfer status: " + statusDescription))
-                .getStatusId();
+
+
+    private Transfer updatePendingTransfer(Long transferId, TransferStatusEnum newStatus) {
+        validatorService.validateExistingTransfer(transferId);
+
+        Transfer transfer = transferRepository.findById(transferId)
+                .orElseThrow(() -> new NotFoundException("Transfer with ID: " + transferId + " could not be found. "));
+
+        transfer.setStatusId(newStatus.getId());
+
+        return transferRepository.save(transfer);
+    }
+
+    @Override
+    public TransferResponseDto handleApprovedRequest(Long transferId){
+        Transfer transfer = updatePendingTransfer(
+                transferId,
+                TransferStatusEnum.COMPLETED);
+
+        accountRepository.handleDirectTransfer(
+                transfer.getAccountFrom(),
+                transfer.getAccountTo(),
+                transfer.getAmount());
+
+        return transferRepository.transferResponse(transfer.getTransferId())
+                .orElseThrow(() -> new NotFoundException("Transfer response not found with ID : " + transferId));
+    }
+
+    @Override
+    public TransferResponseDto handleRejectedRequest(Long transferId){
+        updatePendingTransfer(
+                transferId,
+                TransferStatusEnum.REJECTED);
+
+        return transferRepository.transferResponse(transferId)
+                .orElseThrow(() -> new NotFoundException("Transfer response not found with ID : " + transferId));
     }
 
 }

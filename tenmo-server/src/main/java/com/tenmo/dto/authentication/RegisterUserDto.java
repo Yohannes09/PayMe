@@ -1,4 +1,4 @@
-package com.tenmo.dto;
+package com.tenmo.dto.authentication;
 
 import com.tenmo.util.TenmoRoles;
 import jakarta.validation.constraints.Email;

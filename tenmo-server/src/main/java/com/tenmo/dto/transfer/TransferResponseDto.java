@@ -1,6 +1,5 @@
 package com.tenmo.dto.transfer;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,7 +11,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 public class TransferResponseDto{
-    private Long transferId;
     private String accountFromUsername;
     private String accountToUsername;
     private BigDecimal amount;
@@ -21,8 +19,4 @@ public class TransferResponseDto{
     private LocalDateTime createdAt;
     private String typeDescription;
     private String statusDescription;
-    @JsonIgnore
-    private Integer typeId;
-    @JsonIgnore
-    private Integer statusId;
 }

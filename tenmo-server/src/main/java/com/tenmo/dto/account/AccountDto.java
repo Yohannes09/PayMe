@@ -1,4 +1,4 @@
-package com.tenmo.dto;
+package com.tenmo.dto.account;
 
 import com.tenmo.util.AccountType;
 import lombok.AllArgsConstructor;

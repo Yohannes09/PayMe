@@ -1,6 +1,6 @@
 package com.tenmo.mapper;
 
-import com.tenmo.dto.AccountDto;
+import com.tenmo.dto.account.AccountDto;
 import com.tenmo.entity.Account;
 
 import java.util.List;

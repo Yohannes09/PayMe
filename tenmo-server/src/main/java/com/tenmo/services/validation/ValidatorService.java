@@ -6,5 +6,5 @@ import com.tenmo.dto.transfer.TransferRequestDto;
 public interface ValidatorService {
     void validateNewTransfer(TransferRequestDto request);
 
-    //void validateExistingTransfer(Long transferId);
+    void validateExistingTransfer(Long transferId);
 }

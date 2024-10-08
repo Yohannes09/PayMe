@@ -22,9 +22,10 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.login(loginDto));
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(path = "/register")
-    public void register(@Valid @RequestBody RegisterDto registerDto){
-        authenticationService.register(registerDto);
+    public ResponseEntity<AuthenticationResponseDto> register(@Valid @RequestBody RegisterDto registerDto){
+        return new ResponseEntity(
+                authenticationService.register(registerDto),
+                HttpStatus.CREATED);
     }
 }

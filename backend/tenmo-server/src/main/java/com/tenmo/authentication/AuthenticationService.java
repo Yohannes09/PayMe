@@ -47,6 +47,7 @@ public class AuthenticationService {
             var user = User.builder()
                     .firstName(registerDto.getFirstName())
                     .lastName(registerDto.getLastName())
+                    .username(registerDto.getUsername())
                     .email(registerDto.getEmail())
                     .password(passwordEncoder.encode(registerDto.getPassword()))
                     .role(TenmoRoles.USER)
@@ -93,7 +94,7 @@ public class AuthenticationService {
     }
 
     private boolean userExists(String usernameOrEmail){
-        return userRepository.findByUsernameOrEmail(usernameOrEmail).orElse(null) != null;
+        return userRepository.findByUsernameOrEmail(usernameOrEmail).isPresent();
     }
 
 }

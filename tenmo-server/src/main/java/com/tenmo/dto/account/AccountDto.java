@@ -3,12 +3,14 @@ package com.tenmo.dto.account;
 import com.tenmo.util.AccountType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @Getter
+@NoArgsConstructor
 public class AccountDto {
 
     private Long accountId;

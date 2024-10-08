@@ -12,9 +12,10 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface AccountRepository extends JpaRepository<Account, Long> {
+public interface AccountRepository extends JpaRepository<Account, UUID> {
 
     @Modifying
     @Query(value = "UPDATE account ac " +
@@ -49,7 +50,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
             "JOIN transfer_status ts ON ts.transfer_status_id = tr.transfer_status_id" +
             "WHERE tr.account_from = :accountId OR tr.account_to = :accountId"
             , nativeQuery = true)
-    List<TransferResponseDto> accountTransferHistory(@Param("accountId") Long accountId);
+    Optional<List<TransferResponseDto>> accountTransferHistory(@Param("accountId") Long accountId);
 
     @Query(value = "SELECT * FROM tenmo_user tu " +
             "JOIN account ac ON ac.user_id = tu.user_id " +

@@ -1,42 +1,51 @@
 package com.tenmo.controller;
 
+import com.tenmo.dto.transfer.TransferDto;
 import com.tenmo.dto.transfer.TransferResponseDto;
 import com.tenmo.dto.transfer.TransferRequestDto;
 import com.tenmo.entity.Transfer;
-import com.tenmo.services.main.AccountService;
 import com.tenmo.services.main.TransferService;
-import com.tenmo.services.main.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import java.util.*;
 
-@RequestMapping("api/tenmo/transfer")
+@RequestMapping("api/v1/tenmo/transfer")
 @RestController
 public class TransferController {
     private final TransferService transferService;
-    private final AccountService accountService;
-    private final UserService userService;
 
-    public TransferController(TransferService transferService, AccountService accountService, UserService userService) {
+    public TransferController(TransferService transferService){
         this.transferService = transferService;
-        this.accountService = accountService;
-        this.userService = userService;
     }
 
 
+    @PostMapping("/send")
+    public ResponseEntity<TransferResponseDto> send(@RequestBody @Valid TransferRequestDto transferRequest){
 
+        return new ResponseEntity<>(transferService.handleDirectTransfer(transferRequest),
+                HttpStatus.CREATED);
+    }
 
+    @PostMapping("/request")
+    public ResponseEntity<TransferResponseDto> request(@RequestBody @Valid TransferRequestDto transferRequest){
 
-    public ResponseEntity<Transfer> findTransferById(@PathVariable("transferId") Long transferId) {
+        return new ResponseEntity<>(transferService.handleTransferRequest(transferRequest),
+                HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{transferId}")
+    public ResponseEntity<TransferDto> findTransferById(@PathVariable("transferId") UUID transferId) {
         return ResponseEntity.ok(transferService.findTransferById(transferId));
     }
 
+    @PostMapping("/transfers")
+    public ResponseEntity<List<TransferDto>> findTransfersById(@RequestParam List<UUID> transferIds) {
+        return ResponseEntity.ok(transferService.findAllByTransferId(transferIds));
+    }
 
-    // Maybe this should be approvePendingTransfer maybe deny shoud be here.
-    // client shouldn't be able to update the status directly
-    // just approve and deny a transer
     @PostMapping("/pending/{transferId}/{transferStatusId}")
     public ResponseEntity<Optional<Transfer>> updatePendingTransfer(@PathVariable("transferId") Long transferId,
                                                                     @PathVariable("transferStatusId") Integer newTransferStatusId){

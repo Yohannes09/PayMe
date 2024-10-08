@@ -5,6 +5,8 @@ import lombok.Getter;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.util.Optional;
 
@@ -13,9 +15,8 @@ import java.util.Optional;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class TransferRequestDto {
-//    private @NotNull Integer transferTypeId;
-//    private @NotNull Integer transferStatusId;
     private @NotNull(message = "Sender ID cannot be null. ") Long accountFromId;
     private @NotNull(message = "Recipient ID cannot be null. ") Long accountToId;
     private @Min(value = 0, message = "Enter amount greater than zero.") BigDecimal amount;

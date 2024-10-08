@@ -1,54 +1,110 @@
 package com.tenmo.entity;
 
+import com.tenmo.util.TenmoRoles;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter
-@Getter
+@Builder
+@Data
 @Table(name = "tenmo_user")
 @Entity
-public class User {
+public class User implements UserDetails {
 
     @Id
-    @Column(name = "user_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    @Column(name = "userId", updatable = false, nullable = false)
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
+    private UUID userId;
 
-    @Column(name = "username", nullable = false, unique = true)
+    @NotNull
+    @Column(nullable = false)
+    private String firstName;
+
+    @NotNull
+    @Column(nullable = false)
+    private String lastName;
+
+    // NotNull is for User creation, nullable is to enforce no null in the column.
+    @Size(max = 20, min = 4, message = "Enter a username 4-20 characters long.")
+    @NotNull
+    @Column(unique = true, nullable = false)
     private String username;
 
-    @Column(name = "password_hash", nullable = false)
-    private String passwordHash;
+    @NotNull
+    @Size(min = 6, message = "Password must be at least 6 characters long. ")
+    private String password;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Email
+    @NotNull
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(name = "role", nullable = false)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private TenmoRoles role;
 
-    @Column(name = "is_active", nullable = false)
     private boolean isActive;
 
-    @Column(name = "created_at", updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Account> accounts;
 
-    public User(
-            String username,
-            String email,
-            String passwordHash){
-
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.getRole()));
     }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    @Override
+    public String getPassword(){
+        return this.password;
+    }
+
 }

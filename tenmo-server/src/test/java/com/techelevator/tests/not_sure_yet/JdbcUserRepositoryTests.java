@@ -1,7 +1,7 @@
 package com.techelevator.tests.not_sure_yet;
 //
 //import com.techelevator.tenmo.security.repository.JdbcUserRepository;
-//import com.tenmo.dto.authentication.RegisterUserDto;
+//import com.tenmo.dto.AuthenticationConfig.RegisterUserDto;
 //import com.tenmo.security.model.User;
 //import org.junit.Assert;
 //import org.junit.Before;

@@ -7,12 +7,13 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
+//import org.hibernate.
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface TransferRepository extends JpaRepository<Transfer, Long> {
+public interface TransferRepository extends JpaRepository<Transfer, UUID> {
 
     @Query(value = "SELECT * FROM transfer tr " +
             "JOIN transfer_type tt ON tt.transfer_type_id = tr.transfer_type_id " +
@@ -50,5 +51,5 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
             "JOIN transfer_type tt ON tt.transfer_type_id = tr.transfer_type_id " +
             "JOIN transfer_status ts ON ts.transfer_status_id = tr.transfer_status_id" +
             "WHERE tr.transfer_id = :transferId", nativeQuery = true)
-    Optional<TransferResponseDto> transferResponse(@Param("transferId") Long transferId);
+    Optional<TransferResponseDto> transferResponse(@Param("transferId") UUID transferId);
 }

@@ -1,34 +1,48 @@
 package com.tenmo.entity;
 
+import com.tenmo.util.Currency;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Data // replaces getter and setter annotations
+@Data
+@Builder
 @Table(name = "transfer")
 @Entity
 public class Transfer {
 
-    @Column(name = "transfer_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    private Long transferId;
+    @Column(name = "transferId", updatable = false, nullable = false)
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
+    private UUID transferId;
 
+    @NotNull
     @Column(name = "transfer_type_id", nullable = false)
     private Integer typeId;
 
+    @NotNull
     @Column(name = "transfer_status_id", nullable = false)
     private Integer statusId;
 
-    @Column(name = "account_from", nullable = false)
-    private Long accountFrom;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_from", referencedColumnName = "accountId")
+    private Account accountFrom;
 
-    @Column(name = "account_to", nullable = false)
-    private Long accountTo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_to", referencedColumnName = "accountId")
+    private Account accountTo;
 
     @Column(name = "amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;
@@ -36,8 +50,9 @@ public class Transfer {
     @Column(name = "transfer_message")
     private String transferMessage;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "currency", nullable = false)
-    private String currency;
+    private Currency currency;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -45,34 +60,15 @@ public class Transfer {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-
-    //Needed when creating a new transfer.
-    public Transfer(
-//            Integer typeId,
-//            Integer statusId,
-            Long accountFrom,
-            Long accountTo,
-            BigDecimal amount,
-            String transferMessage,
-            String currency){
-
-//        this.typeId = typeId;
-//        this.statusId = statusId;
-        this.accountFrom = accountFrom;
-        this.accountTo = accountTo;
-        this.amount = amount;
-        this.transferMessage = transferMessage;
-        this.currency = currency != null ? currency.toUpperCase() : "na";
-    }
-
-    @PrePersist //ensures createdAt and updatedAt are set during the entity's initial creation.
+    @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
 
-    @PreUpdate//automatically updates updatedAt whenever the entity is modified.
+    @PreUpdate
     public void preUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
 }

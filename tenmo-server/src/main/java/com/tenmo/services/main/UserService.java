@@ -1,12 +1,17 @@
 package com.tenmo.services.main;
 
-import com.tenmo.entity.User;
+import com.tenmo.dto.user.UserDto;
+import com.tenmo.exception.BadRequestException;
 
-import java.util.Optional;
+import java.util.UUID;
 
 public interface UserService {
 
-    Optional<User> createNewUser(String username, String passwordHash, String email, String role);
+    UserDto findById(UUID userId);
 
-    // NEEDS: update {username, password, email}
+    void updateUsername(UUID userId, String newUsername) throws BadRequestException;
+
+    void updatePassword(UUID userId, String newPassword) throws BadRequestException;
+
+    void updateEmail(UUID userId, String newEmail) throws BadRequestException;
 }

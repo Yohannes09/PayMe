@@ -11,9 +11,9 @@ import java.util.UUID;
 public interface AccountService {
     List<AccountDto> getAllAccounts();
 
-    List<TransferResponseDto> accountTransferHistory(Long accountId,
-                                                   Optional<String> statusDescription,
-                                                   Optional<String> typeDescription);
+    List<TransferResponseDto> accountTransferHistory(UUID accountId,
+                                                     Optional<String> statusDescription,
+                                                     Optional<String> typeDescription);
 
     List<Account> findAllByAccountId(@lombok.NonNull List<UUID> accountIds);
 }

@@ -24,8 +24,8 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
             "   WHEN ac.account_id = :accountToId THEN ac.balance + :amount " +
             "END " +
             "WHERE ac.account_id IN (:accountFromId, :accountToId) ", nativeQuery = true)
-    void handleDirectTransfer(@Param("accountFromId") Long accountFromId,
-                              @Param("accountToId") Long accountToId,
+    void handleDirectTransfer(@Param("accountFromId") UUID accountFromId,
+                              @Param("accountToId") UUID accountToId,
                               @Param("amount") BigDecimal amount);
 
 
@@ -50,7 +50,7 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
             "JOIN transfer_status ts ON ts.transfer_status_id = tr.transfer_status_id" +
             "WHERE tr.account_from = :accountId OR tr.account_to = :accountId"
             , nativeQuery = true)
-    Optional<List<TransferResponseDto>> accountTransferHistory(@Param("accountId") Long accountId);
+    Optional<List<TransferResponseDto>> accountTransferHistory(@Param("accountId") UUID accountId);
 
     @Query(value = "SELECT * FROM tenmo_user tu " +
             "JOIN account ac ON ac.user_id = tu.user_id " +

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RequestMapping("api/v1/tenmo/account")
 @RestController
@@ -24,7 +25,7 @@ public class AccountController {
     *   GET api/.../history/123?status=pending*/
     @GetMapping("/history/{accountId}")
     public ResponseEntity<List<TransferResponseDto>> accountTransferHistory(
-            @PathVariable("accountId") Long accountId,
+            @PathVariable("accountId") UUID accountId,
             @RequestParam(value = "type", required = false) String type,
             @RequestParam(value = "status", required = false) String status) {
 

@@ -21,6 +21,9 @@ public class ValidatorServiceImpl implements ValidatorService{
         this.transferRepository = transferRepository;
     }
 
+    /** NEEDS<br><br>
+     * <li>Validate account currency matches transfer currency. </li>
+     * <li>Check if accounts are active. </li>*/
 
     @Override
     public void validateNewTransfer(TransferRequestDto request) throws NotFoundException, BadRequestException {

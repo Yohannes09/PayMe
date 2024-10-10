@@ -3,7 +3,7 @@ package com.tenmo.services.main;
 import com.tenmo.dto.transfer.TransferDto;
 import com.tenmo.dto.transfer.TransferRequestDto;
 import com.tenmo.dto.transfer.TransferResponseDto;
-import com.tenmo.util.TransferTypeEnum;
+import com.tenmo.util.TransferType;
 import com.tenmo.exception.BadRequestException;
 import com.tenmo.exception.NotFoundException;
 import com.tenmo.entity.Transfer;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -38,52 +39,33 @@ public class TransferServiceImpl implements TransferService {
 
     @Override
     public TransferDto findTransferById(UUID transferId) {
-        Transfer transfer = transferRepository.findById(transferId)
-                .orElseThrow(() -> new NotFoundException("Could not find a tranfer with ID: " + transferId));
-
-        return TransferMapper.mapTransferToDto(transfer);
+        return transferRepository
+                .findById(transferId)
+                .map(TransferMapper::mapTransferToDto)
+                .orElseThrow(()-> new NotFoundException("Transfer " + transferId + " not found. "));
     }
 
     @Override
     public List<TransferDto> findAllByTransferId(List<UUID> transferIds){
-        List<Transfer> transfers = transferRepository.findAllById(transferIds);
-        //transfer -> TransferMapper.mapTransferToDto(transfer)
-        return transfers
+        return transferRepository
+                .findAllById(transferIds)
                 .stream()
                 .map(TransferMapper::mapTransferToDto)
-                .collect(Collectors.toList());
-    }
-
-
-
-    private TransferResponseDto processTransferRequest(
-            TransferRequestDto request,
-            TransferTypeEnum type,
-            TransferStatus status){
-
-        validatorService.validateNewTransfer(request);
-
-        Transfer newTransfer = TransferMapper.mapRequestToTransfer(request);
-        newTransfer.setTypeId(type.getId());
-        newTransfer.setStatusId(status.getId());
-
-        transferRepository.save(newTransfer);
-
-        return transferRepository.transferResponse(newTransfer.getTransferId()).
-                orElseThrow(() -> new BadRequestException("An issue occured with your transfer "));
+                .collect(Collectors.toList()
+        );
     }
 
     @Override
     public TransferResponseDto handleDirectTransfer(TransferRequestDto request){
         TransferResponseDto newTransfer = processTransferRequest(
                 request,
-                TransferTypeEnum.SEND,
+                TransferType.SEND,
                 TransferStatus.COMPLETED);
 
         accountRepository.handleDirectTransfer(
-                request.getAccountFromId(),
-                request.getAccountToId(),
-                request.getAmount());
+                request.accountFromId(),
+                request.accountToId(),
+                request.amount());
 
         return newTransfer;
     }
@@ -92,10 +74,26 @@ public class TransferServiceImpl implements TransferService {
     public TransferResponseDto handleTransferRequest(TransferRequestDto request){
         return processTransferRequest(
                 request,
-                TransferTypeEnum.REQUEST,
-                TransferStatus.PENDING);
+                TransferType.REQUEST,
+                TransferStatus.PENDING
+        );
     }
 
+
+    private TransferResponseDto processTransferRequest(
+            TransferRequestDto request,
+            TransferType type,
+            TransferStatus status){
+        validatorService.validateNewTransfer(request);
+
+        Transfer newTransfer = TransferMapper.mapRequestToTransfer(request);
+        newTransfer.setType(type);
+        newTransfer.setStatus(status);
+        transferRepository.save(newTransfer);
+
+        return transferRepository.transferResponse(newTransfer.getTransferId())
+                .orElseThrow(()-> new BadRequestException("An issue occured with your transfer "));
+    }
 
 
     private Transfer updatePendingTransfer(UUID transferId, TransferStatus newStatus) {
@@ -104,7 +102,7 @@ public class TransferServiceImpl implements TransferService {
         Transfer transfer = transferRepository.findById(transferId)
                 .orElseThrow(() -> new NotFoundException("Transfer with ID: " + transferId + " could not be found. "));
 
-        transfer.setStatusId(newStatus.getId());
+        transfer.setStatus(newStatus);
 
         return transferRepository.save(transfer);
     }

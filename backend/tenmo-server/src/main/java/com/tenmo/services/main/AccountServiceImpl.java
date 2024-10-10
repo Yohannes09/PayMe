@@ -3,8 +3,10 @@ package com.tenmo.services.main;
 import com.tenmo.dto.account.AccountDto;
 import com.tenmo.dto.transfer.TransferResponseDto;
 import com.tenmo.entity.Account;
+import com.tenmo.exception.NotFoundException;
 import com.tenmo.mapper.AccountMapper;
 import com.tenmo.repository.AccountRepository;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,34 +35,31 @@ public class AccountServiceImpl implements AccountService {
                 .collect(Collectors.toList());
     }
 
-
     @Override
-    public List<Account> findAllByAccountId(@NonNull List<UUID> accountIds) {
-        if(accountIds.isEmpty())
-            return List.of();
-
+    public List<Account> findAllByAccountId(@NonNull @NotEmpty List<UUID> accountIds) {
         return accountRepository.findAllById(accountIds);
     }
 
     @Override
     public List<TransferResponseDto> accountTransferHistory(
-            @NonNull Long accountId,
-            Optional<String> statusDescription,
-            Optional<String> typeDescription){
+            UUID accountId,
+            Optional<String> transferType,
+            Optional<String> transferStatus){
 
-        List<TransferResponseDto> transfers = accountRepository.accountTransferHistory(accountId).orElseThrow();
+        List<TransferResponseDto> transfers = accountRepository
+                .accountTransferHistory(accountId)
+                .orElseThrow(()-> new NotFoundException("Account not found. "));
 
         return transfers.stream()
-                .filter(transfer -> typeDescription
-                        .map(type -> transfer.getTypeDescription().equals(typeDescription))
+                .filter(transfer ->transferType
+                        .map(type-> transfer.type().name().equals(transferType))
                         .orElse(true)
-                ).filter(transfer ->statusDescription
-                        .map(status-> transfer.getStatusDescription().equals(statusDescription))
+                )
+                .filter(transfer -> transferStatus
+                        .map(status -> transfer.status().name().equals(transferStatus))
                         .orElse(true)
-                ).filter(transfer -> statusDescription
-                        .map(id -> transfer.getStatusDescription().equals(statusDescription))
-                        .orElse(true)
-                ).collect(Collectors.toList());
+                )
+                .collect(Collectors.toList());
     }
 
 }

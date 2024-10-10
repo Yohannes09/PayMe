@@ -1,6 +1,8 @@
 package com.tenmo.entity;
 
 import com.tenmo.util.Currency;
+import com.tenmo.util.TransferStatus;
+import com.tenmo.util.TransferType;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -9,45 +11,51 @@ import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
-@Table(name = "transfer")
+@Table(name = "transfer", indexes = {
+        @Index(name = "idx_account_from", columnList = "account_from"),
+        @Index(name = "idx_account_to", columnList = "account_to"),
+        @Index(name = "idx_transfer_id", columnList = "transfer_id")
+})
 @Entity
 public class Transfer {
 
     @Id
-    @Column(name = "transferId", updatable = false, nullable = false)
+    @Column(name = "transfer_id", updatable = false, nullable = false)
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(
             name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
+            strategy = "org.hibernate.id.UUIDGenerator")
     private UUID transferId;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     @Column(name = "transfer_type_id", nullable = false)
-    private Integer typeId;
+    private TransferType type;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     @Column(name = "transfer_status_id", nullable = false)
-    private Integer statusId;
+    private TransferStatus status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_from", referencedColumnName = "accountId")
-    private Account accountFrom;
+    @NotNull
+    @Column(name = "account_from", nullable = false)
+    private UUID accountFrom;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_to", referencedColumnName = "accountId")
-    private Account accountTo;
+    @NotNull
+    @Column(name = "account_to", nullable = false)
+    private UUID accountTo;
 
     @Column(name = "amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "transfer_message")
+    @Column(name = "transfer_message", length = 255)
     private String transferMessage;
 
     @Enumerated(EnumType.STRING)

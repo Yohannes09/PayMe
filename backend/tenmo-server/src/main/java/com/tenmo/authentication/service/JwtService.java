@@ -1,4 +1,4 @@
-package com.tenmo.authentication;
+package com.tenmo.authentication.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -18,8 +18,8 @@ import java.util.function.Function;
 public class JwtService {
     private static final String SECRET_KEY =
             "f3ecc61f6df19a110335af756dde01427d29ad34869c77a781e72ddeae2760b4";
+    // 24 hours in milliseconds
     private static final Integer TOKEN_EXPIRATION_TIME = 24 * 60 * 60 * 1000;
-
 
     public String extractUsername(String jwtToken) {
         return extractClaim(jwtToken, Claims::getSubject);
@@ -29,7 +29,8 @@ public class JwtService {
         final String username = extractUsername(jwtToken);
         final Date expirtationDate = extractClaim(jwtToken, Claims::getExpiration);
 
-        return userDetails.getUsername().equals(username) && !isTokenExpired(jwtToken);
+        return userDetails.getUsername().equals(username) &&
+                !isTokenExpired(jwtToken);
     }
 
     public String generateToken(UserDetails userDetails){

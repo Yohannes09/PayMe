@@ -38,7 +38,12 @@
       background-color: #0056b3;
     }
 
-    .signup {
+    .register {
         text-align: center;
         color: #007BFF;
+    }
+
+    .login{
+      text-align: center;
+      color: #007BFF;
     }

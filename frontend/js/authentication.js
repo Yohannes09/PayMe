@@ -2,15 +2,15 @@ async function submitForm(event) {
     event.preventDefault();  // Prevent the default form submission
 
     const formData = {
-        firstname: document.getElementById('firstname').value,
-        lastname: document.getElementById('lastname').value,
+        firstName: document.getElementById('firstname').value,
+        lastName: document.getElementById('lastname').value,
         username: document.getElementById('username').value,
-        password: document.getElementById('password').value,
-        confirmPassword: document.getElementById('confirm-password').value
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
     };
 
     try {
-        const response = await fetch('/ap1/v1/tenmo/register', {
+        const response = await fetch('http://localhost:8080/api/v1/auth/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

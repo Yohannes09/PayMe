@@ -1,22 +1,24 @@
 package com.tenmo.dto.transfer;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.tenmo.util.Currency;
+import com.tenmo.util.TransferStatus;
+import com.tenmo.util.TransferType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  *  Client response containing more information regarding a transfer. */
-@AllArgsConstructor
-@Getter
-public class TransferResponseDto{
-    private String accountFromUsername;
-    private String accountToUsername;
-    private BigDecimal amount;
-    private String transferMessage;
-    private String currency;
-    private LocalDateTime createdAt;
-    private String typeDescription;
-    private String statusDescription;
+public record TransferResponseDto(
+        UUID transferId,
+        String accountFromUsername,
+        String accountToUsername,
+        BigDecimal amount,
+        String transferMessage,
+        Currency currency,
+        LocalDateTime createdAt,
+        TransferType type,
+        TransferStatus status){
+
 }

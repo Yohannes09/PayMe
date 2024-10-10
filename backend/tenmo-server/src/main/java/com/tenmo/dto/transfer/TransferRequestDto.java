@@ -1,25 +1,21 @@
 package com.tenmo.dto.transfer;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.tenmo.util.Currency;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  *  Client request when creating a new transfer.  */
 
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-public class TransferRequestDto {
-    private @NotNull(message = "Sender ID cannot be null. ") Long accountFromId;
-    private @NotNull(message = "Recipient ID cannot be null. ") Long accountToId;
-    private @Min(value = 0, message = "Enter amount greater than zero.") BigDecimal amount;
-    private Optional<String> transferMessage = Optional.empty();
-    private Optional<String> currency = Optional.empty();
+public record TransferRequestDto(
+        @NotNull(message = "Sender ID cannot be null. ") UUID accountFromId,
+        @NotNull(message = "Recipient ID cannot be null. ") UUID accountToId,
+        @Min(value = 0, message = "Enter amount greater than zero.") BigDecimal amount,
+        @NotNull Currency currency,
+        Optional<String> transferMessage){
 }

@@ -1,6 +1,6 @@
-package com.tenmo.configuration;
+package com.tenmo.authentication;
 
-import com.tenmo.authentication.JwtService;
+import com.tenmo.authentication.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

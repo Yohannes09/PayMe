@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 /*  The description for constants should be uppercase for case-insensitive search. */
 @Getter
 @AllArgsConstructor
-public enum TransferTypeEnum {
+public enum TransferType {
     REQUEST("Request", 1),
     SEND("Send", 2);
 
@@ -19,8 +19,8 @@ public enum TransferTypeEnum {
 
 
     private static final Map<String, Integer> TYPE_IDS =
-            Stream.of(TransferTypeEnum.values())
-            .collect(Collectors.toMap(TransferTypeEnum::getDescription, TransferTypeEnum::getId));
+            Stream.of(TransferType.values())
+            .collect(Collectors.toMap(TransferType::getDescription, TransferType::getId));
 
     public static Integer findIdByDescription(String description){
         return TYPE_IDS.getOrDefault(description.toUpperCase(), -1);

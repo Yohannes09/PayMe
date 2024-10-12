@@ -16,7 +16,7 @@
     <name>tenmo</name>
     <description>Peer-to-peer Payment System</description>
 
-<packaging>jar</packaging>
+    <packaging>jar</packaging>
 
 <!--    java.version was 11 before-->
     <properties>
@@ -112,18 +112,23 @@
 
     <build>
         <plugins>
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>3.3.4</version>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 

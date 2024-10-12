@@ -1,9 +1,9 @@
 package com.techelevator.tests.service;
 
-import com.tenmo.repository.AccountRepository;
-import com.tenmo.repository.TransferRepository;
-import com.tenmo.services.main.TransferService;
-import com.tenmo.services.validation.ValidatorService;
+import com.tenmo.app.repository.AccountRepository;
+import com.tenmo.app.repository.TransferRepository;
+import com.tenmo.app.services.main.TransferService;
+import com.tenmo.app.services.validation.ValidatorService;
 import org.mockito.Mock;
 
 public class TransferServiceTests {

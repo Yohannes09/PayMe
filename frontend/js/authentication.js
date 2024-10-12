@@ -1,5 +1,11 @@
+window.onload = function(){
+    document.getElementById('registerForm').addEventListener('submit', submitForm)
+}
+
 async function submitForm(event) {
     event.preventDefault();  // Prevent the default form submission
+
+    console.log("Form submitted")
 
     const formData = {
         firstName: document.getElementById('firstname').value,

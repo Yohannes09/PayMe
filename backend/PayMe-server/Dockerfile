@@ -7,4 +7,4 @@ COPY target/Tenmo.jar Tenmo.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar","Tenmo.jar"]
+ENTRYPOINT ["java", "-jar","PayMe.jar"]

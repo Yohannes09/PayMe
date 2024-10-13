@@ -1,0 +1,154 @@
+/* General styling for dark mode */
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #121212;
+    color: #e0e0e0;
+    overflow-x: hidden; /* Prevents horizontal overflow */
+}
+
+
+.header {
+    background-color: #1f1f1f;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 24px;
+    color: #fff;
+    letter-spacing: 2px;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.header-left{
+    display: flex;
+    align-items: center;
+}
+
+.header .menu-btn {
+    font-size: 30px;
+    margin-right: 15px;
+    cursor: pointer;
+    color: #fff;
+    background-color: transparent;
+    border: none;
+}
+
+/* Logo styling */
+.logo {
+    height: 40px;
+    margin-right: 15px;
+    margin-left: 15px;
+    display:block;
+}
+
+/* Account name styling */
+#account-name-header {
+    font-size: 20px;
+    font-weight: 500;
+    color: #ddd;
+    margin-left: auto;
+}
+
+/* Sidebar menu */
+.sidebar {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #1f1f1f;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+    z-index: 3; /* Ensure sidebar appears over the content */
+}
+
+.sidebar a {
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #e0e0e0;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidebar a:hover {
+    background-color: #333;
+}
+
+/* Close button for the sidebar */
+.sidebar .close-btn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+}
+
+/* Overlay to close the sidebar when clicking outside */
+.overlay {
+    position: fixed;
+    display: none;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2;
+}
+
+/* Main content styling */
+.main-content {
+    margin-left: 0;
+    padding: 20px;
+    transition: margin-left 0.5s;
+}
+
+/* Dashboard stacking style */
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 900px;
+    margin: 0 auto; /* Centers the dashboard */
+}
+
+/* Card styling */
+.card {
+    background-color: #1e1e1e;
+    border-radius: 12px;
+    padding: 20px;
+    width: 100%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    background-color: #2a2a2a;
+}
+
+.card h3 {
+    margin-top: 0;
+}
+
+.transfers-list {
+    list-style: none;
+    padding: 0;
+}
+
+.transfers-list li {
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #333;
+    border-radius: 6px;
+    font-size: 16px;
+    color: #fff;
+}
+
+/* Placeholder styling */
+.card p {
+    color: #aaa;
+}

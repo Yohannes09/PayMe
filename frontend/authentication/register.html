@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Added viewport for responsive design -->
+    <title>PayMe Registration</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h1>Register</h1>
+<hr>
+<form id="registerForm">
+
+    <div class="fullname">
+        <div class="form-group">
+            <div class="input-container">
+                <input type="text" id="firstname" name="firstname" placeholder=" " required>
+                <label for="firstname">First name:</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="input-container">
+                <input type="text" id="lastname" name="lastname" placeholder=" ">
+                <label for="lastname">Last name:</label>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="input-container">
+            <input type="text" id="username" name="username" placeholder=" ">
+            <label for="username">Username:</label>
+        </div>
+    </div>
+
+    <div>
+        <div class="input-container">
+            <input type="email" id="email" name="email" placeholder=" ">
+            <label for="email">Email:</label>
+        </div>
+    </div>
+
+    <div>
+        <div class="input-container">
+            <input type="password" id="password" name="password" placeholder=" ">
+            <label for="password">Password:</label>
+        </div>
+    </div>
+
+    <div>
+        <div class="input-container">
+            <input type="password" id="confirm-password" name="confirm-password" placeholder=" ">
+            <label for="confirm-password">Confirm password:</label>
+        </div>
+    </div>
+
+    <button type="submit">Register</button>
+</form>
+
+<div class="login">
+    <p><a href="login.html">Have an account?</a></p>
+</div>
+
+<script src="register.js"></script>
+
+</body>
+</html>

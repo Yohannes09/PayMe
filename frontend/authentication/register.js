@@ -25,6 +25,7 @@ async function submitForm(event) {
         });
 
         if (response.ok) {
+            const responseData = await response.json();
             alert('User registered successfully');
         } else {
             alert('Failed to register user');

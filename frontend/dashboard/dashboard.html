@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayMe Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css"> 
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            
+            <button class="menu-btn" onclick="openNav()">&#9776;</button>
+            <img src="payme-logo.png" alt="PayMe Logo" class="logo">
+        </div>
+        
+        <span id="account-name-header">Loading user...</span> 
+    </div>
+
+    <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" class="close-btn" onclick="closeNav()">&times;</a>
+        <a href="#" onclick="loadDashboard()">Dashboard</a>
+        <a href="#">Money</a>
+        <a href="#">Send/Request</a>
+        <a href="#">Edit Account</a>
+    </div>
+
+    <div id="overlay" class="overlay" onclick="closeNav()"></div>
+
+    <div class="main-content">
+        <div class="dashboard">
+            
+            <div class="card" id="account-info">
+                <h3>Account Holder: <span id="account-name">Loading...</span></h3>
+                <p>Balance: <span id="account-balance">Loading...</span></p>
+            </div>
+
+            
+            <div class="card" id="transfers-card">
+                <h3>Recent Transfers</h3>
+                <ul class="transfers-list" id="transfers-list">
+                    <!-- Transfer items will load dynamically -->
+                </ul>
+            </div>
+
+            
+            <div class="card">
+                <h3>Widget Placeholder</h3>
+                <p>Customize this widget to show additional data.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

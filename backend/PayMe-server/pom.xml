@@ -10,10 +10,10 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.tenmo</groupId>
-    <artifactId>tenmo-server</artifactId>
+    <groupId>com.payme</groupId>
+    <artifactId>payme-server</artifactId>
     <version>1.0</version>
-    <name>tenmo</name>
+    <name>PayMe</name>
     <description>Peer-to-peer Payment System</description>
 
     <packaging>jar</packaging>

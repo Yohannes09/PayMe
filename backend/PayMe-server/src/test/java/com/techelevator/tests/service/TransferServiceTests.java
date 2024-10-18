@@ -1,16 +1,16 @@
 package com.techelevator.tests.service;
 
-import com.tenmo.app.repository.AccountRepository;
-import com.tenmo.app.repository.TransferRepository;
-import com.tenmo.app.services.main.TransferService;
-import com.tenmo.app.services.validation.ValidatorService;
+import com.payme.app.repository.AccountRepository;
+import com.payme.app.repository.TransactionRepository;
+import com.payme.app.services.main.TransactionService;
+import com.payme.app.services.validation.ValidatorService;
 import org.mockito.Mock;
 
 public class TransferServiceTests {
-    private TransferService transferService;
+    private TransactionService transactionService;
     private ValidatorService validatorService;
 
-    @Mock private TransferRepository transferRepository;
+    @Mock private TransactionRepository transactionRepository;
     @Mock private AccountRepository accountRepository;
 
 //    @BeforeEach

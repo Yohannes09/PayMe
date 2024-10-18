@@ -3,7 +3,7 @@ FROM openjdk:22
 
 WORKDIR /app
 
-COPY target/Tenmo.jar Tenmo.jar
+COPY target/PayMe.jar PayMe.jar
 
 EXPOSE 8080
 

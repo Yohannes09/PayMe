@@ -1,6 +1,6 @@
 package com.payme.app.authentication.dto;
 
-import com.payme.app.util.TenmoRoles;
+import com.payme.app.constants.TenmoRoles;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

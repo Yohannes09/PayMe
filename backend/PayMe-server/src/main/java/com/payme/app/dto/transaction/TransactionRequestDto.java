@@ -1,6 +1,6 @@
 package com.payme.app.dto.transaction;
 
-import com.payme.app.util.Currency;
+import com.payme.app.constants.Currency;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

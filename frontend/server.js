@@ -1,26 +1,45 @@
 const express = require('express');
-const bodyParser = require('body-parser');
+//const bodyParser = require('body-parser');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
-const PORT = 3000; // Set the port to 3000
+const PORT = 3000; 
 
-// Middleware
 app.use(cors()); // Enable CORS for all requests
-app.use(bodyParser.json()); // Parse JSON request bodies
+//app.use(bodyParser.json()); // Parse JSON request bodies
+app.use(express.static(path.join(__dirname, 'public')))
 
-// Sample registration endpoint
-app.post('/api/v1/auth/register', (req, res) => {
-    const { firstName, lastName, username, email, password } = req.body;
-
-    // You can add your registration logic here
-    console.log('User registered:', { firstName, lastName, username, email, password });
-
-    // Send a response back to the client
-    res.status(201).send('User registered successfully');
+// Cache control middleware (useful during development)
+app.use((req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    next();
 });
 
-// Start the server
+// Serve components
+app.get('/home', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'home', 'home.html'));
+});
+
+app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'authentication', 'register.html'));
+});
+
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'authentication', 'login.html'));
+});
+
+app.get('/dashboard', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'dashboard', 'dashboard.html'));
+});
+
+
+//
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

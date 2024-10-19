@@ -1,4 +1,4 @@
-package com.payme.app.util;
+package com.payme.app.constants;
 
 import lombok.AllArgsConstructor;
 

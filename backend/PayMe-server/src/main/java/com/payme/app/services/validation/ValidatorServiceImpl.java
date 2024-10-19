@@ -5,7 +5,7 @@ import com.payme.app.entity.Account;
 import com.payme.app.exception.BadRequestException;
 import com.payme.app.exception.NotFoundException;
 import com.payme.app.exception.TransactionException;
-import com.payme.app.util.Currency;
+import com.payme.app.constants.Currency;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

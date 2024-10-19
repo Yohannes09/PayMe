@@ -1,7 +1,7 @@
 package com.payme.app.authentication.service;
 
 import com.payme.app.entity.User;
-import com.payme.app.util.TenmoRoles;
+import com.payme.app.constants.TenmoRoles;
 import com.payme.app.authentication.dto.AuthenticationResponseDto;
 import com.payme.app.authentication.dto.LoginDto;
 import com.payme.app.authentication.dto.RegisterDto;

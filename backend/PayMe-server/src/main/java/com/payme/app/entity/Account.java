@@ -1,7 +1,7 @@
 package com.payme.app.entity;
 
-import com.payme.app.util.AccountType;
-import com.payme.app.util.Currency;
+import com.payme.app.constants.AccountType;
+import com.payme.app.constants.Currency;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

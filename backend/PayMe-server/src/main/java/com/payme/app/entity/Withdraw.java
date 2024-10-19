@@ -1,6 +1,6 @@
 package com.payme.app.entity;
 
-import com.payme.app.util.TransactionStatus;
+import com.payme.app.constants.TransactionStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

@@ -1,8 +1,8 @@
 package com.payme.app.entity;
 
-import com.payme.app.util.Currency;
-import com.payme.app.util.TransactionStatus;
-import com.payme.app.util.TransactionType;
+import com.payme.app.constants.Currency;
+import com.payme.app.constants.TransactionStatus;
+import com.payme.app.constants.TransactionType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;

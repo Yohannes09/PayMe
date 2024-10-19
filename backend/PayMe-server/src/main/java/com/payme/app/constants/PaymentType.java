@@ -1,4 +1,4 @@
-package com.payme.app.util;
+package com.payme.app.constants;
 
 public enum PaymentType {
     CREDIT_CARD,

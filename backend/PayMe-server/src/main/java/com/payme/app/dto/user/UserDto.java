@@ -1,6 +1,6 @@
 package com.payme.app.dto.user;
 
-import com.payme.app.util.TenmoRoles;
+import com.payme.app.constants.TenmoRoles;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

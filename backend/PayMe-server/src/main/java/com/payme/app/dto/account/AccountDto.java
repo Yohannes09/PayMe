@@ -1,6 +1,6 @@
 package com.payme.app.dto.account;
 
-import com.payme.app.util.AccountType;
+import com.payme.app.constants.AccountType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

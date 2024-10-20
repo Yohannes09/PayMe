@@ -23,7 +23,7 @@ async function submitForm(event) {
 
         if (response.ok) {
             const responseData = await response.json();
-            alert('User authenticated successfully');
+            window.location.href = 'dashboard/dashboard.html';
         } else {
             alert('Failed to authenticate user');
         }

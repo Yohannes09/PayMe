@@ -7,10 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -37,13 +36,12 @@ public class SessionToken {
     private User user;
 
     @NotNull
-    @Column(name = "token", nullable = false, updatable = true)
+    @Column(name = "token", nullable = false, updatable = false, length = 512)
     private String token;
 
     @Column(name = "created_at", nullable = false)
-    @CreationTimestamp
-    private LocalDateTime createdAt;
+    private Date createdAt;
 
     @Column(name = "expires_at", nullable = false, updatable = false)
-    private LocalDateTime expiresAt;
+    private Date expiresAt;
 }

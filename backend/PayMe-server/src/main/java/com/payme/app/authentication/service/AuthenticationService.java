@@ -1,5 +1,6 @@
 package com.payme.app.authentication.service;
 
+import com.payme.app.authentication.entity.SessionToken;
 import com.payme.app.entity.User;
 import com.payme.app.constants.TenmoRoles;
 import com.payme.app.authentication.dto.AuthenticationResponseDto;
@@ -8,7 +9,9 @@ import com.payme.app.authentication.dto.RegisterDto;
 import com.payme.app.exception.BadRequestException;
 import com.payme.app.exception.DuplicateCredentialException;
 import com.payme.app.exception.NotFoundException;
+import com.payme.app.repository.SessionTokenRepository;
 import com.payme.app.repository.UserRepository;
+import io.jsonwebtoken.Claims;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import lombok.NonNull;
@@ -20,6 +23,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -39,26 +44,31 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final SessionTokenRepository tokenRepository;
 
     public AuthenticationService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
-            AuthenticationManager authenticationManager) {
+            AuthenticationManager authenticationManager,
+            SessionTokenRepository tokenRepository
+    ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
+        this.tokenRepository = tokenRepository;
     }
+
 
     public AuthenticationResponseDto register(RegisterDto registerDto) {
 
         try {
             if(isCredentialTaken(registerDto.getEmail()))
-                throw new DuplicateCredentialException("Username already taken. ");
+                throw new DuplicateCredentialException("Email already registered. ");
 
             if(isCredentialTaken(registerDto.getUsername()))
-                throw new DuplicateCredentialException("Email already registered. ");
+                throw new DuplicateCredentialException("Username already taken. ");
 
             var user = User.builder()
                     .firstName(registerDto.getFirstName())
@@ -71,6 +81,8 @@ public class AuthenticationService {
 
             var updatedUser = userRepository.save(user);
             var jwtToken = jwtService.generateToken(user);
+
+            createUserSession(user, jwtToken);
 
             return AuthenticationResponseDto.builder()
                     .userId(updatedUser.getUserId())
@@ -94,11 +106,14 @@ public class AuthenticationService {
                         loginDto.getPassword())
         );
 
+
         var user = userRepository
                 .findByUsernameOrEmail(loginDto.getUsernameOrEmail())
                 .orElseThrow(()-> new NotFoundException("Could not retrieve account. "));
-
+        // a new token shouldnt be created if the user's current token is valid.
         String jwtToken = jwtService.generateToken(user);
+
+        createUserSession(user, jwtToken);
 
         return AuthenticationResponseDto.builder()
                 .userId(user.getUserId())
@@ -109,10 +124,14 @@ public class AuthenticationService {
                 .build();
     }
 
+    public void logout(String token){
+        tokenRepository.deleteByToken(token);
+    }
+
 
     public void updateUsername(UUID userId,
-       @NonNull @Pattern(regexp = USERNAME_PATTERN
-            ,message = USERNAME_VALIDATION_MESSAGE) String newUsername)
+       @NonNull @Pattern(regexp = USERNAME_PATTERN,
+               message = USERNAME_VALIDATION_MESSAGE) String newUsername)
     throws BadRequestException {
 
         if(isCredentialTaken(newUsername))
@@ -163,6 +182,18 @@ public class AuthenticationService {
     }
 
 
+    private void createUserSession(User user, String token){
+        Date creationTime = jwtService.extractClaim(token, Claims::getIssuedAt);
+        Date expirationTime = jwtService.extractClaim(token, Claims::getExpiration);
+
+        SessionToken newSession = SessionToken.builder()
+                .user(user)
+                .token(token)
+                .createdAt(creationTime)
+                .expiresAt(expirationTime)
+                .build();
+        tokenRepository.save(newSession);
+    }
 
     private <T> void updateCredential(
             User user,

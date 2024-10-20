@@ -31,6 +31,22 @@ spring:
     mode: HTML
     encoding: UTF-8
 
+#  mail:
+#    host: smtp.gmail.com
+#    port: 587
+#    username: yohannesm8814@gmail.com
+#    password: dqmgjirtcmezttiy
+#    properties:
+#      mail:
+#        smtp:
+#          auth: true
+#          starttls:
+#            enable: true
+#          ssl:
+#            enable: false
+#      debug: true
+
+
 logging:
   level:
     org.springframework: INFO

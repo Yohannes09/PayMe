@@ -25,11 +25,12 @@ async function submitForm(event) {
         });
 
         if (response.ok) {
-            const responseData = await response.json();
             alert('User registered successfully');
+            window.location.href = 'authentication/login.html';
         } else {
             alert('Failed to register user');
         }
+
     } catch (error) {
         alert('An error occurred while submitting the form');
         console.error('Error:', error);

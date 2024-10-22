@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: PayMe
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: yohannesm8814@gmail.com
+    password: exgsyvyxvvkexuov
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

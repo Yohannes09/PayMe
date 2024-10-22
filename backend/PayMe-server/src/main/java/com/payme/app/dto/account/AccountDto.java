@@ -1,30 +1,19 @@
 package com.payme.app.dto.account;
 
 import com.payme.app.constants.AccountType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.payme.app.constants.Currency;
+import lombok.Builder;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.UUID;
 
-@AllArgsConstructor
-@Getter
-@NoArgsConstructor
-public class AccountDto {
-
-    private Long accountId;
-
-    private Long userId;
-
-    private BigDecimal balance;
-
-    private AccountType accountType;
-
-    private String currency;
-
-    private boolean isActive;
-
-    private LocalDateTime createdAt;
-
+@Builder
+public record AccountDto(
+        UUID accountId,
+        UUID userId,
+        BigDecimal balance,
+        AccountType accountType,
+        Currency currency,
+        boolean isActive) {
+    //
 }

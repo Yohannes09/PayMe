@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
-@RequestMapping("api/v1/tenmo/user")
+@RequestMapping("api/v1/payme/user")
 @RestController
 public class UserController {
     private final UserService userService;
@@ -19,11 +19,12 @@ public class UserController {
     public UserController(UserService userService) {
         this.userService = userService;
     }
+//@PreAuthorize("hasRole('ADMIN')")
 
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{userId}")
     public ResponseEntity<UserDto> getAccountByid(@PathVariable("userId") UUID userId) {
         return ResponseEntity.ok(userService.findById(userId));
     }
+
 }

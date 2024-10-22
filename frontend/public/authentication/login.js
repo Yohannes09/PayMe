@@ -12,7 +12,13 @@ async function submitForm(event) {
         password: document.getElementById('password').value
     };
 
+    if(!formData.usernameOrEmail || !formData.password){
+        alert('Please enter your username and password. ')
+        return;
+    }
+
     try {
+        const API_URL = 'http://localhost:8080/api/v1/auth'
         const response = await fetch('http://localhost:8080/api/v1/auth/login', {
             method: 'POST',
             headers: {
@@ -23,6 +29,8 @@ async function submitForm(event) {
 
         if (response.ok) {
             const responseData = await response.json();
+            localStorage.setItem('token', responseData.token);
+            localStorage.setItem('userId', responseData.userId);
             window.location.href = 'dashboard/dashboard.html';
         } else {
             alert('Failed to authenticate user');

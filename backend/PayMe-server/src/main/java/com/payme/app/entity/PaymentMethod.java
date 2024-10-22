@@ -46,7 +46,7 @@ public class PaymentMethod {
     private String accountNumber;
 
     @Size(max = 9)
-    @Column()
+    @Column(length = 9)
     private String routingNumber;
 
     @Size(max = 16)

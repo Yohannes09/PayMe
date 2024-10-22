@@ -14,46 +14,68 @@ function closeNav() {
 
 /* Function to load dashboard data dynamically */
 function loadDashboard() {
-    fetchUserData();
-    fetchTransfersData();
+    const userId = localStorage.getItem('userId'); // Retrieve user ID from local storage
+    const token = localStorage.getItem('token'); // Retrieve token from local storage
+    console.log(userId);
+    console.log(token);
+    fetchUserData(userId, token);
 }
 
-
-function fetchUserData() {
-    
-    fetch('/api/v1/PayMe/user') 
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('account-name').innerText = data.name;
-            document.getElementById('account-balance').innerText = data.balance;
-            document.getElementById('account-name-header').innerText = data.name;
-        })
-        .catch(error => {
-            console.error('Error fetching user data:', error);
-        });
+function fetchUserData(userId, token) {
+    fetch(`http://localhost:8080/api/v1/payme/user/${userId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log(data);
+        document.getElementById('account-name').innerText = `${data.firstName} ${data.lastName}`;
+        //document.getElementById('account-balance').innerText = data.accounts[0].balance;
+        document.getElementById('account-name-header').innerText = data.firstName;
+    })
+    .catch(error => {
+        console.error('Error fetching user data:', error);
+    });
 }
 
+function fetchTransfersData(token) {
+    fetch('http://localhost:8080/api/v1/PayMe/transfers', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(data => {
+        const transfersList = document.getElementById('transfers-list');
+        transfersList.innerHTML = ''; // Clear existing list
 
-function fetchTransfersData() {
-    
-    fetch('/api/v1/PayMe/transfers') 
-        .then(response => response.json())
-        .then(data => {
-            const transfersList = document.getElementById('transfers-list');
-            transfersList.innerHTML = ''; // Clear existing list
-
-            data.transfers.forEach(transfer => {
-                const li = document.createElement('li');
-                li.innerText = transfer;
-                transfersList.appendChild(li);
-            });
-        })
-        .catch(error => {
-            console.error('Error fetching transfers data:', error);
+        data.transfers.forEach(transfer => {
+            const li = document.createElement('li');
+            li.innerText = transfer;
+            transfersList.appendChild(li);
         });
+    })
+    .catch(error => {
+        console.error('Error fetching transfers data:', error);
+    });
 }
 
 /* Trigger loading data when the page is ready */
-window.onload = function() {
+document.addEventListener('DOMContentLoaded', function() {
     loadDashboard();
-};
+});

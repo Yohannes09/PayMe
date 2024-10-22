@@ -6,7 +6,7 @@ import com.payme.app.entity.Account;
 public class AccountMapper {
 
     public static AccountDto mapAccountToDto(Account account){
-        return new AccountDto();
+        return null;
 //                account.getAccountId(),
 //                account.getUserId(),
 //                account.getBalance(),

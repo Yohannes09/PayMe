@@ -32,12 +32,13 @@ app.get('/dashboard', (req, res) => {
 });
 
 
-//
+// Global error handler
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Something broke!');
 });
 
+// Start Server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

@@ -1,24 +1,23 @@
-/* Function to open the sidebar */
-function openNav() {
+
+function openSidebar() {
     document.getElementById("mySidebar").style.width = "250px";
     document.querySelector(".main-content").style.marginLeft = "250px";
     document.getElementById("overlay").style.display = "block"; // Show overlay
 }
 
-/* Function to close the sidebar */
-function closeNav() {
+function closeSidebar() {
     document.getElementById("mySidebar").style.width = "0";
     document.querySelector(".main-content").style.marginLeft = "0";
     document.getElementById("overlay").style.display = "none"; // Hide overlay
 }
 
-/* Function to load dashboard data dynamically */
 function loadDashboard() {
-    const userId = localStorage.getItem('userId'); // Retrieve user ID from local storage
-    const token = localStorage.getItem('token'); // Retrieve token from local storage
-    console.log(userId);
-    console.log(token);
+    // Retrieve user ID, and token from local storage
+    const userId = localStorage.getItem('userId');
+    const token = localStorage.getItem('token');
+
     fetchUserData(userId, token);
+    fetchTransfersData(userId, token)
 }
 
 function fetchUserData(userId, token) {
@@ -38,7 +37,7 @@ function fetchUserData(userId, token) {
     .then(data => {
         console.log(data);
         document.getElementById('account-name').innerText = `${data.firstName} ${data.lastName}`;
-        //document.getElementById('account-balance').innerText = data.accounts[0].balance;
+        document.getElementById('account-balance').innerText = data.accounts[0].balance;
         document.getElementById('account-name-header').innerText = data.firstName;
     })
     .catch(error => {
@@ -46,8 +45,8 @@ function fetchUserData(userId, token) {
     });
 }
 
-function fetchTransfersData(token) {
-    fetch('http://localhost:8080/api/v1/PayMe/transfers', {
+function fetchTransfersData(userId, token) {
+    fetch(`http://localhost:8080/api/v1/PayMe/transfers/${userId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

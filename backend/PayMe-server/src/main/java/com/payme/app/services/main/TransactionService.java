@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public interface TransactionService {
 
+    List<TransactionResponseDto> getAllUserTransactions(UUID userId);
     List<TransactionResponseDto> findAllByTransferId(List<UUID> transferIds);
 
     TransactionResponseDto handleDirectTransfer(TransactionRequestDto request);

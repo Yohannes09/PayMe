@@ -9,14 +9,14 @@ import java.util.stream.Stream;
 
 @Getter
 @AllArgsConstructor
-public enum TenmoRoles {
+public enum PaymeRoles {
     USER("USER"),
     ADMIN("ADMIN"),
     SUPER_ADMIN("SUPER ADMIN"),
     GUEST("GUEST");
 
-    private static final Set<String> roles = Stream.of(TenmoRoles.values())
-            .map(TenmoRoles::getRole)
+    private static final Set<String> roles = Stream.of(PaymeRoles.values())
+            .map(PaymeRoles::getRole)
             .collect(Collectors.toSet());
 
     private String role;

@@ -3,9 +3,10 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const PORT = 3000; 
+const PORT = 3000;
 
-app.use(cors()); // Enable CORS for all requests
+// Enable CORS for all requests
+app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')))
 
 // Cache control middleware (useful during development)

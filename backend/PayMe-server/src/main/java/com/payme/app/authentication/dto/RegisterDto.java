@@ -1,16 +1,17 @@
 package com.payme.app.authentication.dto;
 
-import com.payme.app.constants.TenmoRoles;
+import com.payme.app.constants.PaymeRoles;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 public class RegisterDto {
 
     @NotNull private String firstName;
@@ -27,6 +28,6 @@ public class RegisterDto {
 //            message = "Password must at least 6 characters long and contain special characters. ")
     @NotNull private String password;
 
-    private TenmoRoles tenmoRoles;
+    private PaymeRoles paymeRoles;
 
 }

@@ -1,6 +1,6 @@
 package com.payme.app.entity;
 
-import com.payme.app.constants.TenmoRoles;
+import com.payme.app.constants.PaymeRoles;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -63,7 +63,7 @@ public class User implements UserDetails {
 
 
     @Enumerated(EnumType.STRING)
-    private Set<TenmoRoles> roles;
+    private Set<PaymeRoles> roles;
 
     @Column(nullable = false)
     private boolean isActive;

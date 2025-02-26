@@ -65,8 +65,8 @@ async function authenticateUser(formData) {
 
 function handleSuccessfulLogin(responseData) {
     console.log('Response data from server:', responseData);
-    const baseUrl = window.location.origin;
-    console.log(baseUrl);
+//    const baseUrl = window.location.origin;
+//    console.log(baseUrl);
 
     // Save token and userId to localStorage
     localStorage.setItem('token', responseData.token);

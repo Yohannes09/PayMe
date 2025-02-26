@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import java.util.*;
 
-@RequestMapping("api/v1/tenmo/transfer")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5500"})
+@RequestMapping("api/v1/payme/transfer")
 @RestController
 public class TransactionController {
     private final TransactionService transactionService;
@@ -33,6 +34,11 @@ public class TransactionController {
 
         return new ResponseEntity<>(transactionService.handleTransferRequest(transferRequest),
                 HttpStatus.CREATED);
+    }
+
+    @GetMapping("/transactions/{userId}")
+    public ResponseEntity<List<TransactionResponseDto>> getAllUserTransactions(@PathVariable UUID userId){
+        return new ResponseEntity<>(transactionService.getAllUserTransactions(userId), HttpStatus.OK);
     }
 
 //    @GetMapping("/{transferId}")

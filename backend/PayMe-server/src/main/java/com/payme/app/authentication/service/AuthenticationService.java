@@ -2,7 +2,7 @@ package com.payme.app.authentication.service;
 
 import com.payme.app.authentication.entity.SessionToken;
 import com.payme.app.entity.User;
-import com.payme.app.constants.TenmoRoles;
+import com.payme.app.constants.PaymeRoles;
 import com.payme.app.authentication.dto.AuthenticationResponseDto;
 import com.payme.app.authentication.dto.LoginDto;
 import com.payme.app.authentication.dto.RegisterDto;
@@ -23,7 +23,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
@@ -76,7 +75,7 @@ public class AuthenticationService {
                     .username(registerDto.getUsername())
                     .email(registerDto.getEmail())
                     .password(passwordEncoder.encode(registerDto.getPassword()))
-                    .roles(Set.of(TenmoRoles.USER))
+                    .roles(Set.of(PaymeRoles.USER))
                     .build();
 
             var updatedUser = userRepository.save(user);

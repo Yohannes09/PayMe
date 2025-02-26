@@ -10,11 +10,12 @@ import com.payme.app.entity.Transaction;
 import com.payme.app.mapper.TransactionMapper;
 import com.payme.app.repository.AccountRepository;
 import com.payme.app.repository.TransactionRepository;
+import com.payme.app.repository.UserRepository;
 import com.payme.app.services.validation.ValidatorService;
 import com.payme.app.constants.TransactionStatus;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.extern.slf4j.Slf4j;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,8 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
-@Slf4j // var name to log is: log. log.warn(), log.info() , etc
+//@Slf4j // var name to log is: log. log.warn(), log.info() , etc
 @Transactional
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -33,15 +35,42 @@ public class TransactionServiceImpl implements TransactionService {
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
     private final ValidatorService validatorService;
+    private final UserRepository userRepository;
 
 
     public TransactionServiceImpl(
             AccountRepository accountRepository,
             TransactionRepository transactionRepository,
-            ValidatorService validatorService) {
+            ValidatorService validatorService,
+            UserRepository userRepository) {
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
         this.validatorService = validatorService;
+        this.userRepository = userRepository;
+    }
+//- **`map`** produces a `Stream<List<Transaction>>` (a stream of lists) because
+// each account has a list of transactions. This results in a nested structure that requires
+// additional steps to flatten.
+
+// - **`flatMap`** flattens those lists as it processes them, producing a `Stream<Transaction>`
+// directly (a single stream of transactions), which is what you need.
+//
+// In your case, `flatMap` avoids the extra step of flattening and directly combines all transactions from all accounts into a single flattened list.
+
+    @Override
+    public List<TransactionResponseDto> getAllUserTransactions(UUID userId){
+        var user = userRepository.findById(userId)
+                .orElseThrow(()-> new NotFoundException("User not found"));
+
+        List<Account> userAccounts = user.getAccounts();
+
+        List<Transaction> transactions = userAccounts.stream()
+                .flatMap(account -> account.getTransactions().stream())
+                .collect(Collectors.toList());
+
+        return transactions.stream()
+                .map(TransactionMapper::mapTransactionToResponse)
+                .collect(Collectors.toList());
     }
 
 
@@ -83,7 +112,7 @@ public class TransactionServiceImpl implements TransactionService {
             throw new RuntimeException(e);
         }
 
-        Transaction newTransaction = TransactionMapper.mapRequestToTransfer(request);
+        Transaction newTransaction = TransactionMapper.mapRequestToTransaction(request);
         newTransaction.setType(type);
         newTransaction.setStatus(status);
 

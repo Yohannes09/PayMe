@@ -1,4 +1,6 @@
-
+window.onload = function () {
+    loadDashboard();
+};
 function openSidebar() {
     document.getElementById("mySidebar").style.width = "250px";
     document.querySelector(".main-content").style.marginLeft = "250px";
@@ -46,7 +48,7 @@ function fetchUserData(userId, token) {
 }
 
 function fetchTransfersData(userId, token) {
-    fetch(`http://localhost:8080/api/v1/PayMe/transfers/${userId}`, {
+    fetch(`http://localhost:8080/api/v1/payme/transfer/${userId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

@@ -16,14 +16,16 @@ import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+//Data
+@Getter
+@Setter
 @Builder
 @Table(name = "account")
 @Entity
 public class Account {
 
     @Id
-    @Column(name = "accountId", updatable = false, nullable = false)
+    @Column(name = "account_id", updatable = false, nullable = false)
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(
             name = "UUID",
@@ -32,7 +34,7 @@ public class Account {
     private UUID accountId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
 
     @Size(max = 20)

@@ -1,13 +1,18 @@
 package com.payme.app.constants;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
 public enum Currency {
     USD("USA"),
     MXN("MEXICO"),
     CAD("CANADA"),
     RUB("RUSSIA");
 
-    private final String currencyLocation;
+    private final String countryName;
+
+    Currency(String countryName){
+        this.countryName = countryName;
+    }
+
+    public String getCountryName() {
+        return countryName;
+    }
 }

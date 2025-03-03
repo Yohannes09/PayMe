@@ -12,7 +12,7 @@ import jakarta.validation.Valid;
 import java.util.*;
 
 @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5500"})
-@RequestMapping("api/v1/payme/transfer")
+@RequestMapping("api/v1/transfer")
 @RestController
 public class TransactionController {
     private final TransactionService transactionService;

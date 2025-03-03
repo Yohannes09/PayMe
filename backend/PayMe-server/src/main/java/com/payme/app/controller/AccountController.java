@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@RequestMapping("api/v1/tenmo/account")
+@RequestMapping("api/v1/account")
 @RestController
 public class AccountController {
     private final AccountService accountService;

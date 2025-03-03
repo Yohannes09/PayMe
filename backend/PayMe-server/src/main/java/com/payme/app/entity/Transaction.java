@@ -20,11 +20,11 @@ import java.util.UUID;
 @AllArgsConstructor
 @Data
 @Builder
-@Table(name = "transfer", indexes = {
-        @Index(name = "idx_account_from", columnList = "account_from"),
-        @Index(name = "idx_account_to", columnList = "account_to"),
-        @Index(name = "idx_transfer_id", columnList = "transfer_id")
-})
+@Table(name = "transaction")//, indexes = {
+//        @Index(name = "idx_account_from", columnList = "account_from"),
+//        @Index(name = "idx_account_to", columnList = "account_to"),
+//        @Index(name = "idx_transfer_id", columnList = "transfer_id")
+//})
 @Entity
 public class Transaction {
 
@@ -36,9 +36,14 @@ public class Transaction {
             strategy = "org.hibernate.id.UUIDGenerator")
     private UUID transferId;
 
+    // Relationship field
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="accountId", nullable=false)
+    private Account account;
+
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "transfer_type_id", nullable = false)
+    //@Column(name = "transfer_type_id", nullable = false)
     private TransactionType type;
 
     @NotNull
@@ -48,10 +53,12 @@ public class Transaction {
 
 
     @Column(name = "account_from", nullable = false)
-    @NotNull private UUID accountFrom;
+    @NotNull
+    private UUID accountFrom;
 
     @Column(name = "account_to", nullable = false)
-    @NotNull private List<UUID> accountTo;
+    @NotNull
+    private List<UUID> accountTo;
 
     @Column(name = "amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;

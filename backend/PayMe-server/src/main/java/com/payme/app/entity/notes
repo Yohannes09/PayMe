@@ -1,0 +1,19 @@
+Understanding mappedBy in @OneToMany
+
+The mappedBy attribute is used in a bidirectional relationship to indicate
+which entity owns the foreign key column in the database.
+	•	In a one-to-many (@OneToMany) relationship, the “one” side
+	    does not own the foreign key.
+
+	•	Instead, the “many” side owns the relationship because it stores
+	    the foreign key in its table
+
+TLDR
+1.	The mappedBy side is the inverse side, meaning it does not have a foreign key
+    column.
+2.	The @JoinColumn is only needed on the side that owns the foreign key
+    (the “many” side in @ManyToOne).
+3.	The database schema should be normalized, meaning the “one” side doesn’t store
+    references to the “many” side.
+4.	Querying account.getTransactions() will work because Hibernate knows how to map
+    them, even though there is no transactions column in the account table

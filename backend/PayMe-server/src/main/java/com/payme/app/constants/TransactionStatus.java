@@ -1,15 +1,10 @@
 package com.payme.app.constants;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /* The description for constants should be upper-case for case-insensitive search. */
-@Getter
-@AllArgsConstructor
 public enum TransactionStatus {
     PENDING("Pending", 1),
     APPROVED("Approved", 2),
@@ -19,12 +14,24 @@ public enum TransactionStatus {
     private final String description;
     private final Integer id;
 
+    TransactionStatus(String description, Integer id) {
+        this.description = description;
+        this.id = id;
+    }
 
-    private static final Map<String, Integer> STATUS_IDS =
+    public String getDescription() {
+        return this.description;
+    }
+
+    public Integer getId() {
+        return this.id;
+    }
+
+    public static final Map<String, Integer> STATUS_IDS =
             Stream.of(TransactionStatus.values())
-            .collect(Collectors.toMap(TransactionStatus::getDescription, TransactionStatus::getId));
+                    .collect(Collectors.toMap(TransactionStatus::getDescription, TransactionStatus::getId));
 
-    public static Integer findIdByDescription(String description){
+    public static Integer findIdByDescription(String description) {
         return STATUS_IDS.getOrDefault(description, -1);
     }
 

@@ -115,6 +115,14 @@
             <scope>provided</scope>
         </dependency>
 
+
+            <!-- This dependency was needed due to issues with Lombok annotations not working at all. -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok-mapstruct-binding</artifactId>
+            <version>0.2.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>

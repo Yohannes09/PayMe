@@ -19,13 +19,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-@Getter
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Data
-@Table(name = "tenmo_user")
+//@Getter
+//@Setter
+@Table(name = "payme_user")
 @Entity
 public class User implements UserDetails {
 
@@ -61,7 +62,8 @@ public class User implements UserDetails {
     @Column(unique = true, nullable = false)
     private String email;
 
-
+    @ElementCollection(targetClass = PaymeRoles.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "userId"))
     @Enumerated(EnumType.STRING)
     private Set<PaymeRoles> roles;
 
@@ -71,7 +73,7 @@ public class User implements UserDetails {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "payme_user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Account> accounts;
 
     @Override
@@ -111,4 +113,17 @@ public class User implements UserDetails {
         return this.password;
     }
 
+//    public static void main(String[] args) {
+//        var newUser = User.builder()
+//                .firstName("John")
+//                .lastName("Doe")
+//                .username("johndoe")
+//                .password("<PASSWORD>")
+//                .email("<EMAIL>")
+//                .roles(Set.of(PaymeRoles.USER, PaymeRoles.ADMIN))
+//                .isActive(true)
+//                .build();
+//
+//        System.out.println(newUser.getUsername() + newUser.getRoles());
+//    }
 }

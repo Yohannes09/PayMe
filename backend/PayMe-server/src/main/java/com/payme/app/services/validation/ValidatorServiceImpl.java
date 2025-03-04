@@ -24,14 +24,14 @@ public class ValidatorServiceImpl implements ValidatorService{
 
         List<Account> allAccounts = mergeAllAccounts(accountFrom, accountsTo);
 
-        if(request.amount().compareTo(BigDecimal.ZERO) <= 0)
+        if(request.getAmount().compareTo(BigDecimal.ZERO) <= 0)
             throw new TransactionException("Transfer must be greater than zero. ");
 
-        hasSufficientBalance(accountFrom, accountsTo, request.amount());
+        hasSufficientBalance(accountFrom, accountsTo, request.getAmount());
 
         hasInactiveAccount(allAccounts);
 
-        hasCurrencyMismatch(allAccounts, request.currency());
+        hasCurrencyMismatch(allAccounts, request.getCurrency());
 
     }
 

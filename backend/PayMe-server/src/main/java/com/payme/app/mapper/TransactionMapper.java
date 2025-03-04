@@ -11,11 +11,11 @@ public class TransactionMapper {
     public static Transaction mapRequestToTransaction(TransactionRequestDto requestDto){
 
         return Transaction.builder()
-                .amount(requestDto.amount().multiply(BigDecimal.valueOf(requestDto.accountToIds().size())))
-                .accountFrom(requestDto.accountFromId())
-                .accountTo(requestDto.accountToIds())
-                .transferMessage(requestDto.transferMessage().orElse(""))
-                .currency(requestDto.currency())
+                .amount(requestDto.getAmount().multiply(BigDecimal.valueOf(requestDto.getAccountToIds().size())))
+                .accountFrom(requestDto.getAccountFromId())
+                .accountTo(requestDto.getAccountToIds())
+                .transferMessage(requestDto.getTransferMessage().orElse(""))
+                .currency(requestDto.getCurrency())
                 .build();
     }
 

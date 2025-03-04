@@ -48,7 +48,7 @@ function fetchUserData(userId, token) {
 }
 
 function fetchTransfersData(userId, token) {
-    fetch(`http://localhost:8080/api/v1/payme/transfer/${userId}`, {
+    fetch(`http://localhost:8080/api/v1/transfer/${userId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

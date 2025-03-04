@@ -1,4 +1,4 @@
-package com.techelevator.tests.service;
+package com.payme.tests.service;
 
 import com.payme.app.repository.AccountRepository;
 import com.payme.app.repository.TransactionRepository;

@@ -46,20 +46,21 @@ public class AccountService{
             Optional<String> transferType,
             Optional<String> transferStatus){
 
-        List<TransactionResponseDto> transfers = accountRepository
-                .accountTransferHistory(accountId)
-                .orElseThrow(()-> new NotFoundException("Account not found. "));
-
-        return transfers.stream()
-                .filter(transfer ->transferType
-                        .map(type-> transfer.getType().name().equals(transferType))
-                        .orElse(true)
-                )
-                .filter(transfer -> transferStatus
-                        .map(status -> transfer.getStatus().name().equals(transferStatus))
-                        .orElse(true)
-                )
-                .collect(Collectors.toList());
+//        List<TransactionResponseDto> transfers = accountRepository
+//                .accountTransferHistory(accountId)
+//                .orElseThrow(()-> new NotFoundException("Account not found. "));
+//
+//        return transfers.stream()
+//                .filter(transfer ->transferType
+//                        .map(type-> transfer.getType().name().equals(transferType))
+//                        .orElse(true)
+//                )
+//                .filter(transfer -> transferStatus
+//                        .map(status -> transfer.getStatus().name().equals(transferStatus))
+//                        .orElse(true)
+//                )
+//                .collect(Collectors.toList());
+        return null;
     }
 
 }

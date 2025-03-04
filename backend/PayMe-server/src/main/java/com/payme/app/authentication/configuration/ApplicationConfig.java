@@ -19,6 +19,26 @@ public class ApplicationConfig {
 
     private final UserRepository userRepository;
 
+    /**
+     * Defines a {@link UserDetailsService} bean that retrieves user details for authentication.
+     * <p>
+     * This method returns a lambda function that implements the {@code UserDetailsService} interface,
+     * which is a functional interface containing a single method:
+     * </p>
+     *
+     * <pre>
+     * UserDetails loadUserByUsername(String username);
+     * </pre>
+     *
+     * <p>
+     * When Spring Security calls {@code loadUserByUsername(username)}, it provides the {@code username} argument.
+     * The lambda function then searches for the user by username or email in the database.
+     * If no user is found, a {@link UsernameNotFoundException} is thrown.
+     * </p>
+     *
+     * @return a {@code UserDetailsService} implementation that retrieves users from the database
+     * @throws UsernameNotFoundException if the user is not found in the repository
+     */
     @Bean
     public UserDetailsService userDetailsService(){
         return username -> userRepository
@@ -26,6 +46,11 @@ public class ApplicationConfig {
                 .orElseThrow(() -> new UsernameNotFoundException("Username: " + username + " not found. "));
     }
 
+    /**
+     * Defines a UserDetailsService bean that retrieves user details for authentication.
+     * It searches for a user by username or email in the database.
+     * If the user is not found, it throws a UsernameNotFoundException.
+     */
     @Bean
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
@@ -35,12 +60,13 @@ public class ApplicationConfig {
         return authenticationProvider;
     }
 
-
+    /**
+     * Defines an AuthenticationManager bean that orchestrates authentication processes.
+     * It retrieves the authentication manager from the AuthenticationConfiguration.
+     */
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authConfiguration
-    )throws Exception {
-
+    public AuthenticationManager authenticationManager
+            (AuthenticationConfiguration authConfiguration)throws Exception {
         return authConfiguration.getAuthenticationManager();
     }
 

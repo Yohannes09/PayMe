@@ -9,7 +9,7 @@ import com.payme.app.authentication.dto.RegisterDto;
 import com.payme.app.exception.BadRequestException;
 import com.payme.app.exception.DuplicateCredentialException;
 import com.payme.app.exception.NotFoundException;
-import com.payme.app.repository.SessionTokenRepository;
+//import com.payme.app.repository.SessionTokenRepository;
 import com.payme.app.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.constraints.Email;
@@ -43,20 +43,20 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private final SessionTokenRepository tokenRepository;
+    //private final SessionTokenRepository tokenRepository;
 
     public AuthenticationService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
-            AuthenticationManager authenticationManager,
-            SessionTokenRepository tokenRepository
+            AuthenticationManager authenticationManager//,
+            //SessionTokenRepository tokenRepository
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
-        this.tokenRepository = tokenRepository;
+        //this.tokenRepository = tokenRepository;
     }
 
 
@@ -99,16 +99,15 @@ public class AuthenticationService {
 
     public AuthenticationResponseDto login(LoginDto loginDto) {
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                         loginDto.getUsernameOrEmail(),
-                        loginDto.getPassword())
-        );
+                        loginDto.getPassword()));
 
 
         var user = userRepository
                 .findByUsernameOrEmail(loginDto.getUsernameOrEmail())
                 .orElseThrow(()-> new NotFoundException("Could not retrieve account. "));
+
         // a new token shouldnt be created if the user's current token is valid.
         String jwtToken = jwtService.generateToken(user);
 
@@ -124,7 +123,7 @@ public class AuthenticationService {
     }
 
     public void logout(String token){
-        tokenRepository.deleteByToken(token);
+        //tokenRepository.deleteByToken(token);
     }
 
 
@@ -148,15 +147,15 @@ public class AuthenticationService {
 
 
     public void updatePassword(UUID userId,
-       @NonNull @Pattern(regexp = PASSWORD_PATTERN,
-               message = PASSWORD_VALIDATION_MESSAGE) String newPassword)
+       @NonNull @Pattern(regexp = PASSWORD_PATTERN, message = PASSWORD_VALIDATION_MESSAGE) String newPassword)
     throws BadRequestException{
 
         var user = fetchUser(userId);
+        String encodedPassword = passwordEncoder.encode(newPassword);
 
         updateCredential(
                 user,
-                newPassword,
+                encodedPassword,
                 user::setPassword,
                 User::getPassword
         );
@@ -180,20 +179,10 @@ public class AuthenticationService {
         );
     }
 
-
-    private void createUserSession(User user, String token){
-        Date creationTime = jwtService.extractClaim(token, Claims::getIssuedAt);
-        Date expirationTime = jwtService.extractClaim(token, Claims::getExpiration);
-
-        SessionToken newSession = SessionToken.builder()
-                .user(user)
-                .token(token)
-                .createdAt(creationTime)
-                .expiresAt(expirationTime)
-                .build();
-        tokenRepository.save(newSession);
-    }
-
+    // *** Extract the current credential (e.g., username or password) from the user object ***
+    // `currentCredentialFunc` is a Function<User, String>, meaning it takes a User and returns a String
+    // Calling `apply(user)` invokes the function, retrieving the credential from the user
+    // Example: If `currentCredentialFunc` is `User::getUsername`, this is equivalent to `user.getUsername()`
     private <T> void updateCredential(
             User user,
             String newCredential,
@@ -210,12 +199,26 @@ public class AuthenticationService {
         userRepository.save(user);
     }
 
+    private void createUserSession(User user, String token){
+        Date creationTime = jwtService.extractClaim(token, Claims::getIssuedAt);
+        Date expirationTime = jwtService.extractClaim(token, Claims::getExpiration);
+
+        SessionToken newSession = SessionToken.builder()
+                .user(user)
+                .token(token)
+                .createdAt(creationTime)
+                .expiresAt(expirationTime)
+                .build();
+        //tokenRepository.save(newSession);
+    }
+
+
+
 
     private User fetchUser(UUID userId){
         return userRepository
                 .findById(userId)
-                .orElseThrow(()->
-                        new NotFoundException("User with ID " + userId + " not found. "));
+                .orElseThrow(()-> new NotFoundException("User with ID " + userId + " not found. "));
     }
 
     private boolean isCredentialTaken(String usernameOrEmail){

@@ -1,8 +1,7 @@
 package com.payme.app.authentication.service;
 
 import com.payme.app.authentication.configuration.JwtConfig;
-import com.payme.app.authentication.entity.SessionToken;
-import com.payme.app.repository.SessionTokenRepository;
+import com.payme.app.authentication.SessionTokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -24,8 +23,7 @@ public class JwtService {
 
     public JwtService(
             JwtConfig jwtConfig,
-            SessionTokenRepository tokenRepository
-    ) {
+            SessionTokenRepository tokenRepository) {
         this.jwtConfig = jwtConfig;
         this.tokenRepository = tokenRepository;
     }
@@ -86,7 +84,7 @@ public class JwtService {
                 .getBody();
     }
 
-    private boolean isTokenExpired(String token){
+    public boolean isTokenExpired(String token){
         return extractClaim(token, Claims::getExpiration).before(new Date());
     }
 

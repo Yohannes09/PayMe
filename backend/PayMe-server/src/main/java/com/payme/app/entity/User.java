@@ -8,7 +8,6 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,14 +23,12 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Builder
 @Data
-//@Getter
-//@Setter
 @Table(name = "payme_user")
 @Entity
 public class User implements UserDetails {
 
     @Id
-    @Column(name = "user_id", updatable = false, nullable = false)
+    @Column(name = "userId", updatable = false, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID userId;
 
@@ -58,8 +55,9 @@ public class User implements UserDetails {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @ElementCollection(targetClass = PaymeRoles.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "userId"))
+    // This was causing problems because there is no table or entity 'user_roles'
+    //@ElementCollection(targetClass = PaymeRoles.class, fetch = FetchType.EAGER)
+    //@CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     private Set<PaymeRoles> roles;
 
@@ -108,6 +106,12 @@ public class User implements UserDetails {
     public String getPassword(){
         return this.password;
     }
+
+//    @PrePersist
+//    public void generateUUID(){
+//        if(this.userId == null)
+//            this.userId = UUID.randomUUID();
+//    }
 
 //    public static void main(String[] args) {
 //        var newUser = User.builder()

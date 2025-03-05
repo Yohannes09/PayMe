@@ -27,7 +27,7 @@ public class Account {
     private UUID accountId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
 
     @Size(max = 20)

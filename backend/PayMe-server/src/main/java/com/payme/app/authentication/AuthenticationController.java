@@ -30,4 +30,5 @@ public class AuthenticationController {
                 authenticationService.register(registerDto),
                 HttpStatus.CREATED);
     }
+
 }

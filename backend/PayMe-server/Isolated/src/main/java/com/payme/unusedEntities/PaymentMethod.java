@@ -25,11 +25,7 @@
 //
 //    @Id
 //    @Column(name = "id", updatable = false, nullable = false)
-//    @GeneratedValue(generator = "UUID")
-//    @GenericGenerator(
-//            name = "UUID",
-//            strategy = "org.hibernate.id.UUIDGenerator"
-//    )
+//    @GeneratedValue(strategy = GenerationType.AUTO)
 //    private UUID id;
 //
 //    @ManyToOne(fetch = FetchType.LAZY)

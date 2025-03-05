@@ -1,5 +1,6 @@
 package com.payme.app.authentication.service;
 
+import com.payme.app.authentication.SessionTokenRepository;
 import com.payme.app.authentication.entity.SessionToken;
 import com.payme.app.entity.User;
 import com.payme.app.constants.PaymeRoles;
@@ -9,7 +10,7 @@ import com.payme.app.authentication.dto.RegisterDto;
 import com.payme.app.exception.BadRequestException;
 import com.payme.app.exception.DuplicateCredentialException;
 import com.payme.app.exception.NotFoundException;
-//import com.payme.app.repository.SessionTokenRepository;
+//import com.payme.app.authentication.SessionTokenRepository;
 import com.payme.app.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.constraints.Email;
@@ -43,54 +44,35 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    //private final SessionTokenRepository tokenRepository;
+    private final SessionTokenRepository tokenRepository;
 
     public AuthenticationService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
-            AuthenticationManager authenticationManager//,
-            //SessionTokenRepository tokenRepository
-    ) {
+            AuthenticationManager authenticationManager,
+            SessionTokenRepository tokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
-        //this.tokenRepository = tokenRepository;
+        this.tokenRepository = tokenRepository;
     }
 
 
     public AuthenticationResponseDto register(RegisterDto registerDto) {
-
         try {
-            if(isCredentialTaken(registerDto.getEmail()))
-                throw new DuplicateCredentialException("Email already registered. ");
+            validateNewUserCredentials(registerDto);
 
-            if(isCredentialTaken(registerDto.getUsername()))
-                throw new DuplicateCredentialException("Username already taken. ");
-
-            var user = User.builder()
-                    .firstName(registerDto.getFirstName())
-                    .lastName(registerDto.getLastName())
-                    .username(registerDto.getUsername())
-                    .email(registerDto.getEmail())
-                    .password(passwordEncoder.encode(registerDto.getPassword()))
-                    .roles(Set.of(PaymeRoles.USER))
-                    .build();
+            var user = generateUserFromDto(registerDto);
 
             var updatedUser = userRepository.save(user);
+
             var jwtToken = jwtService.generateToken(user);
 
-            createUserSession(user, jwtToken);
+            createUserSession(updatedUser, jwtToken);
 
-            return AuthenticationResponseDto.builder()
-                    .userId(updatedUser.getUserId())
-                    .token(jwtToken)
-                    .firstName(registerDto.getFirstName())
-                    .lastName(registerDto.getLastName())
-                    .email(registerDto.getEmail())
-                    .build();
-
+            return generateAuthenticationResponse(updatedUser, jwtToken);
         } catch (DuplicateCredentialException e) {
             throw new RuntimeException(e);
         }
@@ -99,20 +81,36 @@ public class AuthenticationService {
 
     public AuthenticationResponseDto login(LoginDto loginDto) {
 
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
                         loginDto.getUsernameOrEmail(),
                         loginDto.getPassword()));
-
 
         var user = userRepository
                 .findByUsernameOrEmail(loginDto.getUsernameOrEmail())
                 .orElseThrow(()-> new NotFoundException("Could not retrieve account. "));
 
-        // a new token shouldnt be created if the user's current token is valid.
-        String jwtToken = jwtService.generateToken(user);
+        var userToken = tokenRepository
+                .findByUser(user);
+
+        String jwtToken;
+        if (!userToken.isPresent() || jwtService.isTokenExpired(userToken.get().getToken()))
+            jwtToken = jwtService.generateToken(user);
+        else
+            jwtToken = userToken.get().getToken();
 
         createUserSession(user, jwtToken);
 
+        return generateAuthenticationResponse(user, jwtToken);
+    }
+
+
+    public void logout(String token){
+        tokenRepository.deleteByToken(token);
+    }
+
+
+    private AuthenticationResponseDto generateAuthenticationResponse(User user, String jwtToken){
         return AuthenticationResponseDto.builder()
                 .userId(user.getUserId())
                 .token(jwtToken)
@@ -121,12 +119,26 @@ public class AuthenticationService {
                 .email(user.getEmail())
                 .build();
     }
+    public User generateUserFromDto(RegisterDto registerDto){
+         return User.builder()
+                .firstName(registerDto.getFirstName())
+                .lastName(registerDto.getLastName())
+                .username(registerDto.getUsername())
+                .email(registerDto.getEmail())
+                .password(passwordEncoder.encode(registerDto.getPassword()))
+                .roles(Set.of(PaymeRoles.USER))
+                .isActive(true)
+                .build();
+    }
+    private void validateNewUserCredentials(RegisterDto registerDto){
+        if(isCredentialTaken(registerDto.getEmail()))
+            throw new DuplicateCredentialException("Email already registered. ");
 
-    public void logout(String token){
-        //tokenRepository.deleteByToken(token);
+        if(isCredentialTaken(registerDto.getUsername()))
+            throw new DuplicateCredentialException("Username already taken. ");
     }
 
-
+    //******* UPDATE CREDENTIAL METHODS
     public void updateUsername(UUID userId,
        @NonNull @Pattern(regexp = USERNAME_PATTERN,
                message = USERNAME_VALIDATION_MESSAGE) String newUsername)
@@ -199,6 +211,7 @@ public class AuthenticationService {
         userRepository.save(user);
     }
 
+
     private void createUserSession(User user, String token){
         Date creationTime = jwtService.extractClaim(token, Claims::getIssuedAt);
         Date expirationTime = jwtService.extractClaim(token, Claims::getExpiration);
@@ -209,10 +222,9 @@ public class AuthenticationService {
                 .createdAt(creationTime)
                 .expiresAt(expirationTime)
                 .build();
-        //tokenRepository.save(newSession);
+
+        tokenRepository.save(newSession);
     }
-
-
 
 
     private User fetchUser(UUID userId){
@@ -220,6 +232,7 @@ public class AuthenticationService {
                 .findById(userId)
                 .orElseThrow(()-> new NotFoundException("User with ID " + userId + " not found. "));
     }
+
 
     private boolean isCredentialTaken(String usernameOrEmail){
         return userRepository

@@ -23,7 +23,7 @@ function loadDashboard() {
 }
 
 function fetchUserData(userId, token) {
-    fetch(`http://localhost:8080/api/v1/payme/user/${userId}`, {
+    fetch(`http://localhost:8080/api/v1/user/${userId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

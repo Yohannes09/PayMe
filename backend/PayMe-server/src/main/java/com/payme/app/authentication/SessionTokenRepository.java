@@ -1,15 +1,20 @@
-package com.payme.app.repository;
+package com.payme.app.authentication;
 
 import com.payme.app.authentication.entity.SessionToken;
+import com.payme.app.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.UUID;
 
-@Repository
 public interface SessionTokenRepository extends JpaRepository<SessionToken, UUID> {
-    void deleteByToken(String token);
+
+    Optional<SessionToken> findByUser(User user);
 
     Optional<SessionToken> findByToken(String token);
+
+    void delteteByUser(User user);
+
+    void deleteByToken(String token);
+
 }

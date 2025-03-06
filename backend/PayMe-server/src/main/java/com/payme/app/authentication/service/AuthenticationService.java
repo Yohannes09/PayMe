@@ -10,12 +10,13 @@ import com.payme.app.authentication.dto.RegisterDto;
 import com.payme.app.exception.BadRequestException;
 import com.payme.app.exception.DuplicateCredentialException;
 import com.payme.app.exception.NotFoundException;
-//import com.payme.app.authentication.SessionTokenRepository;
+import com.payme.app.authentication.SessionTokenRepository;
 import com.payme.app.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,8 +33,9 @@ import java.util.function.Function;
 
 @Transactional
 @Service
+@Slf4j
 public class AuthenticationService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationService.class);
+    //private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationService.class);
     private static final String USERNAME_PATTERN = "^[a-zA-Z0-9]{5,15}$";
     private static final String PASSWORD_PATTERN = "^(?=.*[A-Z])(?=.*[0-9!@#$%^&*]).{6,}$";
     private static final String USERNAME_VALIDATION_MESSAGE = "Username should be 5-15 characters long with no special symbols.";
@@ -63,16 +65,12 @@ public class AuthenticationService {
     public AuthenticationResponseDto register(RegisterDto registerDto) {
         try {
             validateNewUserCredentials(registerDto);
-
-            var user = generateUserFromDto(registerDto);
-
-            var updatedUser = userRepository.save(user);
-
-            var jwtToken = jwtService.generateToken(user);
-
-            createUserSession(updatedUser, jwtToken);
-
-            return generateAuthenticationResponse(updatedUser, jwtToken);
+            User generatedUserFromDto = generateUserFromDto(registerDto);
+            User savedUser = userRepository.save(generatedUserFromDto);
+            log.info("User registered successfully: {}", savedUser.getUserId());
+            String jwtToken = jwtService.generateToken(savedUser);
+            createUserSession(savedUser, jwtToken);
+            return generateAuthenticationResponse(savedUser, jwtToken);
         } catch (DuplicateCredentialException e) {
             throw new RuntimeException(e);
         }
@@ -80,27 +78,21 @@ public class AuthenticationService {
 
 
     public AuthenticationResponseDto login(LoginDto loginDto) {
-
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginDto.getUsernameOrEmail(),
-                        loginDto.getPassword()));
+                        loginDto.getPassword()
+                )
+        );
+        User user = fetchUser(loginDto.getUsernameOrEmail());
 
-        var user = userRepository
-                .findByUsernameOrEmail(loginDto.getUsernameOrEmail())
-                .orElseThrow(()-> new NotFoundException("Could not retrieve account. "));
-
-        var userToken = tokenRepository
-                .findByUser(user);
-
-        String jwtToken;
-        if (!userToken.isPresent() || jwtService.isTokenExpired(userToken.get().getToken()))
-            jwtToken = jwtService.generateToken(user);
-        else
-            jwtToken = userToken.get().getToken();
+        String jwtToken = tokenRepository
+                .findByUser(user)
+                .filter(token -> !jwtService.isTokenExpired(token.getToken()))
+                .map(SessionToken::getToken)
+                .orElseGet(()-> jwtService.generateToken(user));
 
         createUserSession(user, jwtToken);
-
         return generateAuthenticationResponse(user, jwtToken);
     }
 
@@ -119,7 +111,9 @@ public class AuthenticationService {
                 .email(user.getEmail())
                 .build();
     }
-    public User generateUserFromDto(RegisterDto registerDto){
+
+
+    private User generateUserFromDto(RegisterDto registerDto){
          return User.builder()
                 .firstName(registerDto.getFirstName())
                 .lastName(registerDto.getLastName())
@@ -130,6 +124,8 @@ public class AuthenticationService {
                 .isActive(true)
                 .build();
     }
+
+
     private void validateNewUserCredentials(RegisterDto registerDto){
         if(isCredentialTaken(registerDto.getEmail()))
             throw new DuplicateCredentialException("Email already registered. ");
@@ -140,21 +136,17 @@ public class AuthenticationService {
 
     //******* UPDATE CREDENTIAL METHODS
     public void updateUsername(UUID userId,
-       @NonNull @Pattern(regexp = USERNAME_PATTERN,
-               message = USERNAME_VALIDATION_MESSAGE) String newUsername)
-    throws BadRequestException {
+       @NonNull @Pattern(regexp = USERNAME_PATTERN, message = USERNAME_VALIDATION_MESSAGE)
+       String newUsername) throws BadRequestException {
 
         if(isCredentialTaken(newUsername))
             throw new BadRequestException("Username: " + newUsername + " taken. ");
-
-        var user = fetchUser(userId);
-
+        User user = fetchUser(userId);
         updateCredential(
                 user,
                 newUsername,
                 user::setUsername,
-                User::getUsername
-        );
+                User::getUsername);
     }
 
 
@@ -177,12 +169,9 @@ public class AuthenticationService {
     public void updateEmail(UUID userId,
         @NonNull @Email(message = EMAIL_VALIDATION_MESSAGE) String newEmail)
     throws BadRequestException{
-
         if(isCredentialTaken(newEmail))
             throw new BadRequestException("Email: " + newEmail + " is already registered.");
-
-        var user = fetchUser(userId);
-
+        User user = fetchUser(userId);
         updateCredential(
                 user,
                 newEmail,
@@ -213,24 +202,39 @@ public class AuthenticationService {
 
 
     private void createUserSession(User user, String token){
+        log.info("Generating token for user: {}", user.getUserId());
         Date creationTime = jwtService.extractClaim(token, Claims::getIssuedAt);
         Date expirationTime = jwtService.extractClaim(token, Claims::getExpiration);
 
-        SessionToken newSession = SessionToken.builder()
+        if (user != null) {
+            log.info("user retrieved with id: {}", user.getUserId());
+        }else
+            log.error("user is null ");
+
+        SessionToken sessionToken = SessionToken.builder()
                 .user(user)
                 .token(token)
                 .createdAt(creationTime)
                 .expiresAt(expirationTime)
                 .build();
 
-        tokenRepository.save(newSession);
+        tokenRepository.save(sessionToken);
     }
 
 
     private User fetchUser(UUID userId){
+        log.info("User fetched with ID: {}", userId);
         return userRepository
                 .findById(userId)
                 .orElseThrow(()-> new NotFoundException("User with ID " + userId + " not found. "));
+    }
+
+
+    private User fetchUser(String usernameOrEmail){
+        log.info("User retrieved with credential: {}", usernameOrEmail);
+        return userRepository
+                .findByUsernameOrEmail(usernameOrEmail)
+                .orElseThrow(()-> new NotFoundException(""));
     }
 
 

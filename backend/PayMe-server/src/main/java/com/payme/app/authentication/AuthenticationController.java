@@ -5,6 +5,7 @@ import com.payme.app.authentication.service.AuthenticationService;
 import com.payme.app.authentication.dto.AuthenticationResponseDto;
 import com.payme.app.authentication.dto.RegisterDto;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5500"})
 @RequestMapping("/api/v1/auth")
 @RestController
+@Slf4j
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
@@ -21,6 +23,7 @@ public class AuthenticationController {
 
     @PostMapping(path = "/login")
     public ResponseEntity<AuthenticationResponseDto> login(@Valid @RequestBody LoginDto loginDto){
+        log.info("User sending credentials with username/email: {}", loginDto.getUsernameOrEmail());
         return ResponseEntity.ok(authenticationService.login(loginDto));
     }
 

@@ -26,7 +26,7 @@ public class SessionToken {
     private UUID tokenId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @NotNull
@@ -39,3 +39,5 @@ public class SessionToken {
     @Column(name = "expires_at", nullable = false, updatable = false)
     private Date expiresAt;
 }
+
+

@@ -27,22 +27,22 @@ public class Account {
     private UUID accountId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Size(max = 20)
-    @Column(unique = true)
+    @Column(unique = true, name = "account_number")
     private String accountNumber;
 
     @Size(max = 9)
-    @Column()
+    @Column(name = "routing_number")
     private String routingNumber;
 
     @Column(name = "amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal balance;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, name = "account_type")
     private AccountType accountType;
 
     @Enumerated(EnumType.STRING)
@@ -52,7 +52,7 @@ public class Account {
     @Column(nullable = false)
     private boolean isActive;
 
-    @Column(updatable = false)
+    @Column(updatable = false, name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;
 

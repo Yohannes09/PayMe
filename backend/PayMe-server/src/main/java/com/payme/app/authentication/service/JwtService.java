@@ -1,7 +1,6 @@
 package com.payme.app.authentication.service;
 
 import com.payme.app.authentication.configuration.JwtConfig;
-import com.payme.app.authentication.SessionTokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -19,46 +18,28 @@ import java.util.function.Function;
 @Service
 public class JwtService {
     private final JwtConfig jwtConfig;
-    private final SessionTokenRepository tokenRepository;
 
-    public JwtService(
-            JwtConfig jwtConfig,
-            SessionTokenRepository tokenRepository) {
+    public JwtService(JwtConfig jwtConfig){
         this.jwtConfig = jwtConfig;
-        this.tokenRepository = tokenRepository;
     }
 
-//    public String extractUsername(String jwtToken) {
-//        return extractClaim(jwtToken, Claims::getSubject);
-//    }
-
-    /*
-     * Why fetch the token?
-     *
-     *  In order to invalidate a token, simply delete from
-     *  Database.
-     *
-     *  Thus, if the token is missing
-     *  this method returns false.
-     * */
 
     public boolean isTokenValid(String jwtToken, UserDetails userDetails) {
         final String username = extractClaim(jwtToken, Claims::getSubject);
-        boolean isTokenStored = tokenRepository.findByToken(jwtToken).isPresent();
 
         return userDetails.getUsername().equals(username) &&
-                !isTokenExpired(jwtToken) &&
-                isTokenStored;
+                !isTokenExpired(jwtToken);
     }
+
 
     public String generateToken(UserDetails userDetails){
         return generateToken(new HashMap<>(), userDetails);
     }
 
+
     public String generateToken(
             Map<String, Object> extraClaims,
-            UserDetails userDetails
-    ){
+            UserDetails userDetails){
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
@@ -75,7 +56,6 @@ public class JwtService {
     }
 
 
-
     private Claims extractAllClaims(String token){
         return Jwts.parserBuilder()
                 .setSigningKey(getSignInKey())
@@ -88,9 +68,9 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration).before(new Date());
     }
 
+
     private Key getSignInKey() {
         byte[] secretKeyBytes = Decoders.BASE64.decode(jwtConfig.getSecret());
         return Keys.hmacShaKeyFor(secretKeyBytes);
     }
-
 }

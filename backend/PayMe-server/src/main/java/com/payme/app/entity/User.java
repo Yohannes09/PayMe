@@ -26,21 +26,19 @@ import java.util.stream.Collectors;
 @Table(name = "payme_user")
 @Entity
 public class User implements UserDetails {
-
     @Id
-    @Column(name = "userId", updatable = false, nullable = false)
+    @Column(name = "user_id", updatable = false, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID userId;
 
     @NotNull
-    @Column(nullable = false)
+    @Column(nullable = false, name = "first_name")
     private String firstName;
 
     @NotNull
-    @Column(nullable = false)
+    @Column(nullable = false, name = "last_name")
     private String lastName;
 
-    // NotNull is for User creation, nullable is to enforce no null in the column.
     @Size(max = 20, min = 4, message = "Enter a username 4-20 characters long.")
     @NotNull
     @Column(unique = true, nullable = false)
@@ -55,9 +53,6 @@ public class User implements UserDetails {
     @Column(unique = true, nullable = false)
     private String email;
 
-    // This was causing problems because there is no table or entity 'user_roles'
-    //@ElementCollection(targetClass = PaymeRoles.class, fetch = FetchType.EAGER)
-    //@CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     private Set<PaymeRoles> roles;
 
@@ -65,6 +60,7 @@ public class User implements UserDetails {
     private boolean isActive;
 
     @CreationTimestamp
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -106,24 +102,4 @@ public class User implements UserDetails {
     public String getPassword(){
         return this.password;
     }
-
-//    @PrePersist
-//    public void generateUUID(){
-//        if(this.userId == null)
-//            this.userId = UUID.randomUUID();
-//    }
-
-//    public static void main(String[] args) {
-//        var newUser = User.builder()
-//                .firstName("John")
-//                .lastName("Doe")
-//                .username("johndoe")
-//                .password("<PASSWORD>")
-//                .email("<EMAIL>")
-//                .roles(Set.of(PaymeRoles.USER, PaymeRoles.ADMIN))
-//                .isActive(true)
-//                .build();
-//
-//        System.out.println(newUser.getUsername() + newUser.getRoles());
-//    }
 }

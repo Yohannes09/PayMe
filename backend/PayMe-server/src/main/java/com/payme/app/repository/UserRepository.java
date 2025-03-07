@@ -10,10 +10,13 @@ import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-    @Query(value = "SELECT user FROM User user " +
-            "WHERE LOWER(user.username) = LOWER(:usernameOrEmail)" +
-            "OR LOWER(user.email) = LOWER(:usernameOrEmail) ")
-    Optional<User> findByUsernameOrEmail(
-            @Param(value = "usernameOrEmail") String usernameOrEmail);
+//    @Query(value = "SELECT user FROM User user " +
+//            "WHERE LOWER(user.username) = LOWER(:usernameOrEmail)" +
+//            "OR LOWER(user.email) = LOWER(:usernameOrEmail)")
+    @Query(value = "SELECT * FROM payme_user " +
+           "WHERE LOWER(username) = LOWER(:usernameOrEmail) " +
+           "OR LOWER(email) = LOWER(:usernameOrEmail) " +
+           "LIMIT 1 ", nativeQuery = true)
+    Optional<User> findFirstByUsernameOrEmail(@Param(value = "usernameOrEmail") String usernameOrEmail);
 
 }

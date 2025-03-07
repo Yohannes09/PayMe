@@ -10,21 +10,19 @@ import com.payme.app.authentication.dto.RegisterDto;
 import com.payme.app.exception.BadRequestException;
 import com.payme.app.exception.DuplicateCredentialException;
 import com.payme.app.exception.NotFoundException;
-import com.payme.app.authentication.SessionTokenRepository;
 import com.payme.app.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
@@ -119,6 +117,7 @@ public class AuthenticationService {
                 .lastName(registerDto.getLastName())
                 .username(registerDto.getUsername())
                 .email(registerDto.getEmail())
+                .accounts(new ArrayList<>())
                 .password(passwordEncoder.encode(registerDto.getPassword()))
                 .roles(Set.of(PaymeRoles.USER))
                 .isActive(true)
@@ -233,14 +232,14 @@ public class AuthenticationService {
     private User fetchUser(String usernameOrEmail){
         log.info("User retrieved with credential: {}", usernameOrEmail);
         return userRepository
-                .findByUsernameOrEmail(usernameOrEmail)
+                .findFirstByUsernameOrEmail(usernameOrEmail)
                 .orElseThrow(()-> new NotFoundException(""));
     }
 
 
     private boolean isCredentialTaken(String usernameOrEmail){
         return userRepository
-                .findByUsernameOrEmail(usernameOrEmail)
+                .findFirstByUsernameOrEmail(usernameOrEmail)
                 .isPresent();
     }
 

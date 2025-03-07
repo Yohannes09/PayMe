@@ -28,7 +28,7 @@ async function submitForm(event) {
 
         if (response.ok) {
             alert('User registered successfully');
-            window.location.href = 'authentication/login.html';
+            window.location.href = '/authentication/login.html';
         } else {
             alert('Failed to register user');
         }

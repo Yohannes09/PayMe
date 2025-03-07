@@ -39,8 +39,8 @@ function fetchUserData(userId, token) {
     .then(data => {
         console.log(data);
         document.getElementById('account-name').innerText = `${data.firstName} ${data.lastName}`;
-        document.getElementById('account-balance').innerText = data.accounts[0].balance;
         document.getElementById('account-name-header').innerText = data.firstName;
+        document.getElementById('account-balance').innerText = data.accounts[0].balance;
     })
     .catch(error => {
         console.error('Error fetching user data:', error);

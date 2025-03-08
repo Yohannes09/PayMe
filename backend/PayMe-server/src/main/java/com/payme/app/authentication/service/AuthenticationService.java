@@ -18,6 +18,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +34,6 @@ import java.util.function.Function;
 @Service
 @Slf4j
 public class AuthenticationService {
-    //private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationService.class);
     private static final String USERNAME_PATTERN = "^[a-zA-Z0-9]{5,15}$";
     private static final String PASSWORD_PATTERN = "^(?=.*[A-Z])(?=.*[0-9!@#$%^&*]).{6,}$";
     private static final String USERNAME_VALIDATION_MESSAGE = "Username should be 5-15 characters long with no special symbols.";
@@ -62,10 +62,14 @@ public class AuthenticationService {
 
     public AuthenticationResponseDto register(RegisterDto registerDto) {
         try {
-            validateNewUserCredentials(registerDto);
+            if(userRepository.isCredentialTaken(registerDto.getUsername(), registerDto.getEmail())) {
+                throw new DuplicateCredentialException("Username or email already in use. ");
+            }
+
             User generatedUserFromDto = generateUserFromDto(registerDto);
             User savedUser = userRepository.save(generatedUserFromDto);
             log.info("User registered successfully: {}", savedUser.getUserId());
+
             String jwtToken = jwtService.generateToken(savedUser);
             createUserSession(savedUser, jwtToken);
             return generateAuthenticationResponse(savedUser, jwtToken);
@@ -76,23 +80,51 @@ public class AuthenticationService {
 
 
     public AuthenticationResponseDto login(LoginDto loginDto) {
-        authenticationManager.authenticate(
+        Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginDto.getUsernameOrEmail(),
                         loginDto.getPassword()
                 )
         );
-        User user = fetchUser(loginDto.getUsernameOrEmail());
+
+        User user = (User) authentication.getPrincipal();
 
         String jwtToken = tokenRepository
                 .findByUser(user)
                 .filter(token -> !jwtService.isTokenExpired(token.getToken()))
                 .map(SessionToken::getToken)
-                .orElseGet(()-> jwtService.generateToken(user));
+                .orElseGet(()-> {
+                            String jwt = jwtService.generateToken(user);
+                            createUserSession(user, jwt);
+                            return jwt;
+                });
 
-        createUserSession(user, jwtToken);
         return generateAuthenticationResponse(user, jwtToken);
     }
+
+    private void createUserSession(User user, String token){
+        log.info("Generating token for user: {}", user.getUserId());
+        Date creationTime = jwtService.extractClaim(token, Claims::getIssuedAt);
+        Date expirationTime = jwtService.extractClaim(token, Claims::getExpiration);
+
+        if (user != null) {
+            log.info("user retrieved with id: {}", user.getUserId());
+        }else
+            log.error("user is null ");
+
+        SessionToken sessionToken = SessionToken.builder()
+                .user(user)
+                .token(token)
+                .createdAt(creationTime)
+                .expiresAt(expirationTime)
+                .build();
+
+        tokenRepository.save(sessionToken);
+    }
+
+//    private String genereateAndPersistToken(User user){
+//
+//    }
 
 
     public void logout(String token){
@@ -125,21 +157,14 @@ public class AuthenticationService {
     }
 
 
-    private void validateNewUserCredentials(RegisterDto registerDto){
-        if(isCredentialTaken(registerDto.getEmail()))
-            throw new DuplicateCredentialException("Email already registered. ");
-
-        if(isCredentialTaken(registerDto.getUsername()))
-            throw new DuplicateCredentialException("Username already taken. ");
-    }
-
     //******* UPDATE CREDENTIAL METHODS
     public void updateUsername(UUID userId,
        @NonNull @Pattern(regexp = USERNAME_PATTERN, message = USERNAME_VALIDATION_MESSAGE)
        String newUsername) throws BadRequestException {
 
-        if(isCredentialTaken(newUsername))
+        if(userRepository.existsByUsernameIgnoreCase(newUsername))
             throw new BadRequestException("Username: " + newUsername + " taken. ");
+
         User user = fetchUser(userId);
         updateCredential(
                 user,
@@ -168,8 +193,10 @@ public class AuthenticationService {
     public void updateEmail(UUID userId,
         @NonNull @Email(message = EMAIL_VALIDATION_MESSAGE) String newEmail)
     throws BadRequestException{
-        if(isCredentialTaken(newEmail))
+        if(userRepository.existsByEmailIgnoreCase(newEmail)) {
             throw new BadRequestException("Email: " + newEmail + " is already registered.");
+        }
+
         User user = fetchUser(userId);
         updateCredential(
                 user,
@@ -200,27 +227,6 @@ public class AuthenticationService {
     }
 
 
-    private void createUserSession(User user, String token){
-        log.info("Generating token for user: {}", user.getUserId());
-        Date creationTime = jwtService.extractClaim(token, Claims::getIssuedAt);
-        Date expirationTime = jwtService.extractClaim(token, Claims::getExpiration);
-
-        if (user != null) {
-            log.info("user retrieved with id: {}", user.getUserId());
-        }else
-            log.error("user is null ");
-
-        SessionToken sessionToken = SessionToken.builder()
-                .user(user)
-                .token(token)
-                .createdAt(creationTime)
-                .expiresAt(expirationTime)
-                .build();
-
-        tokenRepository.save(sessionToken);
-    }
-
-
     private User fetchUser(UUID userId){
         log.info("User fetched with ID: {}", userId);
         return userRepository
@@ -232,16 +238,8 @@ public class AuthenticationService {
     private User fetchUser(String usernameOrEmail){
         log.info("User retrieved with credential: {}", usernameOrEmail);
         return userRepository
-                .findFirstByUsernameOrEmail(usernameOrEmail)
+                .findByUsernameOrEmail(usernameOrEmail)
                 .orElseThrow(()-> new NotFoundException(""));
     }
-
-
-    private boolean isCredentialTaken(String usernameOrEmail){
-        return userRepository
-                .findFirstByUsernameOrEmail(usernameOrEmail)
-                .isPresent();
-    }
-
 }
 

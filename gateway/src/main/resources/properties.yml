@@ -1,0 +1,15 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: gateway
+
+# Custom application properties.
+application:
+  security:
+    password:
+      pattern: '^(?=.*[A-Z])(?=.*[0-9!@#$%^&*]).{6,}$'
+      message: "Password must be 6+ characters long, have at least 1 capital letter, and a number or special character."
+  api:
+    endpoints:
+      authentication-service: "http://localhost:8080/api/v1/auth"

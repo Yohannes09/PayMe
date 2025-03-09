@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 @Getter
 @Component
 public class JwtConfig {
-    @Value("${jwt.secret}")
+    @Value("${application.security.jwt.secret}")
     private String secret;
 
-    @Value("${jwt.validity}")
+    @Value("${application.security.jwt.validity}")
     private Long validity;
 }

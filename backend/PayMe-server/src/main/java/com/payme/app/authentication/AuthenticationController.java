@@ -6,6 +6,7 @@ import com.payme.app.authentication.dto.AuthenticationResponseDto;
 import com.payme.app.authentication.dto.RegisterDto;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +18,27 @@ import org.springframework.web.bind.annotation.*;
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
+    @Value("${application.security.jwt.secret}")
+    private String jwtSecret;
+
+    @Value("${application.security.gateway.api-key}")
+    private String gatewayApiKey;
+
+
     public AuthenticationController(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
+    }
+
+
+    // Endpoint that exposes Jwt secret-key if provided a valid API-key.
+    // For now, keeping this simple.
+    @GetMapping("/public-key")
+    public ResponseEntity<String> getPublicKey(@RequestHeader("api-key") String apiKey){
+        if(!gatewayApiKey.equals(apiKey)){
+            return ResponseEntity.status(403).body("FORBIDDEN");
+        }
+        log.info("Gateway successfully retrieved backend jwt secret. ");
+        return ResponseEntity.ok(jwtSecret);
     }
 
     @PostMapping(path = "/login")

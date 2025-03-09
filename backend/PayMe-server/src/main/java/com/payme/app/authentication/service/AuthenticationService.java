@@ -88,6 +88,7 @@ public class AuthenticationService {
         );
 
         User user = (User) authentication.getPrincipal();
+        log.info("User retrieved after providing correct credentials. ID: {}", user.getUserId());
 
         String jwtToken = tokenRepository
                 .findByUser(user)
@@ -107,10 +108,11 @@ public class AuthenticationService {
         Date creationTime = jwtService.extractClaim(token, Claims::getIssuedAt);
         Date expirationTime = jwtService.extractClaim(token, Claims::getExpiration);
 
-        if (user != null) {
-            log.info("user retrieved with id: {}", user.getUserId());
-        }else
+        if (user == null) {
             log.error("user is null ");
+        }
+        log.info("user retrieved with id: {}", user.getUserId());
+
 
         SessionToken sessionToken = SessionToken.builder()
                 .user(user)
@@ -121,10 +123,6 @@ public class AuthenticationService {
 
         tokenRepository.save(sessionToken);
     }
-
-//    private String genereateAndPersistToken(User user){
-//
-//    }
 
 
     public void logout(String token){

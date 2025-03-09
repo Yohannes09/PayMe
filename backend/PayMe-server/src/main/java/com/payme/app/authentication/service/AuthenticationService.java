@@ -79,40 +79,45 @@ public class AuthenticationService {
     }
 
 
-    public AuthenticationResponseDto login(LoginDto loginDto) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginDto.getUsernameOrEmail(),
-                        loginDto.getPassword()
-                )
-        );
+    public AuthenticationResponseDto login2(LoginDto loginDto) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                        loginDto.getUsernameOrEmail(), loginDto.getPassword()));
 
-        User user = (User) authentication.getPrincipal();
-        log.info("User retrieved after providing correct credentials. ID: {}", user.getUserId());
+        User user = fetchUser(loginDto.getUsernameOrEmail());
+        String newToken = jwtService.generateToken(user);
+        createUserSession(user, newToken);
 
-        String jwtToken = tokenRepository
-                .findByUser(user)
-                .filter(token -> !jwtService.isTokenExpired(token.getToken()))
-                .map(SessionToken::getToken)
-                .orElseGet(()-> {
-                            String jwt = jwtService.generateToken(user);
-                            createUserSession(user, jwt);
-                            return jwt;
-                });
-
-        return generateAuthenticationResponse(user, jwtToken);
+        return generateAuthenticationResponse(user, newToken);
     }
+
+//    public AuthenticationResponseDto login(LoginDto loginDto) {
+//        Authentication authentication = authenticationManager.authenticate(
+//                new UsernamePasswordAuthenticationToken(
+//                        loginDto.getUsernameOrEmail(),
+//                        loginDto.getPassword()
+//                )
+//        );
+//
+//        User user = fetchUser(loginDto.getUsernameOrEmail());
+//
+//        String jwtToken = tokenRepository
+//                .findByUserId(user.getUserId())
+//                .filter(token -> !jwtService.isTokenExpired(token.getToken()))
+//                .map(SessionToken::getToken)
+//                .orElseGet(()-> {
+//                            String newJwt = jwtService.generateToken(user);
+//                            createUserSession(user, newJwt);
+//                            return newJwt;
+//                });
+//
+//        return generateAuthenticationResponse(user, jwtToken);
+//    }
+
 
     private void createUserSession(User user, String token){
         log.info("Generating token for user: {}", user.getUserId());
         Date creationTime = jwtService.extractClaim(token, Claims::getIssuedAt);
         Date expirationTime = jwtService.extractClaim(token, Claims::getExpiration);
-
-        if (user == null) {
-            log.error("user is null ");
-        }
-        log.info("user retrieved with id: {}", user.getUserId());
-
 
         SessionToken sessionToken = SessionToken.builder()
                 .user(user)
@@ -234,7 +239,7 @@ public class AuthenticationService {
 
 
     private User fetchUser(String usernameOrEmail){
-        log.info("User retrieved with credential: {}", usernameOrEmail);
+        log.info("Retrieving user with credential: {}", usernameOrEmail);
         return userRepository
                 .findByUsernameOrEmail(usernameOrEmail)
                 .orElseThrow(()-> new NotFoundException(""));

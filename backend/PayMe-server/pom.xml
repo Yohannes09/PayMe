@@ -121,8 +121,6 @@
             <version>1.18.34</version>
             <scope>provided</scope>
         </dependency>
-
-
             <!-- This dependency was needed due to issues with Lombok annotations not working at all. -->
         <dependency>
             <groupId>org.projectlombok</groupId>

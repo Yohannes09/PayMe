@@ -33,12 +33,6 @@ import java.util.function.Function;
 @Service
 @Slf4j
 public class AuthenticationService {
-    private static final String USERNAME_PATTERN = "^[a-zA-Z0-9]{5,15}$";
-    private static final String PASSWORD_PATTERN = "^(?=.*[A-Z])(?=.*[0-9!@#$%^&*]).{6,}$";
-    private static final String USERNAME_VALIDATION_MESSAGE = "Username should be 5-15 characters long with no special symbols.";
-    private static final String PASSWORD_VALIDATION_MESSAGE = "Password must be 6+ characters long, have at least 1 capital letter, and a number or special character.";
-    private static final String EMAIL_VALIDATION_MESSAGE = "Entered invalid email";
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -156,76 +150,6 @@ public class AuthenticationService {
                 .roles(Set.of(PaymeRoles.USER))
                 .isActive(true)
                 .build();
-    }
-
-
-    //******* UPDATE CREDENTIAL METHODS
-    public void updateUsername(UUID userId,
-       @NonNull @Pattern(regexp = USERNAME_PATTERN, message = USERNAME_VALIDATION_MESSAGE)
-       String newUsername) throws BadRequestException {
-
-        if(userRepository.existsByUsernameIgnoreCase(newUsername))
-            throw new BadRequestException("Username: " + newUsername + " taken. ");
-
-        User user = fetchUser(userId);
-        updateCredential(
-                user,
-                newUsername,
-                user::setUsername,
-                User::getUsername);
-    }
-
-
-    public void updatePassword(UUID userId,
-       @NonNull @Pattern(regexp = PASSWORD_PATTERN, message = PASSWORD_VALIDATION_MESSAGE) String newPassword)
-    throws BadRequestException{
-
-        var user = fetchUser(userId);
-        String encodedPassword = passwordEncoder.encode(newPassword);
-
-        updateCredential(
-                user,
-                encodedPassword,
-                user::setPassword,
-                User::getPassword
-        );
-    }
-
-
-    public void updateEmail(UUID userId,
-        @NonNull @Email(message = EMAIL_VALIDATION_MESSAGE) String newEmail)
-    throws BadRequestException{
-        if(userRepository.existsByEmailIgnoreCase(newEmail)) {
-            throw new BadRequestException("Email: " + newEmail + " is already registered.");
-        }
-
-        User user = fetchUser(userId);
-        updateCredential(
-                user,
-                newEmail,
-                user::setEmail,
-                User::getEmail
-        );
-    }
-
-    // *** Extract the current credential (e.g., username or password) from the user object ***
-    // `currentCredentialFunc` is a Function<User, String>, meaning it takes a User and returns a String
-    // Calling `apply(user)` invokes the function, retrieving the credential from the user
-    // Example: If `currentCredentialFunc` is `User::getUsername`, this is equivalent to `user.getUsername()`
-    private <T> void updateCredential(
-            User user,
-            String newCredential,
-            Consumer<String> newCredentialFunction,
-            Function<User, String> currentCredentialFunc){
-
-        String currentCredential = currentCredentialFunc.apply(user);
-
-        if(newCredential.equals(currentCredential)) {
-            throw new BadRequestException("New credential is identical to the current one. ");
-        }
-
-        newCredentialFunction.accept(newCredential);
-        userRepository.save(user);
     }
 
 

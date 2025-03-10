@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface SessionTokenRepository extends JpaRepository<SessionToken, UUID> {
+public interface TokenRepository extends JpaRepository<SessionToken, UUID> {
 
     @Query("""
             SELECT token FROM SessionToken token

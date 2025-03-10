@@ -1,6 +1,6 @@
 package com.payme.app.authentication.service;
 
-import com.payme.app.authentication.SessionTokenRepository;
+import com.payme.app.authentication.TokenRepository;
 import com.payme.app.authentication.entity.SessionToken;
 import com.payme.app.entity.User;
 import com.payme.app.constants.PaymeRoles;
@@ -9,7 +9,7 @@ import com.payme.app.authentication.dto.LoginDto;
 import com.payme.app.authentication.dto.RegisterDto;
 import com.payme.app.exception.BadRequestException;
 import com.payme.app.exception.DuplicateCredentialException;
-import com.payme.app.exception.NotFoundException;
+import com.payme.app.exception.UserNotFoundException;
 import com.payme.app.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.constraints.Email;
@@ -18,7 +18,6 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,14 +43,14 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private final SessionTokenRepository tokenRepository;
+    private final TokenRepository tokenRepository;
 
     public AuthenticationService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
             AuthenticationManager authenticationManager,
-            SessionTokenRepository tokenRepository) {
+            TokenRepository tokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
@@ -234,7 +233,7 @@ public class AuthenticationService {
         log.info("User fetched with ID: {}", userId);
         return userRepository
                 .findById(userId)
-                .orElseThrow(()-> new NotFoundException("User with ID " + userId + " not found. "));
+                .orElseThrow(()-> new UserNotFoundException("User with ID " + userId + " not found. "));
     }
 
 
@@ -242,7 +241,7 @@ public class AuthenticationService {
         log.info("Retrieving user with credential: {}", usernameOrEmail);
         return userRepository
                 .findByUsernameOrEmail(usernameOrEmail)
-                .orElseThrow(()-> new NotFoundException(""));
+                .orElseThrow(()-> new UserNotFoundException("User with credential " + usernameOrEmail + " not found. "));
     }
 }
 

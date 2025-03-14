@@ -1,6 +1,7 @@
 package com.payme.app.authentication.configuration;
 
 import com.payme.app.authentication.service.JwtService;
+import com.payme.app.exception.UserNotFoundException;
 import com.payme.app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -44,7 +45,7 @@ public class ApplicationConfig {
     public UserDetailsService userDetailsService(){
         return username -> userRepository
                 .findByUsernameOrEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Username: " + username + " not found. "));
+                .orElseThrow(() -> new UserNotFoundException("Could not find user with username: " + username));
     }
 
 

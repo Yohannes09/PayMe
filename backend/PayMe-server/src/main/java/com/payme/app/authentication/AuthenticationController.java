@@ -44,7 +44,7 @@ public class AuthenticationController {
     @PostMapping(path = "/login")
     public ResponseEntity<AuthenticationResponseDto> login(@Valid @RequestBody LoginDto loginDto){
         log.info("User sending credentials with username/email: {}", loginDto.getUsernameOrEmail());
-        return ResponseEntity.ok(authenticationService.login2(loginDto));
+        return ResponseEntity.ok(authenticationService.login(loginDto));
     }
 
     @PostMapping(path = "/register")

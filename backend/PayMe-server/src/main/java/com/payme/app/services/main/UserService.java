@@ -1,6 +1,6 @@
 package com.payme.app.services.main;
 
-import com.payme.app.ValidationPattern;
+import com.payme.app.constants.ValidationPattern;
 import com.payme.app.dto.user.UserDto;
 import com.payme.app.entity.User;
 import com.payme.app.exception.BadRequestException;
@@ -34,58 +34,41 @@ public class UserService{
     }
 
     public void updateUsername(UUID userId, String newUsername) throws BadRequestException {
-        if(!newUsername.matches(ValidationPattern.USERNAME_PATTERN.getPattern())){
-
-        }
-        if(userRepository.existsByUsernameIgnoreCase(newUsername))
+        credentialMatchesPattern(newUsername, ValidationPattern.USERNAME_PATTERN);
+        if(userRepository.existsByUsernameIgnoreCase(newUsername)) {
             throw new BadRequestException("Username: " + newUsername + " taken. ");
+        }
 
         User user = fetchUser(userId);
-        updateCredential(
-                user,
-                newUsername,
-                user::setUsername,
-                User::getUsername);
+        updateCredential(user, newUsername, user::setUsername, User::getUsername);
     }
 
 
-    public void updatePassword(UUID userId,
-           //@Pattern(regexp = PASSWORD_PATTERN, message = PASSWORD_VALIDATION_MESSAGE)
-           String newPassword)
-            throws BadRequestException{
-
-        var user = fetchUser(userId);
+    public void updatePassword(UUID userId, String newPassword) throws BadRequestException{
+        credentialMatchesPattern(newPassword, ValidationPattern.PASSWORD_PATTERN);
+        User user = fetchUser(userId);
         String encodedPassword = passwordEncoder.encode(newPassword);
 
-        updateCredential(
-                user,
-                encodedPassword,
-                user::setPassword,
-                User::getPassword
-        );
+        updateCredential(user, encodedPassword, user::setPassword, User::getPassword);
     }
 
 
     public void updateEmail(UUID userId, String newEmail) throws BadRequestException{
-        if(!credentialMatchesPattern(newEmail, ValidationPattern.EMAIL_PATTERN)){
-
-        }
+        credentialMatchesPattern(newEmail, ValidationPattern.EMAIL_PATTERN);
         if(userRepository.existsByEmailIgnoreCase(newEmail)) {
             throw new BadRequestException("Email: " + newEmail + " is already registered.");
         }
 
         User user = fetchUser(userId);
-        updateCredential(
-                user,
-                newEmail,
-                user::setEmail,
-                User::getEmail
-        );
+        updateCredential(user, newEmail, user::setEmail, User::getEmail);
     }
 
-    private boolean credentialMatchesPattern(String newCredential, ValidationPattern validationPattern){
-        return newCredential != null && validationPattern.getPattern().matches(newCredential);
+    private void credentialMatchesPattern(String newCredential, ValidationPattern validationPattern){
+        if (newCredential == null || !validationPattern.getPattern().matches(newCredential)){
+            throw new BadRequestException("");
+        }
     }
+
     // *** Extract the current credential (e.g., username or password) from the user object ***
     // `currentCredentialFunc` is a Function<User, String>, meaning it takes a User and returns a String
     // Calling `apply(user)` invokes the function, retrieving the credential from the user

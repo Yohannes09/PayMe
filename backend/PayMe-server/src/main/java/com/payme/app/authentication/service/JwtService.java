@@ -25,10 +25,14 @@ public class JwtService {
 
 
     public boolean isTokenValid(String jwtToken, UserDetails userDetails) {
-        final String username = extractClaim(jwtToken, Claims::getSubject);
-
-        return userDetails.getUsername().equals(username) &&
+        final String extractedUsername = extractClaim(jwtToken, Claims::getSubject);
+        return userDetails.getUsername().equals(extractedUsername) &&
                 !isTokenExpired(jwtToken);
+    }
+
+    public boolean isTokenValid(String jwtToken, String username) {
+        final String extractedUsername = extractClaim(jwtToken, Claims::getSubject);
+        return username.equals(extractedUsername) && !isTokenExpired(jwtToken);
     }
 
 

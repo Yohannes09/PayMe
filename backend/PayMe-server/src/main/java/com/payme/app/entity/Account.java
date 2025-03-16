@@ -38,7 +38,7 @@ public class Account {
     @Column(name = "routing_number")
     private String routingNumber;
 
-    @Column(name = "amount", nullable = false, precision = 15, scale = 2)
+    @Column(name = "balance", nullable = false, precision = 15, scale = 2)
     private BigDecimal balance;
 
     @Enumerated(EnumType.STRING)
@@ -50,7 +50,7 @@ public class Account {
     private Currency currency;
 
     @Column(nullable = false)
-    private boolean isActive;
+    private boolean active;
 
     @Column(updatable = false, name = "created_at")
     @CreationTimestamp

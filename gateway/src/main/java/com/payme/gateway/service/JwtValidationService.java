@@ -52,6 +52,11 @@ public class JwtValidationService {
     public boolean isTokenValid(String token, UserDetails user){
         return usernameMatchesSubject(token, user) && !isTokenExpired(token);
     }
+    public boolean isTokenValid(String token, String username){
+        return usernameMatchesSubject(token, username) && !isTokenExpired(token);
+    }
+
+
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
         Claims claims = Jwts.parserBuilder()
@@ -64,9 +69,13 @@ public class JwtValidationService {
     }
 
     private boolean usernameMatchesSubject(String token, UserDetails user){
-        String username = extractClaim(token, Claims::getSubject);
-        return user.getUsername().equals(username);
+        String extractedUsername = extractClaim(token, Claims::getSubject);
+        return user.getUsername().equals(extractedUsername);
     }
+    private boolean usernameMatchesSubject(String token, String username){
+        return username.equals(extractClaim(token, Claims::getSubject));
+    }
+
     private boolean isTokenExpired(String token){
         return extractClaim(token, Claims::getExpiration).before(new Date());
     }

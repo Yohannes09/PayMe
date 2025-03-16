@@ -3,7 +3,6 @@ package com.payme.app.authentication.service;
 import com.payme.app.authentication.TokenRepository;
 import com.payme.app.authentication.entity.SessionToken;
 import com.payme.app.authentication.util.UserPrincipal;
-import com.payme.app.entity.Account;
 import com.payme.app.entity.User;
 import com.payme.app.constants.PaymeRoles;
 import com.payme.app.authentication.dto.AuthenticationResponseDto;
@@ -19,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -134,16 +132,22 @@ public class AuthenticationService {
     }
 
     private User generateUserFromDto(RegisterDto registerDto){
-         return User.builder()
+        Set<PaymeRoles> defaultRoles = new HashSet<>();
+        defaultRoles.add(PaymeRoles.USER);
+
+        User user = User.builder()
                 .firstName(registerDto.getFirstName())
                 .lastName(registerDto.getLastName())
                 .username(registerDto.getUsername())
                 .email(registerDto.getEmail())
                 .accounts(new ArrayList<>())
                 .password(passwordEncoder.encode(registerDto.getPassword()))
-                .roles(Set.of(PaymeRoles.USER))
-                .isActive(false)
+                .roles(defaultRoles)
+                .active(false)
                 .build();
+
+        log.info("Generated user: {}", user);
+         return user;
     }
 
     private User fetchUser(UUID userId){

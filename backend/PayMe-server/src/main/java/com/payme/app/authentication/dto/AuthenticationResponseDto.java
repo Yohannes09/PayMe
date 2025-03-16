@@ -14,7 +14,4 @@ public class AuthenticationResponseDto {
     private String lastName;
     private String email;
     private UUID userId;
-
-    // eventually this will need to be annotated with @Email and other annotations that enforce
-    // each field's requirements.
 }

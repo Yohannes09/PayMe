@@ -19,16 +19,4 @@ public enum PaymeRoles {
     public String getRole(){
         return this.role;
     }
-
-    private static final Set<String> roles = Stream.of(PaymeRoles.values())
-            .map(PaymeRoles::getRole)
-            .collect(Collectors.toSet());
-
-    public static Set<String> getRoles(){
-        return roles;
-    }
-
-    public static boolean contains(String role){
-        return roles.contains(role);
-    }
 }

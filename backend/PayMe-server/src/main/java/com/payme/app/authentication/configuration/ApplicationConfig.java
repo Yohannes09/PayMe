@@ -45,7 +45,7 @@ public class ApplicationConfig {
     public UserDetailsService userDetailsService(){
         return username -> userRepository
                 .findByUsernameOrEmail(username)
-                .orElseThrow(() -> new UserNotFoundException("Could not find user with username: " + username));
+                .orElseThrow(() -> new UserNotFoundException("Could not authenticate user: " + username));
     }
 
 

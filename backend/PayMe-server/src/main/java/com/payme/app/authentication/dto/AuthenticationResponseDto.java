@@ -4,9 +4,9 @@ import lombok.*;
 
 import java.util.UUID;
 
+//token and userId should be sufficient, no need for other fields.
 @AllArgsConstructor
-@NoArgsConstructor
-@Data
+@Getter
 @Builder
 public class AuthenticationResponseDto {
     private String token;

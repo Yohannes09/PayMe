@@ -57,7 +57,6 @@ public class JwtValidationService {
     }
 
 
-
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(signingKey)

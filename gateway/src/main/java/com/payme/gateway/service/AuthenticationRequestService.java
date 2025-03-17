@@ -22,7 +22,6 @@ import java.util.Optional;
 @Service
 public class AuthenticationRequestService {
     private final RestClient restClient;
-    private final JwtValidationService jwtValidationService;
     private final RedisTokenService redisTokenService;
 
     @Value("${application.api.endpoints.authentication-service}")
@@ -38,7 +37,7 @@ public class AuthenticationRequestService {
                     .retrieve()
                     .toEntity(AuthenticationResponseDto.class);
 
-            var responseBody = response.getBody();
+            AuthenticationResponseDto responseBody = response.getBody();
             if(responseBody == null){
                 throw new IllegalStateException("Unable to fetch authentication response. ");
             }

@@ -16,8 +16,10 @@ import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,6 +70,7 @@ public class AuthenticationService {
 
     public AuthenticationResponseDto login(LoginDto loginDto) {
         Authentication authenticatedUser = authenticateUser(loginDto);
+        log.info(authenticatedUser.getName());
         User fetchedUser = fetchUser(authenticatedUser.getName());
         manageUserSessions(fetchedUser.getUserId());
 
@@ -84,18 +87,29 @@ public class AuthenticationService {
 
 
     private Authentication authenticateUser(LoginDto loginCredentials){
-        log.info("Authenticating user : {}\n", loginCredentials.getUsernameOrEmail() );
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        loginCredentials.getUsernameOrEmail(),
-                        loginCredentials.getPassword());
+        String credential = Optional.ofNullable(loginCredentials.getUsernameOrEmail()).orElse("");
+        log.info("Authenticating user : {}", credential);
 
-        return authenticationManager.authenticate(authenticationToken);
+        try{
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginCredentials.getUsernameOrEmail(),
+                            loginCredentials.getPassword()
+                    )
+            );
+
+            log.info("Authentication successful for user: {}", credential);
+            return authentication;
+        }catch (AuthenticationException e){
+            log.warn("Authentication failed for user: {}", credential);
+            log.error("Error during authentication: ", e);
+            throw new BadCredentialsException("Could not find user: " + credential);
+        }
     }
 
     private void manageUserSessions(UUID userId){
         log.info("Managing user sessions. ");
-        List<SessionToken> userActiveSessions = tokenRepository
-                .findAllByUserId(userId);
+        List<SessionToken> userActiveSessions = tokenRepository.findAllByUserId(userId);
 
         if(userActiveSessions.size() >= 5){
             userActiveSessions.stream()

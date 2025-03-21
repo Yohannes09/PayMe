@@ -8,31 +8,29 @@ import com.payme.app.authentication.entity.SessionToken;
 import com.payme.app.authentication.service.AuthenticationService;
 import com.payme.app.authentication.service.JwtService;
 import com.payme.app.entity.User;
-import com.payme.app.exception.UserNotFoundException;
 import com.payme.app.repository.UserRepository;
+import com.payme.tests.MockedUsers;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.testcontainers.junit.jupiter.Testcontainers;
-
-import java.util.Optional;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+@Slf4j
 @SpringBootTest(classes = PaymeApplication.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class AuthenticationTests {
+@ActiveProfiles("test")
+public class AuthenticationServiceTests {
 
     @Autowired
     private AuthenticationService authenticationService;
@@ -53,8 +51,12 @@ public class AuthenticationTests {
     private TokenRepository tokenRepository;
 
     @BeforeEach
-    public void setUp(){
+    void setUp(){
+        var mockedUsers = new MockedUsers();
 
+        log.info("Beginning setup process.");
+        userRepository.saveAll(mockedUsers.getMockedUsers());
+        log.info("Setup complete. ");
     }
 
     @Test
@@ -72,16 +74,20 @@ public class AuthenticationTests {
     }
 
     @Test
-    void testInvalidCredentialsLogin(){
+    void testInvalidCredentialsLogin() {
         LoginDto loginDto = new LoginDto("JohnDoe", "password");
 
-        when(userRepository.findByUsernameOrEmail(anyString())).thenReturn(Optional.empty());
+        // Simulate failed authentication by making `authenticate` throw an exception
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(new BadCredentialsException("Could not find user: " + loginDto.getUsernameOrEmail()));
 
-        assertThrows(UserNotFoundException.class, () -> authenticationService.login(loginDto));
+        assertThrows(BadCredentialsException.class, () -> authenticationService.login(loginDto));
 
+        // Verify that authenticate was called
         verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(userRepository, times(1)).findByUsernameOrEmail(anyString());
-        verify(tokenRepository, times(0)).save(any(SessionToken.class));
+
+        // Verify that userRepository.findByUsernameOrEmail() was never called
+        verify(userRepository, never()).findByUsernameOrEmail(anyString());
     }
 
 

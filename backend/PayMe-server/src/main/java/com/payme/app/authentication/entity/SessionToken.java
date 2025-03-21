@@ -11,15 +11,12 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 import java.util.UUID;
 
-/**
- * Stores user's tokens. Allows logout feature and invalidation of tokens manually*/
-
 @Builder
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "session_tokens")
+@Table(name = "token")
 public class SessionToken {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

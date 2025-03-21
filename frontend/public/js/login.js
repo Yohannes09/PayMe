@@ -71,9 +71,9 @@ function handleSuccessfulLogin(responseData) {
     localStorage.setItem('userId', responseData.userId);
 
     // Redirect the user to the dashboard dynamically
-    const baseUrl = window.location.origin; // E.g., http://localhost:3000
-    window.location.href = `${baseUrl}/dashboard/dashboard.html`;
-
+//    const baseUrl = window.location.origin; // E.g., http://localhost:3000
+//    window.location.href = `${baseUrl}/dashboard/dashboard.html`;
+    alert('Authentication successful')
 }
 
 function handleFailedLogin(error) {

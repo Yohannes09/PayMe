@@ -1,6 +1,5 @@
 package com.payme.app.entity;
 
-import com.payme.app.constants.PaymeRoles;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -15,10 +14,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@NoArgsConstructor
 @Data
 @Table(name = "payme_user")
 @Entity
@@ -49,12 +47,14 @@ public class User implements UserDetails {
     @NotNull
     @Column(unique = true, nullable = false)
     private String email;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
-    @Enumerated(EnumType.STRING)
-    @Column(name = "roles")
-    private Set<PaymeRoles> roles;
+//, cascade = CascadeType.ALL
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_role", // Name of the join table
+            joinColumns = @JoinColumn(name = "user_id"), // Foreign key for User
+            inverseJoinColumns = @JoinColumn(name = "role_id") // Foreign key for Role
+    )
+    private Set<Role> roles = new HashSet<>();
 
     @Column(nullable = false)
     private boolean active;
@@ -63,13 +63,18 @@ public class User implements UserDetails {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
     private List<Account> accounts;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.name()))
+                .map(role -> new SimpleGrantedAuthority(role.getRole().toString()))
                 .collect(Collectors.toSet());
     }
 
@@ -103,3 +108,17 @@ public class User implements UserDetails {
         return this.password;
     }
 }
+
+/**
+ *
+ * Lesson(s) learned
+ *      User has a many-to-many relationship with Role. Previous
+ *      implementation of User had one-to-many relationship
+ *      with Role.
+ *
+ *      THE PROBLEM?
+ *      Each role belonged to one user. This made no sense as
+ *      the roles USER, ADMIN, ETC should be shared across many
+ *      users.
+ *
+ *      */

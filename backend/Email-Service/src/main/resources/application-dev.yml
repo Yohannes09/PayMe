@@ -1,0 +1,10 @@
+server:
+  port: 8086
+spring:
+  cloud:
+    config:
+      enabled: false
+      import-check:
+        enabled: false
+  application:
+    name: email-service

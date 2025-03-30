@@ -2,7 +2,6 @@ package com.payme.app.authentication.service;
 
 import com.payme.app.authentication.TokenRepository;
 import com.payme.app.authentication.entity.SessionToken;
-import com.payme.app.authentication.util.UserPrincipal;
 import com.payme.app.entity.Role;
 import com.payme.app.entity.User;
 import com.payme.app.constants.PaymeRoles;
@@ -11,21 +10,17 @@ import com.payme.app.authentication.dto.LoginDto;
 import com.payme.app.authentication.dto.RegisterDto;
 import com.payme.app.exception.DuplicateCredentialException;
 import com.payme.app.exception.RoleNotFoundException;
-import com.payme.app.exception.UserNotFoundException;
-import com.payme.app.mapper.UserMapper;
 import com.payme.app.repository.RoleRepository;
 import com.payme.app.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,7 +59,7 @@ public class AuthenticationService {
 
     @Transactional
     public void register(@Valid RegisterDto registerDto) {
-        if(userRepository.isCredentialTaken(registerDto.getUsername(), registerDto.getEmail())) {
+        if(userRepository.isCredentialTaken(registerDto.username(), registerDto.email())) {
             throw new DuplicateCredentialException("Username or email already in use. ");
         }
 
@@ -92,14 +87,14 @@ public class AuthenticationService {
 
 
     private User authenticateUser(LoginDto loginCredentials){
-        String credential = Optional.ofNullable(loginCredentials.getUsernameOrEmail()).orElse("");
+        String credential = Optional.ofNullable(loginCredentials.usernameOrEmail()).orElse("");
         log.info("Authenticating user : {}", credential);
 
         try{
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            loginCredentials.getUsernameOrEmail(),
-                            loginCredentials.getPassword()
+                            loginCredentials.usernameOrEmail(),
+                            loginCredentials.password()
                     )
             );
 
@@ -168,11 +163,11 @@ public class AuthenticationService {
         defaultRoles.add(defaultRole);
 
         return User.builder()
-                .firstName(registerDto.getFirstName())
-                .lastName(registerDto.getLastName())
-                .username(registerDto.getUsername())
-                .email(registerDto.getEmail())
-                .password(passwordEncoder.encode(registerDto.getPassword()))
+                .firstName(registerDto.firstName())
+                .lastName(registerDto.lastName())
+                .username(registerDto.username())
+                .email(registerDto.email())
+                .password(passwordEncoder.encode(registerDto.password()))
                 .roles(defaultRoles)
                 .active(false)
                 .build();

@@ -43,7 +43,7 @@ public class AuthenticationController {
 
     @PostMapping(path = "/login")
     public ResponseEntity<AuthenticationResponseDto> login(@Valid @RequestBody LoginDto loginDto){
-        log.info("New login by user: {}", loginDto.getUsernameOrEmail());
+        log.info("New login by user: {}", loginDto.usernameOrEmail());
         return ResponseEntity.ok(authenticationService.login(loginDto));
     }
 

@@ -1,0 +1,7 @@
+com/payme/common/entity/User.class
+com/payme/common/entity/Account.class
+com/payme/common/entity/Role.class
+com/payme/common/constants/PaymeRoles.class
+com/payme/common/entity/User$UserBuilder.class
+com/payme/common/model/BaseUser.class
+com/payme/common/model/SecurityUser.class

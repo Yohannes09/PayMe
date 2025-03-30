@@ -1,0 +1,6 @@
+/Users/yohannesmata/PayMe/backend/common-models/common-models/src/main/java/com/payme/common/constants/PaymeRoles.java
+/Users/yohannesmata/PayMe/backend/common-models/common-models/src/main/java/com/payme/common/entity/Account.java
+/Users/yohannesmata/PayMe/backend/common-models/common-models/src/main/java/com/payme/common/entity/Role.java
+/Users/yohannesmata/PayMe/backend/common-models/common-models/src/main/java/com/payme/common/entity/User.java
+/Users/yohannesmata/PayMe/backend/common-models/common-models/src/main/java/com/payme/common/model/BaseUser.java
+/Users/yohannesmata/PayMe/backend/common-models/common-models/src/main/java/com/payme/common/model/SecurityUser.java

@@ -84,7 +84,7 @@ public class AuthenticationServiceTests {
     @Test
     void testInvalidCredentialsLogin() {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenThrow(new BadCredentialsException("Could not find user: " + loginDto.getUsernameOrEmail()));
+                .thenThrow(new BadCredentialsException("Could not find user: " + loginDto.usernameOrEmail()));
 
         assertThrows(BadCredentialsException.class, () -> authenticationService.login(loginDto));
 
@@ -97,7 +97,7 @@ public class AuthenticationServiceTests {
     @Test
     void testValidCredentialsLogin(){
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenReturn(new UsernamePasswordAuthenticationToken(user, loginDto.getPassword()));
+                .thenReturn(new UsernamePasswordAuthenticationToken(user, loginDto.password()));
         when(tokenRepository.findAllByUserId(any(UUID.class)))
                 .thenReturn(new ArrayList<>());
         when(jwtService.generateToken(any(User.class)))

@@ -1,5 +1,6 @@
-package com.payme.app.entity;
+package com.payme.common.entity;
 
+import com.payme.common.model.BaseUser;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -14,13 +15,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-@AllArgsConstructor
+
 @Builder
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "payme_user")
 @Entity
-public class User implements UserDetails {
+public class User implements BaseUser {
 
     @Id
     @Column(name = "user_id", updatable = false, nullable = false)
@@ -48,7 +50,12 @@ public class User implements UserDetails {
     @NotNull
     @Column(unique = true, nullable = false)
     private String email;
-//, cascade = CascadeType.ALL
+
+    private boolean enabled;
+    private boolean accountNonExpired;
+    private boolean accountNonLocked;
+    private boolean credentialsNonExpired;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role", // Name of the join table
@@ -73,10 +80,8 @@ public class User implements UserDetails {
     private List<Account> accounts = new ArrayList<>(3);
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getRole().toString()))
-                .collect(Collectors.toSet());
+    public UUID getId(){
+        return userId;
     }
 
     @Override
@@ -85,18 +90,8 @@ public class User implements UserDetails {
     }
 
     @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
+    public String getPassword(){
+        return this.password;
     }
 
     @Override
@@ -104,9 +99,16 @@ public class User implements UserDetails {
         return true;
     }
 
-    @Override
-    public String getPassword(){
-        return this.password;
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 
 }

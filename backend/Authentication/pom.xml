@@ -147,6 +147,13 @@
             <version>0.2.0</version>
         </dependency>
 
+        <!--shared models dependency-->
+        <dependency>
+            <groupId>com.payme</groupId>
+            <artifactId>common-models</artifactId>
+            <version>1.0</version>
+        </dependency>
+
     </dependencies>
 
 
@@ -166,10 +173,18 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.30</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
 
         </plugins>
+
     </build>
 
 </project>

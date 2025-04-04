@@ -1,7 +1,7 @@
 //package com.payme.app.entity;
 //
-//import com.payme.app.constants.CardType;
-//import com.payme.app.constants.PaymentType;
+//import com.payme.app.diffMicroServ.constants.CardType;
+//import com.payme.app.diffMicroServ.constants.PaymentType;
 //import jakarta.persistence.*;
 //import jakarta.validation.constraints.Size;
 //import lombok.AllArgsConstructor;

@@ -1,10 +1,8 @@
-
-FROM openjdk:22
+FROM openjdk:21-slim
 
 WORKDIR /app
 
 COPY target/PayMe.jar PayMe.jar
 
-EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar","PayMe.jar"]

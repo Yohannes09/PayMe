@@ -1,6 +1,6 @@
-package com.payme.common.entity;
+package com.payme.authentication.entity;
 
-import com.payme.common.model.BaseUser;
+import com.payme.common.entity.Account;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -14,21 +14,18 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
+@AllArgsConstructor
 @Builder
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "payme_user")
 @Entity
-public class User implements BaseUser {
+public class User implements UserDetails {
 
     @Id
-    @Column(
-            name = "user_id",
-            updatable = false,
-            nullable = false
-    )
+    @Column(name = "user_id", updatable = false, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID userId;
 
@@ -40,8 +37,8 @@ public class User implements BaseUser {
     @Column(nullable = false, name = "last_name")
     private String lastName;
 
-    @NotNull
     @Size(max = 20, min = 4)
+    @NotNull
     @Column(unique = true, nullable = false)
     private String username;
 
@@ -53,12 +50,7 @@ public class User implements BaseUser {
     @NotNull
     @Column(unique = true, nullable = false)
     private String email;
-
-    private boolean enabled;
-    private boolean accountNonExpired;
-    private boolean accountNonLocked;
-    private boolean credentialsNonExpired;
-
+//, cascade = CascadeType.ALL
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role", // Name of the join table
@@ -83,8 +75,10 @@ public class User implements BaseUser {
     private List<Account> accounts = new ArrayList<>(3);
 
     @Override
-    public UUID getId(){
-        return userId;
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getRole().toString()))
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -93,8 +87,18 @@ public class User implements BaseUser {
     }
 
     @Override
-    public String getPassword(){
-        return this.password;
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 
     @Override
@@ -102,16 +106,9 @@ public class User implements BaseUser {
         return true;
     }
 
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    public boolean isCredentialsNonExpired() {
-        return true;
+    @Override
+    public String getPassword(){
+        return this.password;
     }
 
 }

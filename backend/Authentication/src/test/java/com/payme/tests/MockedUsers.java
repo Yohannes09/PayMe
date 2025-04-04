@@ -1,6 +1,6 @@
 package com.payme.tests;
 
-import com.payme.app.entity.User;
+import com.payme.authentication.entity.User;
 
 import java.util.List;
 import java.util.UUID;

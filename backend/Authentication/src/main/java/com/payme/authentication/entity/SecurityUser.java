@@ -1,56 +1,45 @@
 package com.payme.authentication.entity;
 
-import com.payme.common.entity.Account;
+import com.payme.authentication.constant.ValidationPattern;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-
-import jakarta.persistence.*;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
 @Builder
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
-@Table(name = "payme_user")
+@AllArgsConstructor
 @Entity
-public class User implements UserDetails {
-
+@Table(name = "security_user")
+public class SecurityUser implements UserDetails {
     @Id
-    @Column(name = "user_id", updatable = false, nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID userId;
+    private UUID id;
 
-    @NotNull
-    @Column(nullable = false, name = "first_name")
-    private String firstName;
-
-    @NotNull
-    @Column(nullable = false, name = "last_name")
-    private String lastName;
-
-    @Size(max = 20, min = 4)
-    @NotNull
+    @Pattern(regexp = ValidationPattern.USERNAME_PATTERN)
     @Column(unique = true, nullable = false)
     private String username;
 
-    @NotNull
-    @Size(min = 6)
+    @Pattern(regexp = ValidationPattern.PASSWORD_PATTERN)
     private String password;
 
-    @Email
-    @NotNull
+    @Email(message = ValidationPattern.EMAIL_VALIDATION_MESSAGE)
     @Column(unique = true, nullable = false)
     private String email;
-//, cascade = CascadeType.ALL
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role", // Name of the join table
@@ -59,20 +48,21 @@ public class User implements UserDetails {
     )
     private Set<Role> roles;
 
-    @Column(nullable = false)
-    private boolean active;
-
-    @CreationTimestamp
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
     @OneToMany(
-            mappedBy = "user",
-            cascade = CascadeType.REMOVE,
-            orphanRemoval = true,
+            mappedBy = "securityUser",
+            cascade = CascadeType.ALL,
             fetch = FetchType.LAZY
     )
-    private List<Account> accounts = new ArrayList<>(3);
+    private Set<Token> userTokens;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
+    private boolean accountNonExpired;
+    private boolean accountNonLocked;
+    private boolean credentialsNonExpired;
+    private boolean enabled;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -83,32 +73,31 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.username;
+        return username;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return accountNonExpired;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return accountNonLocked;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return credentialsNonExpired;
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
-
-    @Override
-    public String getPassword(){
-        return this.password;
-    }
-
 }

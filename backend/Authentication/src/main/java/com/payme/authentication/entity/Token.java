@@ -21,8 +21,8 @@ public class Token {
     private UUID tokenId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "security_user_id", nullable = false)
+    private SecurityUser securityUser;
 
     @Column(name = "token", nullable = false, updatable = false, length = 512)
     private String token;

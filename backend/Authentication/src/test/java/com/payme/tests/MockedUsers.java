@@ -1,6 +1,6 @@
 package com.payme.tests;
 
-import com.payme.authentication.entity.User;
+import com.payme.authentication.user_micro_serv.entity.User;
 
 import java.util.List;
 import java.util.UUID;

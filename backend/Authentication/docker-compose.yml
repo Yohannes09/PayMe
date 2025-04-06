@@ -1,0 +1,17 @@
+services:
+  authentication-db:
+    image: "postgres:latest"
+    restart: always
+    ports:
+      - 5433:5432
+    environment:
+      MYSQL_DATABASE: auth_service_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: 1234
+      MYSQL_ROOT_PASSWORD: 1234
+
+  authentication-service:
+      image: .
+      restart: always
+      ports:
+        - 8081:8080

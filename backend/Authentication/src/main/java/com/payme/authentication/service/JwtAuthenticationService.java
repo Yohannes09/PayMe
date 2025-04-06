@@ -1,15 +1,16 @@
 package com.payme.authentication.service;
 
+import com.payme.authentication.entity.SecurityUser;
+import com.payme.authentication.repository.SecurityUserRepository;
 import com.payme.authentication.repository.TokenRepository;
 import com.payme.authentication.entity.Token;
 import com.payme.authentication.entity.Role;
-import com.payme.authentication.entity.User;
+import com.payme.authentication.user_micro_serv.entity.User;
 import com.payme.authentication.constant.PaymeRoles;
 import com.payme.authentication.dto.AuthenticationResponseDto;
 import com.payme.authentication.dto.LoginDto;
 import com.payme.authentication.dto.RegisterDto;
 import com.payme.authentication.exception.DuplicateCredentialException;
-import com.payme.authentication.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -29,9 +30,7 @@ import java.util.*;
 @Qualifier("JwtAuthenticationService")
 @Slf4j
 public class JwtAuthenticationService implements AuthenticationService{
-    private static final int INITIAL_ACCOUNT_SIZE = 3;
-
-    private final UserRepository userRepository;
+    private final SecurityUserRepository securityUserRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -40,14 +39,14 @@ public class JwtAuthenticationService implements AuthenticationService{
 
 
     public JwtAuthenticationService(
-            UserRepository userRepository,
+            SecurityUserRepository securityUserRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
             AuthenticationManager authenticationManager,
             TokenRepository tokenRepository,
             RoleService roleService
     ) {
-        this.userRepository = userRepository;
+        this.securityUserRepository = securityUserRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
@@ -59,12 +58,12 @@ public class JwtAuthenticationService implements AuthenticationService{
     @Override
     @Transactional
     public void register(@Valid RegisterDto registerDto) {
-        if(userRepository.isCredentialTaken(registerDto.username(), registerDto.email())) {
+        if(securityUserRepository.isCredentialTaken(registerDto.username(), registerDto.email())) {
             throw new DuplicateCredentialException("Username or email already in use. ");
         }
 
-        User generatedUserFromDto = createNewUser(registerDto);
-        User savedUser = userRepository.save(generatedUserFromDto);
+        SecurityUser generatedUserFromDto = createNewUser(registerDto);
+        User savedUser = securityUserRepository.save(generatedUserFromDto);
 
         log.info("User registered successfully: {}", savedUser.getUsername());
     }
@@ -139,7 +138,7 @@ public class JwtAuthenticationService implements AuthenticationService{
         if (user.isEnabled()) {
             log.info("Creating session for user: {}", user.getUsername());
             Token sessionToken = Token.builder()
-                    .user(user)
+                    .securityUser(user)
                     .token(token)
                     .isValid(true)
                     .createdAt(creationTime)

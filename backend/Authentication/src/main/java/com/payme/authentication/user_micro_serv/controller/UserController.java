@@ -1,7 +1,7 @@
-package com.payme.authentication.controller;
+package com.payme.authentication.user_micro_serv.controller;
 
-import com.payme.authentication.dto.UserDto;
-import com.payme.authentication.service.UserService;
+import com.payme.authentication.user_micro_serv.dto.UserDto;
+import com.payme.authentication.user_micro_serv.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,7 +1,7 @@
 package com.payme.authentication.repository;
 
 import com.payme.authentication.entity.Token;
-import com.payme.authentication.entity.User;
+import com.payme.authentication.user_micro_serv.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

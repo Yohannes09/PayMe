@@ -1,7 +1,5 @@
-package com.payme.authentication.controller;
+package com.payme.authentication.exception;
 
-import com.payme.authentication.exception.ErrorResponse;
-import com.payme.authentication.exception.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -16,9 +14,9 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(UserNotFoundException.class)
+    @ExceptionHandler(SecurityUserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUserNotFoundException
-            (UserNotFoundException exception, HttpServletRequest request){
+            (SecurityUserNotFoundException exception, HttpServletRequest request){
 
         log.warn("User not found: {}", exception.getMessage());
 

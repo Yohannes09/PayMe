@@ -1,4 +1,4 @@
-package com.payme.authentication.dto;
+package com.payme.authentication.user_micro_serv.dto;
 
 import lombok.Builder;
 

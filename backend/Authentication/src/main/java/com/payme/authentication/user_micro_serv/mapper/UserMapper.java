@@ -1,7 +1,8 @@
-package com.payme.authentication.mapper;
+package com.payme.authentication.user_micro_serv.mapper;
 
-import com.payme.authentication.dto.UserDto;
-import com.payme.authentication.entity.User;
+import com.payme.authentication.dto.RegisterDto;
+import com.payme.authentication.user_micro_serv.dto.UserDto;
+import com.payme.authentication.user_micro_serv.entity.User;
 
 public class UserMapper {
 
@@ -13,6 +14,10 @@ public class UserMapper {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .build();
+    }
+
+    public static User createUser(RegisterDto registerDto){
+
     }
 
 }

@@ -23,7 +23,4 @@ public enum PaymeRoles {
         return Arrays.stream(PaymeRoles.values()).toList();
     }
 
-    public static void main(String[] args) {
-        allRoles().forEach(System.out::println);
-    }
 }

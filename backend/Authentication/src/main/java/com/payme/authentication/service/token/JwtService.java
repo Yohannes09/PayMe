@@ -1,4 +1,4 @@
-package com.payme.authentication.service;
+package com.payme.authentication.service.token;
 
 import com.payme.authentication.configuration.JwtConfig;
 import io.jsonwebtoken.Claims;
@@ -68,7 +68,7 @@ public class JwtService {
                 .getBody();
     }
 
-    private boolean isTokenExpired(String token){
+    public boolean isTokenExpired(String token){
         return extractClaim(token, Claims::getExpiration).before(new Date());
     }
 

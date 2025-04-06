@@ -1,7 +1,7 @@
 package com.payme.authentication.configuration;
 
 import com.payme.authentication.repository.SecurityUserRepository;
-import com.payme.authentication.service.JwtService;
+import com.payme.authentication.service.token.JwtService;
 import com.payme.authentication.exception.SecurityUserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

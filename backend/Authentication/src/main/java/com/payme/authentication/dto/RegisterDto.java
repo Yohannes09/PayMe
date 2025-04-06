@@ -7,12 +7,6 @@ import jakarta.validation.constraints.Pattern;
 
 public record RegisterDto(
         @NotNull
-        String firstName,
-
-        @NotNull
-        String lastName,
-
-        @NotNull
         @Pattern(
                 regexp = ValidationPattern.USERNAME_PATTERN,
                 message = "Invalid username format. "
@@ -30,4 +24,5 @@ public record RegisterDto(
         )
         String password
 ) {
+
 }

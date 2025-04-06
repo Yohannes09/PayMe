@@ -1,6 +1,6 @@
 package com.payme.authentication.configuration;
 
-import com.payme.authentication.service.JwtService;
+import com.payme.authentication.service.token.JwtService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

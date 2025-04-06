@@ -20,9 +20,9 @@ public class UserController {
     }
 
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<UserDto> fetchUserById(@PathVariable("userId") UUID userId) {
-        return ResponseEntity.ok(userService.findById(userId));
-    }
+//    @GetMapping("/{userId}")
+//    public ResponseEntity<UserDto> fetchUserById(@PathVariable("userId") UUID userId) {
+//        return ResponseEntity.ok(userService.findById(userId));
+//    }
 
 }

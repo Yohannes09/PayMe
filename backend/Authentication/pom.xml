@@ -13,8 +13,8 @@
     <groupId>com.payme</groupId>
     <artifactId>authentication</artifactId>
     <version>1.0</version>
-    <name>PayMe</name>
-    <description>PayMe authentication system</description>
+    <name>authentication</name>
+    <description>Authentication system</description>
 
 
     <packaging>jar</packaging>

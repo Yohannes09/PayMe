@@ -1,4 +1,4 @@
-package com.payme.authentication.service;
+package com.payme.authentication.service.auth;
 
 import com.payme.authentication.dto.AuthenticationResponseDto;
 import com.payme.authentication.dto.LoginDto;

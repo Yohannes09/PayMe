@@ -1,7 +1,7 @@
 package com.payme.authentication.controller;
 
 import com.payme.authentication.dto.LoginDto;
-import com.payme.authentication.service.AuthenticationService;
+import com.payme.authentication.service.auth.AuthenticationService;
 import com.payme.authentication.dto.AuthenticationResponseDto;
 import com.payme.authentication.dto.RegisterDto;
 import jakarta.validation.Valid;

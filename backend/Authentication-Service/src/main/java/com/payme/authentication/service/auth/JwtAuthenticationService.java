@@ -50,9 +50,6 @@ public class JwtAuthenticationService implements AuthenticationService {
         }
 
         SecurityUser user = createNewUserWithRoles(registerDto);
-
-
-
         log.info("User registered successfully: {}", user.getUsername());
     }
 

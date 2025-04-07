@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-public class ApplicationConfig {
+public class AuthenticationServiceConfig {
     private final SecurityUserRepository securityUserRepository;
 
 

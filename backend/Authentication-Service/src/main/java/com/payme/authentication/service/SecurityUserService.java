@@ -1,13 +1,12 @@
 package com.payme.authentication.service;
 
+import com.payme.authentication.configuration.RestClientConfig;
 import com.payme.authentication.entity.Role;
 import com.payme.authentication.entity.SecurityUser;
 import com.payme.authentication.exception.BadRequestException;
 import com.payme.authentication.exception.SecurityUserNotFoundException;
 import com.payme.authentication.repository.SecurityUserRepository;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,15 +21,24 @@ import java.util.UUID;
 @Transactional
 @Validated
 @Service
-@AllArgsConstructor
 public class SecurityUserService {
     private final SecurityUserRepository securityUserRepository;
     private final RestClient restClient;
+    private final RestClientConfig restClientConfig;
+    private final String userServiceUrl;
+    private final String userEndpoint;
 
-    @Value("${external.user-service.base-url}")
-    private String userServiceUrl;
-    @Value("${external.user-service.endpoints.user}")
-    private String userEndpoint;
+    public SecurityUserService(
+            SecurityUserRepository securityUserRepository,
+            RestClient restClient,
+            RestClientConfig restClientConfig
+    ) {
+        this.securityUserRepository = securityUserRepository;
+        this.restClient = restClient;
+        this.restClientConfig = restClientConfig;
+        this.userServiceUrl = restClientConfig.getBaseUrl();
+        this.userEndpoint = restClientConfig.getUserEndpoint();
+    }
 
     @Transactional
     public SecurityUser createNewSecurityUser(
@@ -66,7 +74,6 @@ public class SecurityUserService {
     public boolean isUsernameOrEmailTaken(String username, String email) {
         boolean isUsernamePresent = Optional.ofNullable(username).isPresent();
         boolean isEmailPresent = Optional.ofNullable(email).isPresent();
-        boolean isTaken = true;
 
         if(!isUsernamePresent && !isEmailPresent){
             throw new BadRequestException("");
@@ -81,7 +88,7 @@ public class SecurityUserService {
             return securityUserRepository.existsByEmailIgnoreCase(email);
         }
 
-        return isTaken;
+        return true;
     }
 
     private void newUserPostRequest(UUID id){

@@ -1,4 +1,4 @@
-package com.payme.authentication.exception;
+package com.payme.authentication.not_used;
 
 public class TransactionException extends RuntimeException{
     public TransactionException(){

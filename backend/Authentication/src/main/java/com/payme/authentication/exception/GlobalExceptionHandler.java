@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -14,6 +15,19 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(
+            AuthenticationException exception,
+            HttpServletRequest request
+    ){
+        log.error("Error during authentication: ", exception);
+
+        return generateErrorResponse(
+                exception,
+                request,
+                HttpStatus.BAD_REQUEST
+        );
+    }
     @ExceptionHandler(SecurityUserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUserNotFoundException
             (SecurityUserNotFoundException exception, HttpServletRequest request){

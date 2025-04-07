@@ -11,8 +11,13 @@ import com.payme.authentication.dto.LoginDto;
 import com.payme.authentication.dto.RegisterDto;
 import com.payme.authentication.exception.DuplicateCredentialException;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -21,53 +26,44 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 
 import java.util.*;
 
-@Service
-@Qualifier("JwtAuthenticationService")
 @Slf4j
+@Service
+@AllArgsConstructor
+@Qualifier("JwtAuthenticationService")
 public class JwtAuthenticationService implements AuthenticationService {
+    private final RoleService roleService;
+    private final TokenService tokenService;
     private final SecurityUserService userService;
     private final PasswordEncoder passwordEncoder;
-    private final TokenService tokenService;
     private final AuthenticationManager authenticationManager;
-    private final RoleService roleService;
-
-    public JwtAuthenticationService(
-            SecurityUserService userService,
-            PasswordEncoder passwordEncoder,
-            TokenService tokenService,
-            AuthenticationManager authenticationManager,
-            RoleService roleService
-    ) {
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-        this.tokenService = tokenService;
-        this.authenticationManager = authenticationManager;
-        this.roleService = roleService;
-    }
 
 
     @Override
     @Transactional
     public void register(@Valid RegisterDto registerDto) {
-        if(userService.isCredentialTaken(registerDto.username(), registerDto.email())) {
+        if(userService.isUsernameOrEmailTaken(registerDto.username(), registerDto.email())) {
             throw new DuplicateCredentialException("Username or email already in use. ");
         }
 
-        SecurityUser generatedUser = createNewUserWithRoles(registerDto);
-        SecurityUser savedUser = userService.save(generatedUser);
+        SecurityUser user = createNewUserWithRoles(registerDto);
 
-        log.info("User registered successfully: {}", savedUser.getUsername());
+
+
+        log.info("User registered successfully: {}", user.getUsername());
     }
 
 
     @Override
     public AuthenticationResponseDto login(@Valid LoginDto loginDto) {
-        SecurityUser authenticatedUser = authenticateUser(loginDto);
+        SecurityUser authenticatedUser = authenticate(loginDto);
 
-        return tokenService.initializeUserSession(authenticatedUser);
+        AuthenticationResponseDto response = tokenService.initializeUserSession(authenticatedUser);
+        log.info("Successful login for ID: {}", authenticatedUser.getId());
+        return response;
     }
 
 
@@ -76,7 +72,7 @@ public class JwtAuthenticationService implements AuthenticationService {
     }
 
 
-    private SecurityUser authenticateUser(LoginDto loginCredentials){
+    private SecurityUser authenticate(LoginDto loginCredentials){
         String credential = Optional.ofNullable(loginCredentials.usernameOrEmail()).orElse("");
         log.info("Authenticating user : {}", credential);
 
@@ -88,35 +84,29 @@ public class JwtAuthenticationService implements AuthenticationService {
                     )
             );
 
-            log.info("Authentication successful for user: {}", credential);
             return (SecurityUser) authentication.getPrincipal();
-
         }catch (BadCredentialsException e){
-            log.warn("Authentication failed for user: {}", credential);
-            log.error("Error during authentication: ", e);
-            throw new BadCredentialsException("Could not find user: " + credential);
+            throw new BadCredentialsException(credential + " provided bad credentials");
         }catch (DisabledException e){
-            log.warn("Authentication failed for user: {}", credential);
-            log.error("Error during authentication: ", e);
-            throw new DisabledException("Authentication failed for disabled user: " + credential);
+            throw new DisabledException(credential + " has been disabled");
         }
 
     }
 
-
     private SecurityUser createNewUserWithRoles(RegisterDto registerDto){
         Set<Role> defaultRoles = new HashSet<>();
-        Role defaultRole = roleService.fetchRole(PaymeRoles.USER);
-        defaultRoles.add(defaultRole);
+        Role userRole = roleService.findRole(PaymeRoles.USER);
+        defaultRoles.add(userRole);
 
-        SecurityUser user = userService.createUser(registerDto);
+        SecurityUser securityUser = userService.createNewSecurityUser(
+                registerDto.username(),
+                registerDto.email(),
+                passwordEncoder.encode(registerDto.password()),
+                defaultRoles
+        );
 
-        return user.builder()
-                .password(passwordEncoder.encode(registerDto.password()))
-                .roles(defaultRoles)
-                .build();
+        return securityUser;
     }
-
 
 }
 

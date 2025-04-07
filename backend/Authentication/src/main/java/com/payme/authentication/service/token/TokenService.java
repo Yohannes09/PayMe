@@ -18,6 +18,8 @@ import java.util.UUID;
 @Slf4j
 @Service
 public class TokenService {
+    private final static int MAX_USER_SESSIONS = 2;
+
     private final TokenRepository tokenRepository;
     private final JwtService jwtService;
 
@@ -30,9 +32,7 @@ public class TokenService {
         UUID id = securityUser.getId();
 
         String token = createUserSession(securityUser);
-
         manageUserSessions(id);
-
         return generateAuthenticationResponse(id, token);
     }
 
@@ -59,23 +59,21 @@ public class TokenService {
                 .build();
 
         tokenRepository.save(sessionToken);
-        log.info("Created session for user: {}", securityUser.getUsername());
+        log.info("Created session for: {}", securityUser.getId());
 
         return token;
     }
 
     private void manageUserSessions(UUID id){
-        log.info("Managing user sessions ID: {} ", id);
+        log.info("Managing user sessions for: {} ", id);
 
         List<Token> userActiveSessions = tokenRepository
-                .findAllByUserId(id)
+                .findAllBySecurityUserId(id)
                 .stream()
-                .filter(token -> {
-                    return jwtService.isTokenExpired(token.getToken());
-                })
+                .filter(token -> !jwtService.isTokenExpired(token.getToken()))
                 .toList();
 
-        if(userActiveSessions.size() >= 5){
+        if(userActiveSessions.size() >= MAX_USER_SESSIONS){
             userActiveSessions.stream()
                     .min(Comparator.comparing(Token::getCreatedAt))
                     .map(Token::getToken)

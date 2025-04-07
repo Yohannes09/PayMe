@@ -27,14 +27,12 @@ public class RoleService {
 
 
     @PostConstruct
-    private void addAllroles(){
+    private void addAllRoles(){
         List<Role> allRoles = PaymeRoles.allRoles()
                 .stream()
                 .map(Role::new)
                 .toList();
 
-        // Fetch all stored roles and add them to a set for fast lookups (slight optimization)
-        // very few roles
         Set<PaymeRoles> storedRoles = roleRepository.findAll()
                 .stream()
                 .map(Role::getRole)
@@ -53,7 +51,7 @@ public class RoleService {
         log.info("Roles added to cache.");
     }
 
-    public Role fetchRole(PaymeRoles role){
+    public Role findRole(PaymeRoles role){
         return Optional.ofNullable(roleCache.get(role))
                 .orElseThrow(() -> new RoleNotFoundException("Could not find role: " + role.getRole()));
     }

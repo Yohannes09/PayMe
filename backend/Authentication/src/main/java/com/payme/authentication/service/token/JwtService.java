@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -30,22 +31,16 @@ public class JwtService {
                 !isTokenExpired(jwtToken);
     }
 
-    public boolean isTokenValid(String jwtToken, String username) {
-        final String extractedUsername = extractClaim(jwtToken, Claims::getSubject);
-        return username.equals(extractedUsername) && !isTokenExpired(jwtToken);
-    }
-
-
     public String generateToken(UserDetails userDetails){
         Map<String, Object> roleClaims = new HashMap<>();
-        roleClaims.put("roles", userDetails.getAuthorities());
-        return generateToken(roleClaims, userDetails);
-    }
-
-
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails){
+        roleClaims.put("roles",
+                userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList()
+        );
         return Jwts.builder()
-                .setClaims(extraClaims)
+                .setClaims(roleClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + jwtConfig.getValidity()))
@@ -53,10 +48,13 @@ public class JwtService {
                 .compact();
     }
 
-
-    public <T> T extractClaim(String token, Function<Claims, T> claimResolver){
+    public <T> T extractClaim(String token, Function<Claims, T> claimExtractor){
         final Claims claims = extractAllClaims(token);
-        return claimResolver.apply(claims);
+        return claimExtractor.apply(claims);
+    }
+
+    public boolean isTokenExpired(String token){
+        return extractClaim(token, Claims::getExpiration).before(new Date());
     }
 
 
@@ -67,11 +65,6 @@ public class JwtService {
                 .parseClaimsJws(token)
                 .getBody();
     }
-
-    public boolean isTokenExpired(String token){
-        return extractClaim(token, Claims::getExpiration).before(new Date());
-    }
-
 
     private Key getSignInKey() {
         byte[] secretKeyBytes = Decoders.BASE64.decode(jwtConfig.getSecret());

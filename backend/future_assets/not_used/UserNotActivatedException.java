@@ -1,4 +1,4 @@
-package com.payme.authentication.exception;
+package com.payme.authentication.not_used;
 
 import org.springframework.security.core.AuthenticationException;
 

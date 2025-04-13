@@ -9,7 +9,7 @@
         <version>1.0</version>
     </parent>
 
-    <artifactId>Serivce-Registry</artifactId>
+    <artifactId>Service-Registry</artifactId>
 
     <properties>
         <maven.compiler.source>22</maven.compiler.source>

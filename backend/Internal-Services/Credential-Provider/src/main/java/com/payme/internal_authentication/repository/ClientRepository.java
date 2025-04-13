@@ -12,7 +12,22 @@ public interface ClientRepository extends JpaRepository<Client, UUID> {
 
     @Query("""
             SELECT client FROM Client client
-            WHERE client.baseUrl = :baseUrl
+            WHERE (LOWER(client.name) = LOWER(:nameOrBaseUrl))
+            OR (LOWER(client.baseUrl) = LOWER(:nameOrBaseUrl));
             """)
-    Optional<Client> findClientByBaseUrl(@Param("baseUrl") String baseUrl);
+    Optional<Client> findByNameOrBaseUrl(@Param("nameOrBaseUrl") String nameOrBaseUrl);
+
+    @Query("""
+            SELECT CASE
+                WHEN COUNT(client) > 0 THEN true
+                ELSE false END
+            FROM Client client
+            WHERE (LOWER(client.name) = LOWER(:name))
+            OR (LOWER(client.baseUrl) = LOWER(:baseUrl))
+            """)
+    boolean existsByNameOrBaseUrl(
+            @Param("name") String name,
+            @Param("baseUrl") String baseUrl
+    );
+
 }

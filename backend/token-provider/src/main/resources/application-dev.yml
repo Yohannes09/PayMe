@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: token-provider
+  profile:
+    active: dev
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      format-sql: true

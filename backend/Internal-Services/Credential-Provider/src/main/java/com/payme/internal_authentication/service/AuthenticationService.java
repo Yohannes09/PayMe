@@ -1,13 +1,16 @@
 package com.payme.internal_authentication.service;
 
+import com.payme.internal_authentication.constant.ValidationPattern;
+import com.payme.internal_authentication.dto.ClientRegisterDto;
 import com.payme.internal_authentication.entity.Client;
+import com.payme.internal_authentication.exception.ClientBadRequestException;
+import com.payme.internal_authentication.exception.FailedRegisterException;
+import com.payme.internal_authentication.util.CredentialGenerator;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.payme.internal_authentication.constant.ServiceType;
-import com.payme.internal_authentication.dto.AuthenticationRequestDto;
-import com.payme.internal_authentication.dto.AuthenticationResponseDto;
-import com.payme.internal_authentication.entity.Credential;
 import com.payme.internal_authentication.repository.ClientRepository;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,60 +19,87 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthenticationService {
+    private static final int CREDENTIAL_SIZE = 32;
+
     private final ClientRepository clientRepository;
-    private final CredentialService credentialService;
+    private final PasswordEncoder passwordEncoder;
 
-    // Each time client starts, it sends its information.
     @Transactional
-    public AuthenticationResponseDto handleInitialRequest(AuthenticationRequestDto requestDto){
-        Client client = clientRepository
-                .findClientByBaseUrl(requestDto.baseUrl())
-                .orElseGet(() -> {
-                    Client newClient = handleNewClient(requestDto);
-                    log.info("New client base URL: {}", newClient.getBaseUrl());
+    public String register(ClientRegisterDto clientRegisterDto){
+        if(clientRepository.existsByNameOrBaseUrl(clientRegisterDto.name(), clientRegisterDto.baseUrl())){
+            log.warn("Client failed to register, duplicate service name or base url provided: {}", clientRegisterDto.name());
+            throw new FailedRegisterException("A service with the provided name or Base URL exists already. ");
+        }
 
-                    return newClient;
-                });
-
-        Credential credential = credentialService.resolveCredential(client);
-
-        client.getCredentials().add(credential);
+        String secret = CredentialGenerator.generateCredential(CREDENTIAL_SIZE);
+        Client client = handleNewClient(clientRegisterDto, secret);
         clientRepository.save(client);
-        log.info("New API Key created for service: {}", client.getServiceName());
 
-        return new AuthenticationResponseDto(credential.getCredential());
+        return secret;
     }
 
-
-    private Client handleNewClient(AuthenticationRequestDto requestDto){
+    private Client handleNewClient(ClientRegisterDto registerDto, String secret){
+        validateClient(registerDto);
         return generateNewClient(
-                requestDto.clientName(),
-                requestDto.baseUrl(),
-                requestDto.endpoint(),
-                requestDto.description(),
+                registerDto.name(),
+                secret,
+                registerDto.baseUrl(),
+                registerDto.description(),
                 ServiceType.INTERNAL
         );
+    }
 
+    private void validateClient(ClientRegisterDto registerDto){
+        if(!registerDto.name().matches(ValidationPattern.CLIENT_NAME_PATTERN)){
+            throw new ClientBadRequestException(ValidationPattern.CLIENT_NAME_MESSAGE);
+        }
+
+        if(registerDto.baseUrl().matches(ValidationPattern.BASE_URL_PATTERN)){
+            throw new ClientBadRequestException(ValidationPattern.BASE_URL_MESSAGE);
+        }
     }
 
     private Client generateNewClient(
-            String serviceName,
+            String name,
+            String secret,
             String baseUrl,
-            String endpoint,
             String description,
             ServiceType serviceType
     ){
         return Client.builder()
-                .serviceName(serviceName)
+                .name(name)
+                .secret(passwordEncoder.encode(secret))
                 .baseUrl(baseUrl)
-                .endpoint(endpoint)
                 .description(Optional.ofNullable(description).orElse(""))
                 .serviceType(serviceType)
-                .credentials(new ArrayList<>())
+                .endpoints(new ArrayList<>())
+                .active(true)
                 .build();
-
     }
 
 }
+//    private final CredentialService credentialService;
+//
+//    // Each time client starts, it sends its information.
+//    @Transactional
+//    public AuthenticationResponseDto handleInitialRequest(AuthenticationRequestDto registerDto){
+//        validateClient(registerDto);
+//        Client client = clientRepository
+//                .findByFullPath(registerDto.baseUrl() + registerDto.endpoint())
+//                .orElseGet(() -> {
+//                    Client newClient = handleNewClient(registerDto);
+//                    log.info("New client base URL: {}", newClient.getBaseUrl());
+//
+//                    return newClient;
+//                });
+//
+//        Credential credential = credentialService.resolveCredential(client);
+//        client.getCredentials().add(credential);
+//        clientRepository.save(client);
+//
+//        log.info("New credential created for service: {}", client.getServiceName());
+//
+//        return new AuthenticationResponseDto(credential.getCredential());
+//    }

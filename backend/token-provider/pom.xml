@@ -9,11 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.payme</groupId>
-	<artifactId>internal-authentication-serivce</artifactId>
-	<version>1.0</version>
-    <packaging>pom</packaging>
-    <name>internal-authentication-service</name>
-	<description>Provides credentials for internal services</description>
+	<artifactId>token-provider</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>token-provider</name>
+	<description>Token provider used for authentication purposes. </description>
 	<url/>
 	<licenses>
 		<license/>
@@ -21,12 +20,7 @@
 	<developers>
 		<developer/>
 	</developers>
-    <modules>
-        <module>Secret-Provider</module>
-		<module>Credential-Provider</module>
-		<module>Service-Registry</module>
-	</modules>
-    <scm>
+	<scm>
 		<connection/>
 		<developerConnection/>
 		<tag/>
@@ -37,19 +31,27 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
+
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.boot</groupId>-->
+<!--			<artifactId>spring-boot-starter-security</artifactId>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
@@ -69,6 +71,23 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<!-- JWT Dependencies -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>0.11.1</version>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>0.11.1</version>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>0.11.1</version>
 		</dependency>
 
 	</dependencies>

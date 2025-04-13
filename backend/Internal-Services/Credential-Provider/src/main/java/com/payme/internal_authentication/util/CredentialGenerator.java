@@ -13,4 +13,8 @@ public class CredentialGenerator {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
     }
 
+    public static void main(String[] args) {
+        System.out.println(generateCredential(32));
+    }
+
 }

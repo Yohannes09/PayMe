@@ -7,10 +7,10 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 
 @Slf4j
-public class PrivateKeyProvider {
+public class KeyPairProvider {
 
     public static KeyPair generateKeyPair(int sizeInBits, String algorithmType) throws NoSuchAlgorithmException {
-        log.info("Generating key pair: Algorithm: {} size:{}", algorithmType, sizeInBits);
+        log.info("Generating key pair - Algorithm: {} - Size: {} bits", algorithmType, sizeInBits);
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(algorithmType);
         keyPairGenerator.initialize(sizeInBits);
 

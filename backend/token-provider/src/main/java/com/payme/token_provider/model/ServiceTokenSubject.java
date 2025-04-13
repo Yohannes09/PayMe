@@ -8,6 +8,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ServiceTokenSubject implements TokenSubject{
     private final String serviceName;
+    private final Map<String, Object> claims;
 
     @Override
     public String getUsernameOrId() {

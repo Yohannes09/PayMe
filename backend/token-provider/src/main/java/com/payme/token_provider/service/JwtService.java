@@ -28,27 +28,4 @@ public class JwtService {
                 .compact();
     }
 
-    public boolean isTokenValid(String jwtToken, String usernameOrId) {
-        final String extractedUsername = extractClaim(jwtToken, Claims::getSubject);
-        return usernameOrId.equals(extractedUsername) &&
-                !isTokenExpired(jwtToken);
-    }
-
-    public <T> T extractClaim(String token, Function<Claims, T> claimExtractor){
-        final Claims claims = extractAllClaims(token);
-        return claimExtractor.apply(claims);
-    }
-
-    private boolean isTokenExpired(String token){
-        return extractClaim(token, Claims::getExpiration).before(new Date());
-    }
-
-    private Claims extractAllClaims(String token){
-        return Jwts.parserBuilder()
-                .setSigningKey(signingKeyManager.getPublicKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-    }
-
 }

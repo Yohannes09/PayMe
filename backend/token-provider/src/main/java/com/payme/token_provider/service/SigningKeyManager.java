@@ -3,7 +3,7 @@ package com.payme.token_provider.service;
 import com.payme.token_provider.repository.SigningKeyRepository;
 import com.payme.token_provider.constant.KeyAlgorithm;
 import com.payme.token_provider.entity.SigningKey;
-import com.payme.token_provider.util.PrivateKeyProvider;
+import com.payme.token_provider.util.KeyPairProvider;
 import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -42,6 +42,7 @@ public class SigningKeyManager {
         return Base64.getEncoder().encodeToString(publicKey.getEncoded());
     }
 
+
     @PostConstruct
     private void initializeSigningKey(){
         try {
@@ -67,11 +68,10 @@ public class SigningKeyManager {
     }
 
     private void refreshKeys() throws NoSuchAlgorithmException{
-        KeyPair keyPair = PrivateKeyProvider.generateKeyPair(KEY_SIZE_BITS, "RSA");
+        KeyPair keyPair = KeyPairProvider.generateKeyPair(KEY_SIZE_BITS, "RSA");
         this.privateKey = keyPair.getPrivate();
         this.publicKey = keyPair.getPublic();
     }
-
 
     private SigningKey generate(String publicKey, KeyAlgorithm keyAlgorithm){
         return SigningKey.builder()

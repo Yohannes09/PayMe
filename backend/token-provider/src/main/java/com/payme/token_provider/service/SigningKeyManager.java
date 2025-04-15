@@ -6,6 +6,7 @@ import com.payme.token_provider.entity.SigningKey;
 import com.payme.token_provider.util.KeyPairProvider;
 import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,12 +32,11 @@ public class SigningKeyManager {
     @Getter(AccessLevel.NONE)
     private final SigningKeyRepository signingKeyRepository;
 
-    private PrivateKey privateKey;
-    private PublicKey publicKey;
+    private volatile KeyPairHolder keyPairHolder;
 
 
     public String getEncodedPublicKey(){
-        if(publicKey == null){
+        if(keyPairHolder.publicKey== null){
             throw new IllegalStateException("Failed to initialize public key. ");
         }
         return Base64.getEncoder().encodeToString(publicKey.getEncoded());
@@ -81,4 +81,10 @@ public class SigningKeyManager {
                 .build();
     }
 
+    @AllArgsConstructor
+    @Getter
+    private static class KeyPairHolder{
+        private static PublicKey publicKey;
+        private static PrivateKey privateKey;
+    }
 }

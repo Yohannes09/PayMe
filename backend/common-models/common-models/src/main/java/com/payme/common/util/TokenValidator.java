@@ -2,39 +2,32 @@ package com.payme.common.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
 import java.util.function.Function;
 
-@RequiredArgsConstructor
+@Setter
 public abstract class TokenValidator {
-    private final String secret;
-
-
-    public abstract void idk();
-    public boolean isTokenValid(String jwtToken, String recipientUsernameOrId) {
-        final String extractedUsername = extractClaim(jwtToken, Claims::getSubject);
-        return recipientUsernameOrId.equals(extractedUsername) &&
-                !isTokenExpired(jwtToken);
-    }
 
     public <T> T extractClaim(
             String token,
+            String signingKey,
             Function<Claims, T> claimExtractor
     ){
-        final Claims claims = extractAllClaims(token);
+        final Claims claims = extractAllClaims(token, signingKey);
         return claimExtractor.apply(claims);
     }
 
-
-    private boolean isTokenExpired(String token){
-        return extractClaim(token, Claims::getExpiration).before(new Date());
+    public boolean isTokenExpired(String token, String signingKey){
+        Date expiration = extractClaim(token, signingKey, Claims::getExpiration);
+        return expiration.before(new Date());
     }
 
-    private Claims extractAllClaims(String token){
+
+    private Claims extractAllClaims(String token, String signingKey){
         return Jwts.parserBuilder()
-                .setSigningKey(secret)
+                .setSigningKey(signingKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

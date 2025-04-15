@@ -1,6 +1,7 @@
 package com.payme.token_provider.config;
 
-import com.payme.token_provider.service.TokenProviderValidator;
+import com.payme.common.util.ServiceTokenValidator;
+import com.payme.token_provider.service.SigningKeyManager;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,16 +19,18 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
+@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String AUTH_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer";
-    private static final List<String> PUBLIC_ENDPOINTS = List.of("/api/v1/public-key");
+    private static final Set<String> PUBLIC_ENDPOINTS = Set.of("/api/v1/public-key");
 
-    private final TokenProviderValidator tokenProviderValidator;
+    private final ServiceTokenValidator serviceTokenValidator;
+    private final SigningKeyManager signingKeyManager;
 
 
     @Override
@@ -37,7 +40,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        if(isPublicEndpoint(request.getRequestURI())){
+        String requestUri = request.getRequestURI();
+        if(isPublicEndpoint(requestUri)){
             filterChain.doFilter(request, response);
             return;
         }
@@ -48,27 +52,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String authHeader = request.getHeader(AUTH_HEADER);
-
-        if(authHeader == null || !authHeader.startsWith("bearer")){
+        if(authHeader == null || !authHeader.startsWith(BEARER_PREFIX)){
             filterChain.doFilter(request, response);
             return;
         }
 
         String jwtToken = authHeader.substring(7);
-        boolean hasValidClaims = validateTokenClaims(jwtToken);
-
+        String publicKey = signingKeyManager.getEncodedPublicKey();
+        boolean hasValidClaims = serviceTokenValidator.hasValidClaims(jwtToken, publicKey, Set.of()); // havent figured out roles yet
         if(!hasValidClaims){
             filterChain.doFilter(request, response);
             return;
         }
 
-        String clientName = tokenProviderValidator.extractClaim(jwtToken, Claims::getSubject);
-        List<String> authorities = tokenProviderValidator.extractClaim(
+        String clientName = serviceTokenValidator.extractClaim(jwtToken, publicKey, Claims::getSubject);
+        List<String> authorities = serviceTokenValidator.extractClaim(
                 jwtToken,
+                publicKey,
                 claims -> claims.get("roles", List.class)
         );
 
-        if(tokenProviderValidator.isTokenValid(jwtToken, clientName)){
+        if(serviceTokenValidator.isTokenValid(jwtToken, publicKey)){
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(
                             clientName,
@@ -87,23 +91,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return PUBLIC_ENDPOINTS.contains(urlPath);
     }
 
-
-    private boolean validateTokenClaims(String token){
-        String clientType = tokenProviderValidator.extractClaim(
-                token,
-                claims -> claims.get("type", String.class)
-        );
-        if(clientType == null || !clientType.equals("SERVICE")){
-            log.error("Client provided incorrect client-type. ");
-            return false;
-        }
-
-        String client = tokenProviderValidator.extractClaim(token, Claims::getSubject);
-        if(client == null){
-            log.error("Client provided a null name identifier. ");
-            return false;
-        }
-
-        return true;
-    }
 }

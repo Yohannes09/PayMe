@@ -1,3 +1,7 @@
+
+server:
+  port: 8090
+
 spring:
   application:
     name: token-provider
@@ -5,7 +9,13 @@ spring:
     active: dev
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
     properties:
       format-sql: true
+
+internal:
+  endpoints:
+    public-key: /public-key
+    access-token: /access-token
+    refresh-token: /refresh-token

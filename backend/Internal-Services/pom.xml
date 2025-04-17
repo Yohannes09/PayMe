@@ -22,7 +22,6 @@
 		<developer/>
 	</developers>
     <modules>
-        <module>Secret-Provider</module>
 		<module>Credential-Provider</module>
 		<module>Service-Registry</module>
 	</modules>

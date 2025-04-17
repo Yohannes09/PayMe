@@ -1,7 +1,7 @@
 package com.payme.token_provider.service;
 
+import com.payme.token_provider.component.SigningKeyManager;
 import com.payme.token_provider.model.TokenSubject;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;

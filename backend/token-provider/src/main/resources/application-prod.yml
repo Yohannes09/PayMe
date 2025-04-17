@@ -1,0 +1,20 @@
+
+server:
+  port: 8080
+spring:
+  application:
+    name: token-provider
+  profile:
+    active: dev
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      format-sql: true
+
+internal:
+  endpoints:
+    public-key: /api/v1/public-key
+    access-token: /api/v1/access-token
+    refresh-token: /api/v1/refresh-token

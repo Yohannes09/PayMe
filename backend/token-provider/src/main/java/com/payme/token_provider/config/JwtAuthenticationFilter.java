@@ -1,7 +1,8 @@
 package com.payme.token_provider.config;
 
 import com.payme.common.util.ServiceTokenValidator;
-import com.payme.token_provider.service.SigningKeyManager;
+import com.payme.token_provider.component.SigningKeyManager;
+import com.payme.token_provider.model.RecentPublicKeys;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -32,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final ServiceTokenValidator serviceTokenValidator;
     private final SigningKeyManager signingKeyManager;
 
-
+// Need to redo, this is useless as only 2 services can communicate5
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -58,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String jwtToken = authHeader.substring(7);
-        String publicKey = signingKeyManager.getEncodedPublicKey();
+        RecentPublicKeys publicKey = signingKeyManager.getCurrentAndPreviousPublicKeys();
         boolean hasValidClaims = serviceTokenValidator.hasValidClaims(jwtToken, publicKey, Set.of()); // havent figured out roles yet
         if(!hasValidClaims){
             filterChain.doFilter(request, response);

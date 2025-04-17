@@ -2,6 +2,7 @@ com/payme/common/entity/User.class
 com/payme/common/entity/Account.class
 com/payme/common/util/UserTokenValidator.class
 com/payme/common/entity/Role.class
+com/payme/common/exception/ErrorResponse$ErrorResponseBuilder.class
 com/payme/common/util/TokenValidator.class
 com/payme/common/constants/PaymeRoles.class
 com/payme/common/exception/ErrorResponse.class

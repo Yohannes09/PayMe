@@ -1,10 +1,11 @@
 package com.payme.common.constants;
 
 public enum PaymeRoles {
+    GUEST("GUEST"),
     USER("USER"),
+    SERVICE("SERVICE"),
     ADMIN("ADMIN"),
-    SUPER_ADMIN("SUPER ADMIN"),
-    GUEST("GUEST");
+    SUPER_ADMIN("SUPER ADMIN");
 
     private final String role;
 

@@ -5,8 +5,6 @@ server:
 spring:
   application:
     name: token-provider
-  profile:
-    active: dev
   jpa:
     hibernate:
       ddl-auto: create-drop

@@ -1,42 +1,121 @@
 package com.payme.common.util;
 
+import com.payme.common.constants.ClaimsType;
+import com.payme.common.constants.DomainConstants;
+import com.payme.common.constants.PaymeRoles;
+import com.payme.common.constants.TokenType;
 import io.jsonwebtoken.Claims;
+import lombok.RequiredArgsConstructor;
 
-import java.util.List;
-import java.util.Set;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public class ServiceTokenValidator extends TokenValidator{
-    private static final String REQUIRED_CLAIMS_TYPE = "SERVICE";
+import static io.jsonwebtoken.Jwts.claims;
 
-    public boolean hasValidClaims(String token, String signingKey, Set<String> allowedRoles){
-        String extractedType = extractClaim(
-                token,
-                signingKey,
-                claims -> claims.get("type", String.class)
-        );
-        if(extractedType == null || !extractedType.equals(REQUIRED_CLAIMS_TYPE)){
-            return false;
-        }
+@RequiredArgsConstructor
+public class ServiceTokenValidator implements TokenValidator{
+    private final String issuer;// = DomainConstants.DEFAULT_ISSUER;
+    // the token's audience should be the same as the recieving microservice's name
+    private final String audience;
+    private final Set<TokenType> requiredTokenTypes;
+    private final Set<ClaimsType> requiredClaimTypes;
+    private final Set<PaymeRoles> requiredRoles;
 
-        String extractedSubject = extractClaim(token, signingKey, Claims::getSubject);
-        if(extractedSubject == null){
-            return false;
-        }
 
-        List<String> extractedRoles = extractClaim(
-                token,
-                signingKey,
-                claims -> claims.get("roles", List.class)
-        );
-        if(extractedRoles == null){
-            return false;
-        }
+    @Override
+    public boolean isTokenValid(
+            String token,
+            String signingKey,
+            String signingAlgorithm
+    ) throws NoSuchAlgorithmException, InvalidKeySpecException {
 
-        return extractedRoles.stream().anyMatch(allowedRoles::contains);
+        return hasValidType(token, signingKey, requiredClaimTypes, signingAlgorithm) &&
+                hasValidRoles(token, signingKey, requiredRoles, signingAlgorithm) &&
+                hasValidAudience(token, signingKey, signingAlgorithm) &&
+                hasValidSubject(token, signingKey, signingAlgorithm);
     }
 
-    public boolean isTokenValid(String token, String signingKey){
-        return !isTokenExpired(token, signingKey);
+    private boolean hasValidType(
+            String token,
+            String signingKey,
+            Set<ClaimsType> allowedTypes,
+            String signingAlgorithm
+    ) throws NoSuchAlgorithmException, InvalidKeySpecException {
+
+        Optional<String> extractedType = TokenResolver.resolveClaim(
+                token,
+                signingKey,
+                signingAlgorithm,
+                claims -> claims.get("type", String.class)
+        );
+
+        return allowedTypes.stream()
+                .map(ClaimsType::getClaimsType)
+                .anyMatch(extractedType::equals);
+    }
+
+    public boolean hasValidRoles(
+            String token,
+            String signingKey,
+            Set<PaymeRoles> requiredRoles,
+            String signingAlgorithm
+    ) throws NoSuchAlgorithmException, InvalidKeySpecException {
+
+        var extractedRoles = TokenResolver.resolveClaim(
+                token,
+                signingKey,
+                signingAlgorithm,
+                claims -> claims.get("roles", List.class)
+        );
+
+        if(extractedRoles.isEmpty()){
+            return false;
+        }
+
+        Set<String> reqRoles = requiredRoles.stream()
+                .map(PaymeRoles::getRole)
+                .collect(Collectors.toSet());
+
+        return extractedRoles.get()
+                .stream()
+                .anyMatch(role -> reqRoles.contains(role));
+    }
+
+    private boolean hasValidSubject(
+            String token,
+            String signingKey,
+            String signingAlgorithm
+    ) throws NoSuchAlgorithmException, InvalidKeySpecException {
+
+        Optional<String> extractedSubject = TokenResolver.resolveClaim(
+                token,
+                signingKey,
+                signingAlgorithm,
+                Claims::getSubject
+        );
+
+        return extractedSubject.isPresent();
+    }
+
+    private boolean hasValidAudience(
+            String token,
+            String signingKey,
+            String signingAlgorithm
+    ) throws NoSuchAlgorithmException, InvalidKeySpecException {
+
+        Optional<String> extractedAudience = TokenResolver.resolveClaim(
+                token,
+                signingKey,
+                signingAlgorithm,
+                Claims::getAudience
+        );
+
+        return extractedAudience
+                .map(audience::equals)
+                .orElse(false);
     }
 
 }
+

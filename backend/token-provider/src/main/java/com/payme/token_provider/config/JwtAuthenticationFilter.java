@@ -1,6 +1,7 @@
 package com.payme.token_provider.config;
 
 import com.payme.common.util.ServiceTokenValidator;
+import com.payme.common.util.TokenResolver;
 import com.payme.token_provider.component.SigningKeyManager;
 import com.payme.token_provider.model.RecentPublicKeys;
 import io.jsonwebtoken.Claims;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 import java.util.Set;
 
@@ -33,7 +36,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final ServiceTokenValidator serviceTokenValidator;
     private final SigningKeyManager signingKeyManager;
 
-// Need to redo, this is useless as only 2 services can communicate5
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -53,39 +55,45 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String authHeader = request.getHeader(AUTH_HEADER);
-        if(authHeader == null || !authHeader.startsWith(BEARER_PREFIX)){
+        if(!isHeaderValid(authHeader)){
             filterChain.doFilter(request, response);
             return;
         }
 
-        String jwtToken = authHeader.substring(7);
-        RecentPublicKeys publicKey = signingKeyManager.getCurrentAndPreviousPublicKeys();
-        boolean hasValidClaims = serviceTokenValidator.hasValidClaims(jwtToken, publicKey, Set.of()); // havent figured out roles yet
-        if(!hasValidClaims){
+        String token = authHeader.substring(7);
+        if(!hasValidClaims(token)){
             filterChain.doFilter(request, response);
             return;
-        }
-
-        String clientName = serviceTokenValidator.extractClaim(jwtToken, publicKey, Claims::getSubject);
-        List<String> authorities = serviceTokenValidator.extractClaim(
-                jwtToken,
-                publicKey,
-                claims -> claims.get("roles", List.class)
-        );
-
-        if(serviceTokenValidator.isTokenValid(jwtToken, publicKey)){
-            UsernamePasswordAuthenticationToken authToken =
-                    new UsernamePasswordAuthenticationToken(
-                            clientName,
-                            null,
-                            authorities.stream().map(SimpleGrantedAuthority::new).toList()
-                    );
-
-            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authToken);
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private boolean hasValidClaims(String token){
+        RecentPublicKeys recentPublicKeys = signingKeyManager.getCurrentAndPreviousPublicKeys();
+        List<String> publicKeys = List.of(
+                recentPublicKeys.currentPublicKey(),
+                recentPublicKeys.previousPublicKey()
+        );
+
+        return publicKeys.stream()
+                .anyMatch(publicKey -> {
+                    try {
+                        return serviceTokenValidator.isTokenValid(
+                                token,
+                                publicKey,
+                                "RSA"
+                        );
+                    } catch (NoSuchAlgorithmException | InvalidKeySpecException exception) {
+                        log.warn("Failed token validation");
+                        throw new RuntimeException("There was a problem during token validation. ", exception);
+                    }
+                });
+
+    }
+
+    private boolean isHeaderValid(String authHeader){
+        return authHeader != null && authHeader.startsWith(BEARER_PREFIX);
     }
 
     private boolean isPublicEndpoint(String urlPath){

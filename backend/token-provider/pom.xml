@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.payme</groupId>
 	<artifactId>token-provider</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>token-provider</name>
 	<description>Token provider used for authentication purposes. </description>
 	<url/>
@@ -30,8 +30,14 @@
 		<java.version>21</java.version>
 	</properties>
 
-	<dependencies>
+	<repositories>
+		<repository>
+			<id>nexus</id>
+			<url>http://nexus:8081/repository/maven-releases/</url>
+		</repository>
+	</repositories>
 
+	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>

@@ -36,9 +36,11 @@ import java.util.List;
 @Getter
 @RequiredArgsConstructor
 public class SigningKeyManager {
-    private static final int REFRESH_INTERVAL_MILLISECONDS = 30 * 60 * 1000;
+    private static final int MINUTE_IN_MS = 1000 * 60;
+    private static final int REFRESH_INTERVAL_MILLISECONDS = 30 * MINUTE_IN_MS;
+    private static final int TOKEN_REFRESH_DELAY = REFRESH_INTERVAL_MILLISECONDS;
     private static final int KEY_SIZE_BITS = 2048;
-    private static final int KEY_VALIDITY_MINUTES = 31;
+    private static final int KEY_VALIDITY_MINUTES = 30;
 
     @Getter(AccessLevel.NONE)
     private final SigningKeyRepository signingKeyRepository;
@@ -109,7 +111,7 @@ public class SigningKeyManager {
     }
 
     /** Updates the Key Pair at a desired time interval. */
-    @Scheduled(fixedDelay = REFRESH_INTERVAL_MILLISECONDS)
+    @Scheduled(fixedDelay = REFRESH_INTERVAL_MILLISECONDS, initialDelay = TOKEN_REFRESH_DELAY)
     private void scheduledKeyRefresh(){
         try {
             refreshKeys();

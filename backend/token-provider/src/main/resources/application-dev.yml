@@ -17,3 +17,7 @@ internal:
     public-key: /public-key
     access-token: /access-token
     refresh-token: /refresh-token
+
+DB_USER: postgres
+DB_PASSWORD:
+DB_URL: jdbc:postgresql://localhost:5432/test

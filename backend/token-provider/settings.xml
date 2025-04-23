@@ -1,39 +1,53 @@
-
 <settings>
-<servers>
-    <!-- Nexus credentials -->
-    <server>
-        <id>nexus</id>
-        <username>common-models-user</username>
-        <password>build49</password>
-    </server>
-</servers>
+    <servers>
+        <server>
+            <id>nexus</id>
+            <username>admin</username>
+            <password>password</password>
+        </server>
+    </servers>
 
-<profiles>
-    <profile>
+    <mirrors>
+      <mirror>
         <id>nexus</id>
-        <repositories>
-            <repository>
-                <id>nexus</id>
-                <url>http://nexus:8081/repository/maven-releases/</url> <!-- Correct Nexus URL -->
-                <releases>
-                    <enabled>true</enabled>
-                </releases>
-                <snapshots>
-                    <enabled>true</enabled>
-                </snapshots>
-            </repository>
-        </repositories>
-        <pluginRepositories>
-            <pluginRepository>
-                <id>nexus</id>
-                <url>http://nexus:8081/repository/maven-releases/</url> <!-- Correct Nexus URL -->
-            </pluginRepository>
-        </pluginRepositories>
-    </profile>
-</profiles>
+        <mirrorOf>*</mirrorOf>
+        <url>http://host.docker.internal:8083/repository/maven-public/</url>
+      </mirror>
+    </mirrors>
 
-<activeProfiles>
-    <activeProfile>nexus</activeProfile>
-</activeProfiles>
+    <profiles>
+        <profile>
+            <id>nexus</id>
+            <repositories>
+                <repository>
+                    <id>nexus</id>
+                    <url>http://host.docker.internal:8083/repository/maven-releases/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+        </profile>
+        <profile>
+            <id>allow-http</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <maven.wagon.http.ssl.insecure>true</maven.wagon.http.ssl.insecure>
+                <maven.wagon.http.ssl.allowall>true</maven.wagon.http.ssl.allowall>
+            </properties>
+        </profile>
+    </profiles>
+
 </settings>
+
+<!--            <pluginRepositories>-->
+<!--                <pluginRepository>-->
+<!--                    <id>nexus</id>-->
+<!--                    <url>http://localhost:8083/repository/maven-releases/</url>-->
+<!--                </pluginRepository>-->
+<!--            </pluginRepositories>-->

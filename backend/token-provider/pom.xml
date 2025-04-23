@@ -30,6 +30,8 @@
 		<java.version>21</java.version>
 	</properties>
 
+	<!-- Since the token-provider service is built inside Docker Compose,
+     use the internal hostname "nexus" for Maven repository resolution. -->
 	<repositories>
 		<repository>
 			<id>nexus</id>
@@ -99,7 +101,7 @@
 		<dependency>
 			<groupId>com.payme</groupId>
 			<artifactId>common-models</artifactId>
-			<version>1.0</version>
+			<version>1.0.1</version>
 		</dependency>
 
 	</dependencies>
@@ -118,10 +120,13 @@
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>3.4.4</version>
 				<configuration>
+					<mainClass>com.payme.token_provider.TokenProviderApplication</mainClass>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>

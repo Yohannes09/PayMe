@@ -1,6 +1,6 @@
 services:
   nexus:
+    container_name: nexus-java-libs
     image: sonatype/nexus3
-    container_name: nexus
     ports:
       - "8083:8081"

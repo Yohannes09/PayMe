@@ -9,9 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class TokenProviderApplication {
 
 	public static void main(String[] args) {
-		SpringApplication application = new SpringApplication(TokenProviderApplication.class);
-		application.setAdditionalProfiles("dev");
-		application.run(args);
+		SpringApplication.run(TokenProviderApplication.class, args);
 	}
 
 }

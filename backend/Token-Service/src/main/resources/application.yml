@@ -1,0 +1,6 @@
+spring:
+  profiles:
+    active: dev
+
+jwt:
+  issuer: token-provider

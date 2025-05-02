@@ -1,4 +1,4 @@
-package com.payme.token_provider.config;
+package com.payme.token_service.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

@@ -1,4 +1,4 @@
-package com.payme.token_provider.exception;
+package com.payme.token_service.exception;
 
 public class KeyInitializationException extends RuntimeException {
     public KeyInitializationException(String message) {

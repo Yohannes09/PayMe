@@ -1,4 +1,4 @@
-package com.payme.token_provider.dto;
+package com.payme.token_service.dto;
 
 import jakarta.annotation.Nullable;
 

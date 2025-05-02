@@ -1,4 +1,4 @@
-package com.payme.token_provider.config;
+package com.payme.token_service.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -29,13 +29,13 @@ public class WebSecurityConfig {
     @Profile("prod")
     public SecurityFilterChain enabledWebSecurity(
             HttpSecurity http,
-            JwtAuthenticationFilter jwtAuthenticationFilter
+            AuthenticationFilterConfig authenticationFilterConfig
     ) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request ->
                         request.requestMatchers("/api/v1/public-key").permitAll()
-                                // White list of IPS
+                                // Whitelist of IPS
                                 .anyRequest().access((authentication, context) -> {
                                     String incomingRequestIPAddress = context.getRequest().getRemoteAddr();
 
@@ -50,7 +50,7 @@ public class WebSecurityConfig {
                 .sessionManagement(session->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(authenticationFilterConfig, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

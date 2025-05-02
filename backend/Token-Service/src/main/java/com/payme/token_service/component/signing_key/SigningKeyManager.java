@@ -1,12 +1,12 @@
-package com.payme.token_provider.component;
+package com.payme.token_service.component.signing_key;
 
-import com.payme.token_provider.data_structure.PublicKeyHistory;
-import com.payme.token_provider.dto.PublicKeyDto;
-import com.payme.token_provider.exception.KeyInitializationException;
-import com.payme.token_provider.model.RecentPublicKeys;
-import com.payme.token_provider.repository.SigningKeyRepository;
-import com.payme.token_provider.entity.PublicKeyRecord;
-import com.payme.token_provider.util.KeyPairProvider;
+import com.payme.token_service.data_structure.PublicKeyHistory;
+import com.payme.token_service.dto.PublicKeyDto;
+import com.payme.token_service.exception.KeyInitializationException;
+import com.payme.token_service.model.RecentPublicKeys;
+import com.payme.token_service.repository.SigningKeyRepository;
+import com.payme.token_service.entity.PublicKeyRecord;
+import com.payme.token_service.util.KeyPairProvider;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -80,7 +80,7 @@ public class SigningKeyManager {
         return activeSigningKey.privateKey();
     }
 
-    // Used by SignedTokenProvider to add the singing key's ID to the token header.
+    // Used by TokenProvider to add the singing key's ID to the token header.
     public PublicKeyRecord getActiveSigningKey(){
         if(activeSigningKey == null){
             throw new KeyInitializationException();
@@ -101,7 +101,10 @@ public class SigningKeyManager {
     @Scheduled(fixedDelay = TOKEN_ROTATION_INTERVAL)
     private void rotateSigningKey(){
         try {
-            KeyPair keyPair = KeyPairProvider.generateKeyPair(KEY_SIZE_BITS, "RSA");
+            KeyPair keyPair = KeyPairProvider.generateKeyPair(
+                    KEY_SIZE_BITS,
+                    "RSA"
+            );
 
             final String encodedPublicKey = encodeToString(keyPair.getPublic());
             PublicKeyRecord publicKeyRecord = persistSigningKey(encodedPublicKey, SignatureAlgorithm.RS256);

@@ -1,4 +1,4 @@
-package com.payme.token_provider.model;
+package com.payme.token_service.model;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;

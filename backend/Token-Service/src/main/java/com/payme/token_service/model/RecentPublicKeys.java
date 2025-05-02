@@ -1,4 +1,4 @@
-package com.payme.token_provider.model;
+package com.payme.token_service.model;
 
 public record RecentPublicKeys(
         String currentPublicKey,

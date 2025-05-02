@@ -2,5 +2,20 @@ spring:
   profiles:
     active: dev
 
-jwt:
+token:
   issuer: token-provider
+  recipients:
+    user:
+      access-token:
+        validity-mins: 30
+        issue-at-delay-mins: 10
+      refresh-token:
+        validity-mins: 150
+        issue-at-delay-mins: 0
+    service:
+      access-token:
+        validity-mins: 90
+        issue-at-delay-mins: 0
+      refresh-token:
+        validity-mins: 150
+        issue-at-delay-mins: 0

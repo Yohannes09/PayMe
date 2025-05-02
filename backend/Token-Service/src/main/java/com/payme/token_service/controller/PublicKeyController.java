@@ -1,7 +1,7 @@
-package com.payme.token_provider.controller;
+package com.payme.token_service.controller;
 
-import com.payme.token_provider.component.SigningKeyManager;
-import com.payme.token_provider.model.RecentPublicKeys;
+import com.payme.token_service.component.signing_key.SigningKeyManager;
+import com.payme.token_service.model.RecentPublicKeys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

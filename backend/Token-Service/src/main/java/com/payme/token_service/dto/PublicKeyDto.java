@@ -1,5 +1,6 @@
 package com.payme.token_service.dto;
 
+import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.Nullable;
 
 /**
@@ -11,5 +12,7 @@ import jakarta.annotation.Nullable;
 public record PublicKeyDto(
         String currentPublicKey,
         @Nullable
-        String previousPublicKey
+        String previousPublicKey,
+        SignatureAlgorithm signatureAlgorithm,
+        String tokenIssuer
 ){}

@@ -1,5 +1,0 @@
-VOLATILE: This variable is shared between threads, don't cache
-in a thread's local memory. ALWAYS READ THE LATEST VALUE IN MEMORY.
-
-SYNCHRONIZED: Only one thread at a time can, execute a method or block
-for the same object.

@@ -5,6 +5,9 @@ spring:
     name: token-service
   datasource:
     driver-class-name: org.postgresql.Driver
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true # Prevents generating token if client sends invalid json properties.
 
 token:
   issuer: token-provider

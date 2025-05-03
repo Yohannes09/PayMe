@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "token.recipients.service")
-public class ServiceTokenProperties{
+public class ServiceTokenProperties {
     private TokenTimingProperties accessToken;
     private TokenTimingProperties refreshToken;
     private TokenTimingProperties initializationToken;

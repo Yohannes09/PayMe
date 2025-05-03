@@ -2,7 +2,7 @@ package com.payme.token_service.component.token;
 
 import com.payme.internal.constant.TokenType;
 import com.payme.token_service.component.signing_key.SigningKeyManager;
-import com.payme.token_service.component.token.properties.TokenProperties;
+import com.payme.token_service.component.token.properties.SharedTokenProperties;
 import com.payme.token_service.dto.TokenPairDto;
 import com.payme.token_service.entity.PublicKeyRecord;
 import com.payme.token_service.model.TokenSubject;
@@ -28,7 +28,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class TokenProvider {
     private final SigningKeyManager signingKeyManager;
-    private final TokenProperties tokenProperties;
+    private final SharedTokenProperties sharedTokenProperties;
 
 
     public TokenPairDto issueAccessAndRefreshTokens(
@@ -129,7 +129,7 @@ public class TokenProvider {
     ){
         Map<String, Object> claims = new HashMap<>();
 
-        claims.put("iss", tokenProperties.getIssuer());
+        claims.put("iss", sharedTokenProperties.getIssuer());
         claims.put("aud", "all-services"); // haven't thought out
         claims.put("rol", roles);
         claims.put("typ", tokenType);   // type: ACCESS, REFRESH, BOOTSTRAP

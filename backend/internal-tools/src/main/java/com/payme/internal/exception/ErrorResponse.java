@@ -1,17 +1,13 @@
 package com.payme.internal.exception;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Builder
-@Getter
-@AllArgsConstructor
-public class ErrorResponse {
-    private LocalDateTime errorTimestamp;
-    private String message;
-    private int statusCode;
-    private String requestPath;
-}
+public record ErrorResponse(
+        LocalDateTime errorTimestamp,
+        String message,
+        int statusCode,
+        String requestPath
+) {}

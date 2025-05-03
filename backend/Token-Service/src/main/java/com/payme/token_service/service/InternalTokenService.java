@@ -14,12 +14,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.util.Set;
 
+/**
+ *  Generates token for Microservices. ServiceTokenService unfortunately couldn't work as a name.*/
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class InternalTokenService {
     private static final String INITIALIZATION_SUBJECT = "INITIALIZATION_SUBJECT";
-    private static final int INITIALIZATION_TOKEN_DELAY_MS = 1000 * 10; // 10s
+    private static final int INITIALIZATION_TOKEN_DELAY_MS = 1000 * 7; // 7s
 
     private final TokenProvider tokenProvider;
     private final ServiceTokenProperties serviceTokenProperties;
@@ -27,13 +29,13 @@ public class InternalTokenService {
     /**
      * Issues a pair of tokens: an access token and refresh token, both valid immediately.
      */
-    public TokenPairDto issueAccessAndRefresh(String usernameOrId){
+    public TokenPairDto issueAccessAndRefresh(String serviceNameOrId){
         int accessTokenValidityMins = serviceTokenProperties.getAccessToken().getValidityMins();
         int refreshTokenValidityMins = serviceTokenProperties.getRefreshToken().getValidityMins();
 
-        log.info("Issued token pair for {}", usernameOrId);
+        log.info("Issued token pair for {}", serviceNameOrId);
         return tokenProvider.issueAccessAndRefreshTokens(
-                buildTokenSubject(usernameOrId),
+                buildTokenSubject(serviceNameOrId),
                 TokenRecipient.SERVICE.name(),
                 accessTokenValidityMins,
                 refreshTokenValidityMins
@@ -44,13 +46,13 @@ public class InternalTokenService {
     /**
      * Generates a new access token with no issuance delay.
      */
-    public String issueAccessToken(String usernameOrId){
+    public String issueAccessToken(String serviceNameOrId){
         int tokenValidityMins = serviceTokenProperties.getAccessToken().getValidityMins();
         int issueAtDelayMins = serviceTokenProperties.getAccessToken().getIssueAtDelayMins();
 
-        log.info("Issued access token for {}", usernameOrId);
+        log.info("Issued access token for {}", serviceNameOrId);
         return tokenProvider.issueCustomToken(
-                buildTokenSubject(usernameOrId),
+                buildTokenSubject(serviceNameOrId),
                 TokenType.ACCESS.name(),
                 TokenRecipient.SERVICE.name(),
                 tokenValidityMins,
@@ -66,9 +68,8 @@ public class InternalTokenService {
      */
     @Scheduled(initialDelay = INITIALIZATION_TOKEN_DELAY_MS)
     private void displayInitializationToken(){
-        System.out.println("********* Initialization token *********\n");
-        System.out.println(issueInitializationToken());
-        System.out.println("\n****************************************");
+        System.out.println("\nInitialization token: ");
+        System.out.println(issueInitializationToken() + "\n");
     }
 
     /**
@@ -88,9 +89,9 @@ public class InternalTokenService {
 
     }
 
-    private TokenSubject buildTokenSubject(String usernameOrId){
+    private TokenSubject buildTokenSubject(String serviceNameOrId){
         return new ServiceTokenSubject(
-                usernameOrId,
+                serviceNameOrId,
                 Set.of(PaymeRoles.SERVICE.name())
         );
     }

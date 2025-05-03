@@ -13,6 +13,6 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "jwt")
-public class TokenProperties {
+public class SharedTokenProperties {
     private String issuer;
 }

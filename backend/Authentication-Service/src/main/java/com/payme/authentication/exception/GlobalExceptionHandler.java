@@ -1,5 +1,6 @@
 package com.payme.authentication.exception;
 
+import com.payme.common.exception.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -63,8 +64,8 @@ public class GlobalExceptionHandler {
     private ResponseEntity<ErrorResponse> generateErrorResponse(
             RuntimeException runtimeException,
             HttpServletRequest request,
-            HttpStatus status){
-
+            HttpStatus status
+    ){
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .errorTimestamp(LocalDateTime.now())
                 .message(runtimeException.getMessage())

@@ -3,17 +3,15 @@ package com.payme.token_service.service;
 import com.payme.internal.constant.TokenRecipient;
 import com.payme.internal.constant.TokenType;
 import com.payme.token_service.component.token.TokenProvider;
-import com.payme.token_service.component.token.properties.TokenProperties;
 import com.payme.token_service.component.token.properties.UserTokenProperties;
 import com.payme.token_service.dto.TokenPairDto;
-import com.payme.token_service.model.ServiceTokenSubject;
+import com.payme.token_service.dto.UserTokenDto;
 import com.payme.token_service.model.TokenSubject;
+import com.payme.token_service.model.UserTokenSubject;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.Set;
 
 /**
  * Service responsible for issuing JWT access and refresh tokens for users.
@@ -31,14 +29,16 @@ public class UserTokenService {
     /**
      * Issues a pair of tokens: an access token and refresh token, both valid immediately.
      */
-    public TokenPairDto issueAccessAndRefresh(@Valid TokenSubject tokenSubject){
+    public TokenPairDto issueAccessAndRefresh(@Valid UserTokenDto userTokenDto){
+        TokenSubject tokenSubject = mapRequestToTokenSubject(userTokenDto);
+
         int accessTokenValidityMins = userTokenProperties.getAccessToken().getValidityMins();
         int refreshTokenValidityMins = userTokenProperties.getRefreshToken().getValidityMins();
 
         log.info("Issued token pair for {}", tokenSubject.getUsernameOrId());
         return tokenProvider.issueAccessAndRefreshTokens(
                 tokenSubject,
-                TokenRecipient.USER.name(),
+                TokenRecipient.USER.toString(),
                 accessTokenValidityMins,
                 refreshTokenValidityMins
         );
@@ -50,7 +50,9 @@ public class UserTokenService {
      * <p>This is prepared slightly in advance to reduce client latency and avoid overlapping
      * refresh calls, while still maximizing token lifetime.</p>
      */
-    public String issueAccessToken(@Valid TokenSubject tokenSubject){
+    public String issueAccessToken(UserTokenDto userTokenDto){
+        TokenSubject tokenSubject = mapRequestToTokenSubject(userTokenDto);
+
         int accessTokenValidityMins = userTokenProperties.getAccessToken().getValidityMins();
         int accessTokenIssueAtDelayMins = userTokenProperties.getAccessToken().getIssueAtDelayMins();
 
@@ -58,10 +60,15 @@ public class UserTokenService {
         return tokenProvider.issueCustomToken(
                 tokenSubject,
                 TokenType.ACCESS.name(),
-                TokenRecipient.USER.name(),
+                TokenRecipient.USER.toString(),
                 accessTokenValidityMins,
                 accessTokenIssueAtDelayMins
         );
+    }
+
+
+    private TokenSubject mapRequestToTokenSubject(UserTokenDto userTokenDto){
+        return new UserTokenSubject(userTokenDto.usernameOrId(), userTokenDto.roles());
     }
 
 }

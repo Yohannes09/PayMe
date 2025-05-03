@@ -1,5 +1,6 @@
 package com.payme.token_service.component.signing_key;
 
+import com.payme.token_service.component.token.properties.SharedTokenProperties;
 import com.payme.token_service.data_structure.PublicKeyHistory;
 import com.payme.token_service.dto.PublicKeyDto;
 import com.payme.token_service.exception.KeyInitializationException;
@@ -41,6 +42,7 @@ public class SigningKeyManager {
 
     private final PublicKeyRecordRepository publicKeyRecordRepository;
     private final PublicKeyHistory publicKeyHistory;
+    private final SharedTokenProperties sharedTokenProperties;
 
     private volatile ActiveSigningKey activeSigningKey;
 
@@ -94,8 +96,11 @@ public class SigningKeyManager {
         RecentPublicKeys recentPublicKeys = getCurrentAndPreviousPublicKeys();
         return new PublicKeyDto(
                 recentPublicKeys.currentPublicKey(),
-                recentPublicKeys.previousPublicKey()
+                recentPublicKeys.previousPublicKey(),
+                getActiveSigningKey().getSignatureAlgorithm(),
+                sharedTokenProperties.getIssuer()
         );
+
     }
 
 

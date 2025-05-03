@@ -1,12 +1,11 @@
-
 server:
   port: 8080
 
 spring:
-  application:
-    name: token-provider
-  profile:
-    active: dev
+  datasource:
+    url: jdbc:postgres://token-provider-db:5432/token_service_db
+    username: user
+    password: 1234
   jpa:
     hibernate:
       ddl-auto: update
@@ -17,9 +16,15 @@ spring:
 internal:
   endpoints:
     public-key: /api/v1/public-key
-    access-token: /api/v1/access-token
-    refresh-token: /api/v1/refresh-token
+    user:
+      access-and-refresh-token: /api/v1/user/access-refresh-token
+      access-token: /api/v1/user/access-token
+      refresh-token: /api/v1/user/refresh-token
+    service:
+      access-and-refresh-token: /api/v1/service/access-refresh-token
+      access-token: /api/v1/service/access-token
+      refresh-token: /api/v1/service/refresh-token
 
-DB_USER: ${DB_USER}
-DB_PASSWORD: ${DB_PASSWORD}
-DB_URL: ${DB_URL}
+#DB_USER: ${DB_USER}
+#DB_PASSWORD: ${DB_PASSWORD}
+#DB_URL: ${DB_URL}

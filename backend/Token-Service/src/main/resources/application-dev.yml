@@ -1,10 +1,11 @@
-
 server:
   port: 8090
 
 spring:
-  application:
-    name: token-provider
+  datasource:
+    url: jdbc:postgresql://localhost:5432/test
+    username: postgres
+    password:
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -15,9 +16,12 @@ spring:
 internal:
   endpoints:
     public-key: /public-key
-    access-token: /access-token
-    refresh-token: /refresh-token
+    user:
+      access-and-refresh-token: /user/access-refresh-token
+      access-token: /user/access-token
+      refresh-token: /user/refresh-token
+    service:
+      access-and-refresh-token: /service/access-refresh-token
+      access-token: /service/access-token
+      refresh-token: /service/refresh-token
 
-DB_USER: postgres
-DB_PASSWORD:
-DB_URL: jdbc:postgresql://localhost:5432/test

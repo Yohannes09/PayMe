@@ -1,6 +1,6 @@
 package com.payme.token_service.component.token;
 
-import com.payme.common.constants.TokenType;
+import com.payme.internal.constant.TokenType;
 import com.payme.token_service.component.signing_key.SigningKeyManager;
 import com.payme.token_service.component.token.properties.TokenProperties;
 import com.payme.token_service.dto.TokenPairDto;
@@ -58,15 +58,16 @@ public class TokenProvider {
         return new TokenPairDto(accessToken, refreshToken);
     }
 
-    public String issueAccessToken(
+    public String issueCustomToken(
             TokenSubject tokenSubject,
+            String tokenType,
             String tokenRecipient,
             int accessTokenValidityMins,
             int issuedAtDelayMins
     ){
         return buildTokenWithClaims(
                 tokenSubject,
-                TokenType.ACCESS.name(),
+                tokenType,
                 tokenRecipient,
                 accessTokenValidityMins,
                 issuedAtDelayMins

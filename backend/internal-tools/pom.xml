@@ -4,11 +4,11 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.library</groupId>
-  <artifactId>internal-libs</artifactId>
+  <groupId>com.payme</groupId>
+  <artifactId>internal-tools</artifactId>
   <packaging>jar</packaging>
   <version>1.0.0</version>
-  <name>internal-libs</name>
+  <name>internal-tools</name>
   <url>http://maven.apache.org</url>
 
   <properties>

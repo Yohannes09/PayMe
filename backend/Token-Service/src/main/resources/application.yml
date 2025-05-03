@@ -1,6 +1,10 @@
 spring:
   profiles:
     active: dev
+  application:
+    name: token-service
+  datasource:
+    driver-class-name: org.postgresql.Driver
 
 token:
   issuer: token-provider
@@ -19,3 +23,7 @@ token:
       refresh-token:
         validity-mins: 150
         issue-at-delay-mins: 0
+      initialization-token:
+        validity-mins: 1440
+        issue-at-delay-mins: 0
+

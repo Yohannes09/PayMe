@@ -1,7 +1,8 @@
 package com.payme.token_service.component.token.properties;
 
-import com.payme.token_service.component.token.properties.models.TokenTiminigProperties;
+import com.payme.token_service.component.token.properties.models.TokenTimingProperties;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -11,8 +12,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Getter
+@Setter
 @ConfigurationProperties(prefix = "token.recipients.service")
-public class ServiceTokenProperties extends TokenProperties{
-    private TokenTiminigProperties accessToken;
-    private TokenTiminigProperties refreshToken;
+public class ServiceTokenProperties{
+    private TokenTimingProperties accessToken;
+    private TokenTimingProperties refreshToken;
+    private TokenTimingProperties initializationToken;
 }

@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.payme</groupId>
-	<artifactId>token-provider</artifactId>
+	<artifactId>token-service</artifactId>
 	<version>1.0.0</version>
-	<name>token-provider</name>
-	<description>Token provider used for authentication purposes. </description>
+	<name>token-service</name>
+	<description>Token provider used to authenticate requests. </description>
 	<url/>
 	<licenses>
 		<license/>
@@ -100,8 +100,8 @@
 
 		<dependency>
 			<groupId>com.payme</groupId>
-			<artifactId>common-models</artifactId>
-			<version>1.0.1</version>
+			<artifactId>internal-tools</artifactId>
+			<version>1.0.0</version>
 		</dependency>
 
 	</dependencies>

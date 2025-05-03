@@ -4,12 +4,13 @@ import com.payme.token_service.data_structure.PublicKeyHistory;
 import com.payme.token_service.dto.PublicKeyDto;
 import com.payme.token_service.exception.KeyInitializationException;
 import com.payme.token_service.model.RecentPublicKeys;
-import com.payme.token_service.repository.SigningKeyRepository;
+import com.payme.token_service.repository.PublicKeyRecordRepository;
 import com.payme.token_service.entity.PublicKeyRecord;
 import com.payme.token_service.util.KeyPairProvider;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.repository.cdi.Eager;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -29,8 +30,8 @@ import java.util.List;
  *
  * <li>Keys are persisted for traceability.</li>
  */
-@Slf4j
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class SigningKeyManager {
     private static final int MINUTE_IN_MS = 1000 * 60;
@@ -38,7 +39,7 @@ public class SigningKeyManager {
     private static final int KEY_SIZE_BITS = 2048;
     private static final int KEY_VALIDITY_MINUTES = 30;
 
-    private final SigningKeyRepository signingKeyRepository;
+    private final PublicKeyRecordRepository publicKeyRecordRepository;
     private final PublicKeyHistory publicKeyHistory;
 
     private volatile ActiveSigningKey activeSigningKey;
@@ -129,7 +130,7 @@ public class SigningKeyManager {
                 .expiresAt(LocalDateTime.now().plusMinutes(KEY_VALIDITY_MINUTES))
                 .signatureAlgorithm(signatureAlgorithm)
                 .build();
-        return signingKeyRepository.save(publicKeyRecord);
+        return publicKeyRecordRepository.save(publicKeyRecord);
     }
 
     // PublicKey and PrivateKey extend AsymmetricKey

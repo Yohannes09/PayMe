@@ -1,16 +1,19 @@
 package com.payme.token_service.service;
 
-import com.payme.common.constants.TokenRecipient;
-import com.payme.common.constants.TokenType;
+import com.payme.internal.constant.TokenRecipient;
+import com.payme.internal.constant.TokenType;
 import com.payme.token_service.component.token.TokenProvider;
 import com.payme.token_service.component.token.properties.TokenProperties;
 import com.payme.token_service.component.token.properties.UserTokenProperties;
 import com.payme.token_service.dto.TokenPairDto;
+import com.payme.token_service.model.ServiceTokenSubject;
 import com.payme.token_service.model.TokenSubject;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 /**
  * Service responsible for issuing JWT access and refresh tokens for users.
@@ -52,8 +55,9 @@ public class UserTokenService {
         int accessTokenIssueAtDelayMins = userTokenProperties.getAccessToken().getIssueAtDelayMins();
 
         log.info("Issued access token for {}", tokenSubject.getUsernameOrId());
-        return tokenProvider.issueAccessToken(
+        return tokenProvider.issueCustomToken(
                 tokenSubject,
+                TokenType.ACCESS.name(),
                 TokenRecipient.USER.name(),
                 accessTokenValidityMins,
                 accessTokenIssueAtDelayMins

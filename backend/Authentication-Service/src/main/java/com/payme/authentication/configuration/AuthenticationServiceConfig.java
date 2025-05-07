@@ -62,8 +62,8 @@ public class AuthenticationServiceConfig {
 
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtService jwtService){
-        return new JwtAuthenticationFilter(jwtService, userDetailsService());
+    public AuthenticationFilterConfig jwtAuthenticationFilter(JwtService jwtService){
+        return new AuthenticationFilterConfig(jwtService, userDetailsService());
     }
 
 

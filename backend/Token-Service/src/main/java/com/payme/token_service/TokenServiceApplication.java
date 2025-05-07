@@ -6,10 +6,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
 @SpringBootApplication
-public class TokenProviderApplication {
+public class TokenServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(TokenProviderApplication.class, args);
+		SpringApplication.run(TokenServiceApplication.class, args);
 	}
 
 }

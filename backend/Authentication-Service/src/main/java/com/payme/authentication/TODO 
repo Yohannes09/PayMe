@@ -1,0 +1,14 @@
+GENERAL:
+- Massive rework, specifically, validation logic
+  and separation of concerns.
+- Fix naming of variables, and classes.
+- Remove unused services, entities, etc.
+- Implement new logic that fetches token
+  from TokenService
+- Add feature that fetches auth and refresh
+  tokens for this service, using TokenService's
+  initialization token.
+- Create Indexes for DB
+
+TESTING:
+- ensure you cannot register with "    " (any blank credential)

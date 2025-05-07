@@ -6,6 +6,7 @@ import com.payme.authentication.exception.BadRequestException;
 import com.payme.authentication.exception.CredentialUpdateException;
 import com.payme.authentication.exception.SecurityUserNotFoundException;
 import com.payme.authentication.repository.SecurityUserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,22 +17,16 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+@Service
 @Slf4j
 @Lazy
-@Service
+@RequiredArgsConstructor
 public class CredentialService {
     private final static String ERROR_MESSAGE = "FAILED CREDENTIAL UPDATE:";
 
     private final SecurityUserRepository securityUserRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public CredentialService(
-            SecurityUserRepository securityUserRepository,
-            PasswordEncoder passwordEncoder
-    ) {
-        this.securityUserRepository = securityUserRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
 
 
     @Transactional
@@ -112,6 +107,8 @@ public class CredentialService {
                 .orElseThrow(() -> new SecurityUserNotFoundException("User not found ID: " + id));
     }
 
+    // Remove this method. Client sends DTO that will validate what they want to change.
+    //
     private void validateCredential(
             SecurityUser securityUser,
             String newCredential,
@@ -138,6 +135,7 @@ public class CredentialService {
 
     }
 
+    // this is updating and persisting, naming is off.
     private <T> void updateCredential(
             SecurityUser securityUser,
             String newCredential,

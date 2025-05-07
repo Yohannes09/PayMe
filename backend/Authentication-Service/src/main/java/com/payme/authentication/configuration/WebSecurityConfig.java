@@ -20,12 +20,12 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig{
+public class WebSecurityConfig {
     private final AuthenticationProvider authenticationProvider;
 
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationFilterConfig authenticationFilterConfig) throws Exception {
 
         http
                 .cors(cors-> cors.configurationSource(corsConfigurationSource()))
@@ -38,7 +38,7 @@ public class SecurityConfig{
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(authenticationFilterConfig, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

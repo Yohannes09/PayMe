@@ -1,36 +1,14 @@
 package com.payme.tests.service;
 
 import com.payme.authentication.PaymeApplication;
-import com.payme.authentication.repository.TokenRepository;
-import com.payme.authentication.dto.LoginDto;
-import com.payme.authentication.dto.RegisterDto;
-import com.payme.authentication.entity.Token;
-import com.payme.authentication.service.auth.JwtAuthenticationService;
 import com.payme.authentication.service.token.JwtService;
-import com.payme.authentication.constant.PaymeRoles;
-import com.payme.authentication.entity.Role;
 
-import com.payme.authentication.exception.DuplicateCredentialException;
-import com.payme.authentication.repository.RoleRepository;
-import com.payme.tests.MockedUsers;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
 
 @Slf4j
 @SpringBootTest(classes = PaymeApplication.class)

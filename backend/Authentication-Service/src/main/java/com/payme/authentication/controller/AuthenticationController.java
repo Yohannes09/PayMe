@@ -33,17 +33,6 @@ public class AuthenticationController {
     }
 
 
-    // Endpoint that exposes Jwt secret-key if provided a valid API-key.
-    // For now, keeping this simple.
-    @GetMapping("/public-key")
-    public ResponseEntity<String> getPublicKey(@RequestHeader("api-key") String apiKey){
-        if(!gatewayApiKey.equals(apiKey)){
-            return ResponseEntity.status(403).body("FORBIDDEN");
-        }
-        log.info("Gateway successfully retrieved backend jwt secret. ");
-        return ResponseEntity.ok(jwtSecret);
-    }
-
     @PostMapping(path = "/login")
     public ResponseEntity<AuthenticationResponseDto> login(@Valid @RequestBody LoginDto loginDto){
         log.info("New login by user: {}", loginDto.usernameOrEmail());

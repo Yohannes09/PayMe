@@ -20,14 +20,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
- * Recall, {@code JwtAuthenticationFilter} is the first part
+ * Recall, {@code AuthenticationFilterConfig} is the first part
  * of the authentication process.
  * Internally It calls {@code JwtService} to extract the information
  */
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class AuthenticationFilterConfig extends OncePerRequestFilter {
     private static final String AUTH_HEADER = "Authorization";
 
     private final JwtService jwtService;

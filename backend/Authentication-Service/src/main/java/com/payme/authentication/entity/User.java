@@ -1,11 +1,9 @@
 package com.payme.authentication.entity;
 
-import com.payme.authentication.constant.ValidationPattern;
+import com.payme.authentication.constant.ValidationConstants;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,18 +23,18 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Entity
 @Table(name = "security_user")
-public class SecurityUser implements UserDetails {
+public class User implements UserDetails {
     @Id
     private UUID id;
 
-    @Pattern(regexp = ValidationPattern.USERNAME_PATTERN)
+    @Pattern(regexp = ValidationConstants.USERNAME_PATTERN)
     @Column(unique = true, nullable = false)
     private String username;
 
-    @Pattern(regexp = ValidationPattern.PASSWORD_PATTERN)
+    @Pattern(regexp = ValidationConstants.PASSWORD_PATTERN)
     private String password;
 
-    @Email(message = ValidationPattern.EMAIL_VALIDATION_MESSAGE)
+    @Email(message = ValidationConstants.EMAIL_VALIDATION_MESSAGE)
     @Column(unique = true, nullable = false)
     private String email;
 
@@ -49,7 +47,7 @@ public class SecurityUser implements UserDetails {
     private Set<Role> roles;
 
     @OneToMany(
-            mappedBy = "securityUser",
+            mappedBy = "user",
             cascade = CascadeType.ALL,
             fetch = FetchType.LAZY
     )

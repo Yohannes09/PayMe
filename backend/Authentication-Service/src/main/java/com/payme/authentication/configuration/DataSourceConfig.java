@@ -11,7 +11,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @Profile("prod")
-public class DatabaseConfig {
+public class DataSourceConfig {
 
     @Bean
     public DataSource postgresDataSource(){

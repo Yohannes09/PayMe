@@ -29,9 +29,9 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST
         );
     }
-    @ExceptionHandler(SecurityUserNotFoundException.class)
+    @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUserNotFoundException
-            (SecurityUserNotFoundException exception, HttpServletRequest request){
+            (UserNotFoundException exception, HttpServletRequest request){
 
         log.warn("User not found: {}", exception.getMessage());
 

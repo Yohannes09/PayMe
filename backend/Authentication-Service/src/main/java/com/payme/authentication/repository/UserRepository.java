@@ -1,6 +1,6 @@
 package com.payme.authentication.repository;
 
-import com.payme.authentication.entity.SecurityUser;
+import com.payme.authentication.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -8,14 +8,14 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface SecurityUserRepository extends JpaRepository<SecurityUser, UUID> {
+public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Query("""
             SELECT user FROM SecurityUser user
             WHERE LOWER(user.username) = LOWER(:usernameOrEmail)
             OR LOWER(user.email) = LOWER(:usernameOrEmail)
             """)
-    Optional<SecurityUser> findByUsernameOrEmail(
+    Optional<User> findByUsernameOrEmail(
             @Param("usernameOrEmail") String usernameOrEmail
     );
 

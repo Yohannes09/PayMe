@@ -1,8 +1,8 @@
 package com.payme.authentication.configuration;
 
-import com.payme.authentication.repository.SecurityUserRepository;
+import com.payme.authentication.repository.UserRepository;
 import com.payme.authentication.service.token.JwtService;
-import com.payme.authentication.exception.SecurityUserNotFoundException;
+import com.payme.authentication.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Component
 public class AuthenticationServiceConfig {
-    private final SecurityUserRepository securityUserRepository;
+    private final UserRepository userRepository;
 
 
     /**
@@ -43,9 +43,9 @@ public class AuthenticationServiceConfig {
      */
     @Bean
     public UserDetailsService userDetailsService(){
-        return usernameOrEmail -> securityUserRepository
+        return usernameOrEmail -> userRepository
                 .findByUsernameOrEmail(usernameOrEmail)
-                .orElseThrow(() -> new SecurityUserNotFoundException("Could not authenticate user: " + usernameOrEmail));
+                .orElseThrow(() -> new UserNotFoundException("Could not authenticate user: " + usernameOrEmail));
     }
 
 

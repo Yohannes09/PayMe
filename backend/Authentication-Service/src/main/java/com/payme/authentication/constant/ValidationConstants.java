@@ -1,6 +1,6 @@
 package com.payme.authentication.constant;
 
-public class ValidationPattern {
+public class ValidationConstants {
 
     public static final String USERNAME_PATTERN = "^[a-zA-Z0-9]{5,15}$";
     public static final String USERNAME_VALIDATION_MESSAGE = "Username should be 5-15 characters long with no special symbols.";

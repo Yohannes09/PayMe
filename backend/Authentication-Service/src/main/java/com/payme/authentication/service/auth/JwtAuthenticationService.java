@@ -1,9 +1,9 @@
 package com.payme.authentication.service.auth;
 
-import com.payme.authentication.entity.SecurityUser;
+import com.payme.authentication.entity.User;
 import com.payme.authentication.entity.Role;
-import com.payme.authentication.service.SecurityUserService;
-import com.payme.authentication.service.RoleService;
+import com.payme.authentication.service.UserService;
+import com.payme.authentication.components.RoleProvider;
 import com.payme.authentication.constant.PaymeRoles;
 import com.payme.authentication.dto.AuthenticationResponseDto;
 import com.payme.authentication.dto.LoginDto;
@@ -29,8 +29,8 @@ import java.util.*;
 @RequiredArgsConstructor
 @Qualifier("JwtAuthenticationService")
 public class JwtAuthenticationService implements AuthenticationService {
-    private final RoleService roleService;
-    private final SecurityUserService userService;
+    private final RoleProvider roleProvider;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
@@ -42,17 +42,17 @@ public class JwtAuthenticationService implements AuthenticationService {
             throw new DuplicateCredentialException("Username or email already in use. ");
         }
 
-        SecurityUser user = createNewUserWithRoles(registerDto);
+        User user = createNewUserWithRoles(registerDto);
         log.info("User registered successfully: {}", user.getUsername());
     }
 
 
     @Override
     public AuthenticationResponseDto login(@Valid LoginDto loginDto) {
-        SecurityUser authenticatedUser = authenticate(loginDto);
+        User user = authenticate(loginDto);
 
 
-        log.info("Successful login for ID: {}", authenticatedUser.getId());
+        log.info("Successful login for ID: {}", user.getId());
         return null;
     }
 
@@ -62,7 +62,7 @@ public class JwtAuthenticationService implements AuthenticationService {
     }
 
 
-    private SecurityUser authenticate(LoginDto loginCredentials){
+    private User authenticate(LoginDto loginCredentials){
         String credential = Optional.ofNullable(loginCredentials.usernameOrEmail()).orElse("");
         log.info("Authenticating user : {}", credential);
 
@@ -74,7 +74,7 @@ public class JwtAuthenticationService implements AuthenticationService {
                     )
             );
 
-            return (SecurityUser) authentication.getPrincipal();
+            return (User) authentication.getPrincipal();
         }catch (BadCredentialsException e){
             throw new BadCredentialsException(credential + " provided bad credentials");
         }catch (DisabledException e){
@@ -83,12 +83,12 @@ public class JwtAuthenticationService implements AuthenticationService {
 
     }
 
-    private SecurityUser createNewUserWithRoles(RegisterDto registerDto){
+    private User createNewUserWithRoles(RegisterDto registerDto){
         Set<Role> defaultRoles = new HashSet<>();
-        Role userRole = roleService.findRole(PaymeRoles.USER);
+        Role userRole = roleProvider.findRole(PaymeRoles.USER);
         defaultRoles.add(userRole);
 
-        return userService.createNewSecurityUser(
+        return userService.createNewUser(
                 registerDto.username(),
                 registerDto.email(),
                 passwordEncoder.encode(registerDto.password()),

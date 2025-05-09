@@ -1,29 +1,33 @@
-package com.payme.authentication.service;
+package com.payme.authentication.components;
 
 import com.payme.authentication.constant.PaymeRoles;
 import com.payme.authentication.entity.Role;
 import com.payme.authentication.exception.RoleNotFoundException;
 import com.payme.authentication.repository.RoleRepository;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-/* Instead of looking up a role from the db each time, cache it locally
-*  AuthServices no longer have to look up roles from the db when registering.
-*  */
-
+/**
+ * Provides access to application roles and ensures their presence at startup.
+ * <p>
+ * On initialization, this class loads all predefined {@link PaymeRoles} into the database
+ * (if missing) and caches them for fast retrieval.
+ * </p>
+ *
+ * <p>Use {@link #findRole(PaymeRoles)} to fetch a role from the in-memory cache.</p>
+ *
+ */
+@Component
 @Slf4j
-@Service
-public class RoleService {
+@RequiredArgsConstructor
+public class RoleProvider {
     private final RoleRepository roleRepository;
     private final Map<PaymeRoles, Role> roleCache = new HashMap<>();
-
-    public RoleService(RoleRepository roleRepository) {
-        this.roleRepository = roleRepository;
-    }
 
 
     @PostConstruct

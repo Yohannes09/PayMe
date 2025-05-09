@@ -1,7 +1,7 @@
 //package com.payme.tests.repository;
 //
 //import com.payme.authentication.PaymeApplication;
-//import com.payme.authentication.repository.SecurityUserRepository;
+//import com.payme.authentication.repository.UserRepository;
 //import lombok.extern.slf4j.Slf4j;
 //import org.junit.jupiter.api.AfterEach;
 //import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +21,7 @@
 //public class UserRepositoryTests {
 //
 //    @Autowired
-//    private SecurityUserRepository securityUserRepository;
+//    private UserRepository securityUserRepository;
 //
 //    @BeforeEach
 //    void setUp(){

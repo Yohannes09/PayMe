@@ -1,11 +1,11 @@
 package com.payme.authentication.service;
 
-import com.payme.authentication.configuration.RestClientConfig;
+import com.payme.authentication.components.TokenServiceClient;
 import com.payme.authentication.entity.Role;
-import com.payme.authentication.entity.SecurityUser;
+import com.payme.authentication.entity.User;
 import com.payme.authentication.exception.BadRequestException;
-import com.payme.authentication.exception.SecurityUserNotFoundException;
-import com.payme.authentication.repository.SecurityUserRepository;
+import com.payme.authentication.exception.UserNotFoundException;
+import com.payme.authentication.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -21,33 +21,33 @@ import java.util.UUID;
 @Transactional
 @Validated
 @Service
-public class SecurityUserService {
-    private final SecurityUserRepository securityUserRepository;
+public class UserService {
+    private final UserRepository userRepository;
     private final RestClient restClient;
-    private final RestClientConfig restClientConfig;
+    private final TokenServiceClient tokenServiceClient;
     private final String userServiceUrl;
     private final String userEndpoint;
 
-    public SecurityUserService(
-            SecurityUserRepository securityUserRepository,
+    public UserService(
+            UserRepository userRepository,
             RestClient restClient,
-            RestClientConfig restClientConfig
+            TokenServiceClient tokenServiceClient
     ) {
-        this.securityUserRepository = securityUserRepository;
+        this.userRepository = userRepository;
         this.restClient = restClient;
-        this.restClientConfig = restClientConfig;
-        this.userServiceUrl = restClientConfig.getBaseUrl();
-        this.userEndpoint = restClientConfig.getUserEndpoint();
+        this.tokenServiceClient = tokenServiceClient;
+        this.userServiceUrl = tokenServiceClient.getBaseUrl();
+        this.userEndpoint = tokenServiceClient.getUserEndpoint();
     }
 
     @Transactional
-    public SecurityUser createNewSecurityUser(
+    public User createNewUser(
             String username,
             String email,
             String password,
             Set<Role> roles
     ) {
-        SecurityUser securityUser = SecurityUser.builder()
+        User user = User.builder()
                 .username(username)
                 .email(email)
                 .password(password)
@@ -58,17 +58,17 @@ public class SecurityUserService {
                 .enabled(false)
                 .build();
 
-        SecurityUser savedSecurityUser = securityUserRepository.save(securityUser);
-        newUserPostRequest(savedSecurityUser.getId());
-        return savedSecurityUser;
+        User savedUser = userRepository.save(user);
+        newUserPostRequest(savedUser.getId());
+        return savedUser;
     }
 
     // map to dto and return a dto
-    public SecurityUser findById(UUID userId){
+    public User findById(UUID userId){
         log.info("User fetched with ID: {}", userId);
-        return securityUserRepository
+        return userRepository
                 .findById(userId)
-                .orElseThrow(()-> new SecurityUserNotFoundException("User with ID " + userId + " not found. "));
+                .orElseThrow(()-> new UserNotFoundException("User with ID " + userId + " not found. "));
     }
 
     public boolean isUsernameOrEmailTaken(String username, String email) {
@@ -79,13 +79,13 @@ public class SecurityUserService {
             throw new BadRequestException("");
         }
         if(isUsernamePresent && isEmailPresent) {
-            return securityUserRepository.existsByUsernameOrEmail(username, email);
+            return userRepository.existsByUsernameOrEmail(username, email);
         }
         if(isUsernamePresent) {
-            return securityUserRepository.existsByUsernameIgnoreCase(username);
+            return userRepository.existsByUsernameIgnoreCase(username);
         }
         if(isEmailPresent) {
-            return securityUserRepository.existsByEmailIgnoreCase(email);
+            return userRepository.existsByEmailIgnoreCase(email);
         }
 
         return true;

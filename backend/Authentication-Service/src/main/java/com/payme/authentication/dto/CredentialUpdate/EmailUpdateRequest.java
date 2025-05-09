@@ -1,4 +1,4 @@
-package com.payme.authentication.dto.expiremental;
+package com.payme.authentication.dto.CredentialUpdate;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -12,16 +12,4 @@ public record EmailUpdateRequest(
         @NotBlank
         @Email
         String newEmail
-) implements CredentialUpdateRequest {
-
-    @Override
-    public UUID getId() {
-        return id;
-    }
-
-    @Override
-    public String getNewCredential() {
-        return newEmail;
-    }
-
-}
+){}

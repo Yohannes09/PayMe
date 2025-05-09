@@ -1,7 +1,6 @@
 package com.payme.internal;
 
-import com.payme.internal.token.TokenResolver;
-import io.jsonwebtoken.Claims;
+import com.payme.internal.security.token.TokenResolver;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;

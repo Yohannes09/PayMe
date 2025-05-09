@@ -1,9 +1,9 @@
 package com.payme.token_service.config;
 
-import com.payme.internal.constant.PaymeRoles;
-import com.payme.internal.constant.TokenRecipient;
-import com.payme.internal.constant.TokenType;
-import com.payme.internal.token.ServiceTokenValidator;
+import com.payme.internal.security.constant.PaymeRoles;
+import com.payme.internal.security.constant.TokenRecipient;
+import com.payme.internal.security.constant.TokenType;
+import com.payme.internal.security.token.ServiceTokenValidator;
 import com.payme.token_service.component.token.properties.SharedTokenProperties;
 import com.payme.token_service.data_structure.PublicKeyHistory;
 import lombok.RequiredArgsConstructor;

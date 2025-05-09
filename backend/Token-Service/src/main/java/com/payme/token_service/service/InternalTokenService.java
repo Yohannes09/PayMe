@@ -1,13 +1,13 @@
 package com.payme.token_service.service;
 
-import com.payme.internal.constant.PaymeRoles;
-import com.payme.internal.constant.TokenRecipient;
-import com.payme.internal.constant.TokenType;
+import com.payme.internal.security.constant.PaymeRoles;
+import com.payme.internal.security.constant.TokenRecipient;
+import com.payme.internal.security.constant.TokenType;
 import com.payme.token_service.component.token.TokenProvider;
 import com.payme.token_service.component.token.properties.ServiceTokenProperties;
-import com.payme.token_service.dto.TokenPairDto;
-import com.payme.token_service.model.ServiceTokenSubject;
-import com.payme.token_service.model.TokenSubject;
+import com.payme.internal.security.dto.TokenPairResponseDto;
+import com.payme.internal.security.model.ServiceTokenSubject;
+import com.payme.internal.security.model.TokenSubject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -29,7 +29,7 @@ public class InternalTokenService {
     /**
      * Issues a pair of tokens: an access token and refresh token, both valid immediately.
      */
-    public TokenPairDto issueAccessAndRefresh(String serviceNameOrId){
+    public TokenPairResponseDto issueAccessAndRefresh(String serviceNameOrId){
         int accessTokenValidityMins = serviceTokenProperties.getAccessToken().getValidityMins();
         int refreshTokenValidityMins = serviceTokenProperties.getRefreshToken().getValidityMins();
 

@@ -1,11 +1,11 @@
 package com.payme.token_service.component.token;
 
-import com.payme.internal.constant.TokenType;
+import com.payme.internal.security.constant.TokenType;
 import com.payme.token_service.component.signing_key.SigningKeyManager;
 import com.payme.token_service.component.token.properties.SharedTokenProperties;
-import com.payme.token_service.dto.TokenPairDto;
+import com.payme.internal.security.dto.TokenPairResponseDto;
 import com.payme.token_service.entity.PublicKeyRecord;
-import com.payme.token_service.model.TokenSubject;
+import com.payme.internal.security.model.TokenSubject;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -31,7 +31,7 @@ public class TokenProvider {
     private final SharedTokenProperties sharedTokenProperties;
 
 
-    public TokenPairDto issueAccessAndRefreshTokens(
+    public TokenPairResponseDto issueAccessAndRefreshTokens(
             TokenSubject tokenSubject,
             String tokenRecipient,
             int accessTokenValidityMins,
@@ -55,7 +55,7 @@ public class TokenProvider {
                 issuedAtDelayMins
         );
 
-        return new TokenPairDto(accessToken, refreshToken);
+        return new TokenPairResponseDto(accessToken, refreshToken);
     }
 
     public String issueCustomToken(

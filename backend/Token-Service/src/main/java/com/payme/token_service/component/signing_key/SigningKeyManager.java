@@ -2,16 +2,15 @@ package com.payme.token_service.component.signing_key;
 
 import com.payme.token_service.component.token.properties.SharedTokenProperties;
 import com.payme.token_service.data_structure.PublicKeyHistory;
-import com.payme.token_service.dto.PublicKeyDto;
+import com.payme.internal.security.dto.PublicKeyResponseDto;
 import com.payme.token_service.exception.KeyInitializationException;
-import com.payme.token_service.model.RecentPublicKeys;
+import com.payme.internal.security.model.RecentPublicKeys;
 import com.payme.token_service.repository.PublicKeyRecordRepository;
 import com.payme.token_service.entity.PublicKeyRecord;
 import com.payme.token_service.util.KeyPairProvider;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.repository.cdi.Eager;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -92,9 +91,9 @@ public class SigningKeyManager {
     }
 
     // Client response
-    public PublicKeyDto getPublicKeyResponse(){
+    public PublicKeyResponseDto getPublicKeyResponse(){
         RecentPublicKeys recentPublicKeys = getCurrentAndPreviousPublicKeys();
-        return new PublicKeyDto(
+        return new PublicKeyResponseDto(
                 recentPublicKeys.currentPublicKey(),
                 recentPublicKeys.previousPublicKey(),
                 getActiveSigningKey().getSignatureAlgorithm(),

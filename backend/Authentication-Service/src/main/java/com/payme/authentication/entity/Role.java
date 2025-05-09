@@ -1,6 +1,6 @@
 package com.payme.authentication.entity;
 
-import com.payme.authentication.constant.PaymeRoles;
+import com.payme.internal.security.constant.PaymeRoles;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,8 +1,8 @@
 package com.payme.token_service.controller;
 
-import com.payme.token_service.dto.TokenPairDto;
-import com.payme.token_service.dto.UserTokenDto;
-import com.payme.token_service.model.TokenSubject;
+import com.payme.internal.security.dto.TokenPairResponseDto;
+import com.payme.internal.security.dto.UserTokenRequestDto;
+import com.payme.internal.security.model.TokenSubject;
 import com.payme.token_service.service.UserTokenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +20,13 @@ public class UserTokenController {
 
 
     @PostMapping("${internal.endpoints.user.access-and-refresh-token}")
-    public ResponseEntity<TokenPairDto> issueAccessAndRefreshToken(@RequestBody @Valid UserTokenDto userTokenDto){
-        return ResponseEntity.ok(userTokenService.issueAccessAndRefresh(userTokenDto));
+    public ResponseEntity<TokenPairResponseDto> issueAccessAndRefreshToken(@RequestBody @Valid UserTokenRequestDto userTokenRequestDto){
+        return ResponseEntity.ok(userTokenService.issueAccessAndRefresh(userTokenRequestDto));
     }
 
     @PostMapping("${internal.endpoints.user.access-token}")
-    public ResponseEntity<String> issueAccessToken(@RequestBody @Valid UserTokenDto userTokenDto){
-        return ResponseEntity.ok(userTokenService.issueAccessToken(userTokenDto));
+    public ResponseEntity<String> issueAccessToken(@RequestBody @Valid UserTokenRequestDto userTokenRequestDto){
+        return ResponseEntity.ok(userTokenService.issueAccessToken(userTokenRequestDto));
     }
 
     @PostMapping("${internal.endpoints.user.refresh-token}")

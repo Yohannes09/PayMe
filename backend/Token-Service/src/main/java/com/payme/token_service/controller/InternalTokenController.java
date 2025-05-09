@@ -1,7 +1,7 @@
 package com.payme.token_service.controller;
 
-import com.payme.token_service.dto.InternalTokenDto;
-import com.payme.token_service.dto.TokenPairDto;
+import com.payme.internal.security.dto.ServiceTokenRequestDto;
+import com.payme.internal.security.dto.TokenPairResponseDto;
 import com.payme.token_service.service.InternalTokenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,20 +19,20 @@ public class InternalTokenController {
 
 
     @PostMapping("${internal.endpoints.service.access-and-refresh-token}")
-    public ResponseEntity<TokenPairDto> issueAccessAndRefreshToken(
-            @RequestBody @Valid InternalTokenDto internalTokenDto
+    public ResponseEntity<TokenPairResponseDto> issueAccessAndRefreshToken(
+            @RequestBody @Valid ServiceTokenRequestDto serviceTokenRequestDto
     ){
         return ResponseEntity.ok(internalTokenService.issueAccessAndRefresh(
-                internalTokenDto.serviceNameOrId())
+                serviceTokenRequestDto.serviceNameOrId())
         );
     }
 
     @PostMapping("${internal.endpoints.service.access-token}")
     public ResponseEntity<String> issueAccessToken(
-            @RequestBody @Valid InternalTokenDto internalTokenDto
+            @RequestBody @Valid ServiceTokenRequestDto serviceTokenRequestDto
     ){
         return ResponseEntity.ok(internalTokenService.issueAccessToken(
-                internalTokenDto.serviceNameOrId())
+                serviceTokenRequestDto.serviceNameOrId())
         );
     }
 

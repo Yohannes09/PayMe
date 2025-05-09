@@ -1,6 +1,5 @@
 package com.payme.authentication.repository;
 
-import com.payme.authentication.constant.PaymeRoles;
 import com.payme.authentication.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 

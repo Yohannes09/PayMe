@@ -1,13 +1,13 @@
 package com.payme.token_service.service;
 
-import com.payme.internal.constant.TokenRecipient;
-import com.payme.internal.constant.TokenType;
+import com.payme.internal.security.constant.TokenRecipient;
+import com.payme.internal.security.constant.TokenType;
 import com.payme.token_service.component.token.TokenProvider;
 import com.payme.token_service.component.token.properties.UserTokenProperties;
-import com.payme.token_service.dto.TokenPairDto;
-import com.payme.token_service.dto.UserTokenDto;
-import com.payme.token_service.model.TokenSubject;
-import com.payme.token_service.model.UserTokenSubject;
+import com.payme.internal.security.dto.TokenPairResponseDto;
+import com.payme.internal.security.dto.UserTokenRequestDto;
+import com.payme.internal.security.model.TokenSubject;
+import com.payme.internal.security.model.UserTokenSubject;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +29,8 @@ public class UserTokenService {
     /**
      * Issues a pair of tokens: an access token and refresh token, both valid immediately.
      */
-    public TokenPairDto issueAccessAndRefresh(@Valid UserTokenDto userTokenDto){
-        TokenSubject tokenSubject = mapRequestToTokenSubject(userTokenDto);
+    public TokenPairResponseDto issueAccessAndRefresh(@Valid UserTokenRequestDto userTokenRequestDto){
+        TokenSubject tokenSubject = mapRequestToTokenSubject(userTokenRequestDto);
 
         int accessTokenValidityMins = userTokenProperties.getAccessToken().getValidityMins();
         int refreshTokenValidityMins = userTokenProperties.getRefreshToken().getValidityMins();
@@ -50,8 +50,8 @@ public class UserTokenService {
      * <p>This is prepared slightly in advance to reduce client latency and avoid overlapping
      * refresh calls, while still maximizing token lifetime.</p>
      */
-    public String issueAccessToken(UserTokenDto userTokenDto){
-        TokenSubject tokenSubject = mapRequestToTokenSubject(userTokenDto);
+    public String issueAccessToken(UserTokenRequestDto userTokenRequestDto){
+        TokenSubject tokenSubject = mapRequestToTokenSubject(userTokenRequestDto);
 
         int accessTokenValidityMins = userTokenProperties.getAccessToken().getValidityMins();
         int accessTokenIssueAtDelayMins = userTokenProperties.getAccessToken().getIssueAtDelayMins();
@@ -67,8 +67,8 @@ public class UserTokenService {
     }
 
 
-    private TokenSubject mapRequestToTokenSubject(UserTokenDto userTokenDto){
-        return new UserTokenSubject(userTokenDto.usernameOrId(), userTokenDto.roles());
+    private TokenSubject mapRequestToTokenSubject(UserTokenRequestDto userTokenRequestDto){
+        return new UserTokenSubject(userTokenRequestDto.usernameOrId(), userTokenRequestDto.roles());
     }
 
 }

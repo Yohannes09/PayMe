@@ -1,8 +1,8 @@
 package com.payme.token_service.config;
 
-import com.payme.internal.token.ServiceTokenValidator;
+import com.payme.internal.security.token.ServiceTokenValidator;
 import com.payme.token_service.component.signing_key.SigningKeyManager;
-import com.payme.token_service.model.RecentPublicKeys;
+import com.payme.internal.security.model.RecentPublicKeys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "security_user")
+@Table(name = "user")
 public class User implements UserDetails {
     @Id
     private UUID id;
@@ -45,13 +45,6 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id") // Foreign key for Role
     )
     private Set<Role> roles;
-
-    @OneToMany(
-            mappedBy = "user",
-            cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY
-    )
-    private Set<Token> userTokens;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)

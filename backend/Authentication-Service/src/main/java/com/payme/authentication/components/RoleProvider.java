@@ -1,9 +1,9 @@
 package com.payme.authentication.components;
 
-import com.payme.authentication.constant.PaymeRoles;
 import com.payme.authentication.entity.Role;
 import com.payme.authentication.exception.RoleNotFoundException;
 import com.payme.authentication.repository.RoleRepository;
+import com.payme.internal.security.constant.PaymeRoles;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,7 @@ public class RoleProvider {
 
     @PostConstruct
     private void addAllRoles(){
-        List<Role> allRoles = PaymeRoles.allRoles()
+        List<Role> allRoles = PaymeRoles.getAll()
                 .stream()
                 .map(Role::new)
                 .toList();

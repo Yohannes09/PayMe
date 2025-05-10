@@ -7,4 +7,5 @@ import com.payme.authentication.dto.RegisterDto;
 public interface AuthenticationService {
     AuthenticationResponseDto login(LoginDto loginDto);
     void register(RegisterDto registerDto);
+    void logout(String token);
 }

@@ -62,8 +62,8 @@ public class AuthenticationServiceConfig {
 
 
     @Bean
-    public AuthenticationFilterConfig jwtAuthenticationFilter(JwtService jwtService){
-        return new AuthenticationFilterConfig(jwtService, userDetailsService());
+    public AuthenticationFilterConfig jwtAuthenticationFilter(){
+        return new AuthenticationFilterConfig(userDetailsService());
     }
 
 
@@ -85,4 +85,5 @@ public class AuthenticationServiceConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }

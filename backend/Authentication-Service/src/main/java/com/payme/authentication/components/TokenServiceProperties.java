@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "external.token-service")
+@ConfigurationProperties(prefix = "external.accessToken-service")
 @Getter
 @Setter
 public class TokenServiceProperties {

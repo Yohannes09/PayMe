@@ -16,13 +16,19 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Table(
+        name = "user",
+        indexes = {
+                @Index(name = "idx_user_username", columnList = "username"),
+                @Index(name = "idx_user_email", columnList = "email")
+        }
+)
+@Entity
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "user")
 public class User implements UserDetails {
     @Id
     private UUID id;
@@ -58,7 +64,7 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getRole().toString()))
+                .map(role -> new SimpleGrantedAuthority(role.getRole().name()))
                 .collect(Collectors.toSet());
     }
 

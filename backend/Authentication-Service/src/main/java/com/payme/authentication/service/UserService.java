@@ -4,10 +4,13 @@ import com.payme.authentication.components.TokenServiceClient;
 import com.payme.authentication.entity.Role;
 import com.payme.authentication.entity.User;
 import com.payme.authentication.exception.BadRequestException;
+import com.payme.authentication.exception.DuplicateCredentialException;
 import com.payme.authentication.exception.UserNotFoundException;
 import com.payme.authentication.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -17,50 +20,47 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-@Slf4j
-@Transactional
-@Validated
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final RestClient restClient;
-    private final TokenServiceClient tokenServiceClient;
-    private final String userServiceUrl;
-    private final String userEndpoint;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(
-            UserRepository userRepository,
-            RestClient restClient,
-            TokenServiceClient tokenServiceClient
-    ) {
-        this.userRepository = userRepository;
-        this.restClient = restClient;
-        this.tokenServiceClient = tokenServiceClient;
-        this.userServiceUrl = tokenServiceClient.getBaseUrl();
-        this.userEndpoint = tokenServiceClient.getUserEndpoint();
-    }
 
+    /**
+     * Creates and persists a new {@link User} with the provided credentials and roles.
+     * <p>
+     * This method encodes the user's password, initializes account status flags,
+     * and checks for duplicate username or email entries before saving.
+     * </p>
+     *
+     * @param username the desired username for the new user; must be unique
+     * @param email the user's email address; must be unique
+     * @param password the raw password to be encoded and stored securely
+     * @param roles a set of roles to assign to the new user
+     * @return the created {@link User} entity
+     * @throws DuplicateCredentialException if the username or email already exists
+     */
     @Transactional
-    public User createNewUser(
-            String username,
-            String email,
-            String password,
-            Set<Role> roles
-    ) {
-        User user = User.builder()
-                .username(username)
-                .email(email)
-                .password(password)
-                .roles(roles)
-                .accountNonExpired(true)
-                .accountNonLocked(true)
-                .credentialsNonExpired(true)
-                .enabled(false)
-                .build();
+    public User createNewUser(String username, String email, String password, Set<Role> roles){
 
-        User savedUser = userRepository.save(user);
-        newUserPostRequest(savedUser.getId());
-        return savedUser;
+        if(userRepository.existsByUsernameOrEmail(username, email)){
+            throw new DuplicateCredentialException("Username or Email already registered. ");
+        }
+
+        return userRepository.save(
+                User.builder()
+                        .username(username)
+                        .email(email)
+                        .password(passwordEncoder.encode(password))
+                        .roles(roles)
+                        .accountNonExpired(true)
+                        .accountNonLocked(true)
+                        .credentialsNonExpired(true)
+                        .enabled(false)
+                        .build()
+        );
     }
 
     // map to dto and return a dto
@@ -69,40 +69,6 @@ public class UserService {
         return userRepository
                 .findById(userId)
                 .orElseThrow(()-> new UserNotFoundException("User with ID " + userId + " not found. "));
-    }
-
-    public boolean isUsernameOrEmailTaken(String username, String email) {
-        boolean isUsernamePresent = Optional.ofNullable(username).isPresent();
-        boolean isEmailPresent = Optional.ofNullable(email).isPresent();
-
-        if(!isUsernamePresent && !isEmailPresent){
-            throw new BadRequestException("");
-        }
-        if(isUsernamePresent && isEmailPresent) {
-            return userRepository.existsByUsernameOrEmail(username, email);
-        }
-        if(isUsernamePresent) {
-            return userRepository.existsByUsernameIgnoreCase(username);
-        }
-        if(isEmailPresent) {
-            return userRepository.existsByEmailIgnoreCase(email);
-        }
-
-        return true;
-    }
-
-    private void newUserPostRequest(UUID id){
-        HttpStatusCode response = restClient.post()
-                .uri(userServiceUrl+userEndpoint)
-                .body(id)
-                .retrieve()
-                .toEntity(Void.class)
-                .getStatusCode();
-
-        if(response == null || !response.is2xxSuccessful()){
-            throw new IllegalStateException("User-service failed to create user. ");
-        }
-
     }
 
 }

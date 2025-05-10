@@ -6,7 +6,7 @@ import java.util.UUID;
 
 @Builder
 public record AuthenticationResponseDto(
-        String token,
+        String accessToken,
+        String refreshToken,
         UUID userId
-) {
-}
+){}

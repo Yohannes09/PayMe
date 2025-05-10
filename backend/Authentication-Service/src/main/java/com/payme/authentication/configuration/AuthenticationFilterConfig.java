@@ -1,6 +1,7 @@
 package com.payme.authentication.configuration;
 
 import com.payme.authentication.service.token.JwtService;
+import com.payme.internal.security.token.TokenResolver;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -30,7 +31,6 @@ import java.io.IOException;
 public class AuthenticationFilterConfig extends OncePerRequestFilter {
     private static final String AUTH_HEADER = "Authorization";
 
-    private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
 
@@ -41,29 +41,33 @@ public class AuthenticationFilterConfig extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        // This allows pre-flight requests in-case client doesn't attach token
+        // This allows pre-flight requests in-case client doesn't attach accessToken
         if(request.getMethod().equals("OPTIONS")){
             response.setStatus(HttpServletResponse.SC_OK);
             return;
         }
 
         final String authHeader = request.getHeader(AUTH_HEADER);
-        final String jwtToken;
-        final String usernameOrEmail;
+        final String token;
+        final String tokenSubject;
 
         if(authHeader == null || !authHeader.startsWith("Bearer ")){
             filterChain.doFilter(request, response);
             return;
         }
 
-        jwtToken = authHeader.substring(7);
-        usernameOrEmail = jwtService.extractClaim(jwtToken, Claims::getSubject);
+        token = authHeader.substring(7);
+        tokenSubject = TokenResolver.resolveClaim(
+                token,
+
+                Claims::getSubject
+        );
         boolean isNotAuthenticated = SecurityContextHolder.getContext().getAuthentication() == null;
 
-        if(usernameOrEmail != null && isNotAuthenticated){
-            UserDetails fetchedUser = userDetailsService.loadUserByUsername(usernameOrEmail);
+        if(tokenSubject != null && isNotAuthenticated){
+            UserDetails fetchedUser = userDetailsService.loadUserByUsername(tokenSubject);
 
-            if(jwtService.isTokenValid(jwtToken, fetchedUser)){
+            if(jwtService.isTokenValid(token, fetchedUser)){
 
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(

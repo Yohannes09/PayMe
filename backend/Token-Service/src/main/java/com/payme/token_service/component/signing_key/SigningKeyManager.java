@@ -1,7 +1,7 @@
 package com.payme.token_service.component.signing_key;
 
 import com.payme.token_service.component.token.properties.SharedTokenProperties;
-import com.payme.token_service.data_structure.PublicKeyHistory;
+import com.payme.token_service.util.data_structure.PublicKeyHistory;
 import com.payme.internal.security.dto.PublicKeyResponseDto;
 import com.payme.token_service.exception.KeyInitializationException;
 import com.payme.internal.security.model.RecentPublicKeys;
@@ -74,16 +74,17 @@ public class SigningKeyManager {
 
     }
 
-    // Used for signing keys.
-    public PrivateKey getActivePrivateKey(){
+    // The active Private key signing tokens.
+    public PrivateKey getActiveSigningKey(){
         if(activeSigningKey == null){
             throw new KeyInitializationException();
         }
         return activeSigningKey.privateKey();
     }
 
-    // Used by TokenProvider to add the singing key's ID to the token header.
-    public PublicKeyRecord getActiveSigningKey(){
+    // Provides the active KeyRecord which contains information like what signing algorithm was used
+    // and other metadata regarding the SigningKey
+    public PublicKeyRecord getActivePublicKeyRecord(){
         if(activeSigningKey == null){
             throw new KeyInitializationException();
         }
@@ -96,7 +97,7 @@ public class SigningKeyManager {
         return new PublicKeyResponseDto(
                 recentPublicKeys.currentPublicKey(),
                 recentPublicKeys.previousPublicKey(),
-                getActiveSigningKey().getSignatureAlgorithm(),
+                getActivePublicKeyRecord().getSignatureAlgorithm(),
                 sharedTokenProperties.getIssuer()
         );
 
@@ -112,7 +113,7 @@ public class SigningKeyManager {
             );
 
             final String encodedPublicKey = encodeToString(keyPair.getPublic());
-            PublicKeyRecord publicKeyRecord = persistSigningKey(encodedPublicKey, SignatureAlgorithm.RS256);
+            PublicKeyRecord publicKeyRecord = persistValidationKey(encodedPublicKey, SignatureAlgorithm.RS256);
             publicKeyHistory.addKey(encodedPublicKey);
 
             this.activeSigningKey = new ActiveSigningKey(
@@ -128,7 +129,7 @@ public class SigningKeyManager {
 
     }
 
-    private PublicKeyRecord persistSigningKey(String publicKey, SignatureAlgorithm signatureAlgorithm){
+    private PublicKeyRecord persistValidationKey(String publicKey, SignatureAlgorithm signatureAlgorithm){
         PublicKeyRecord publicKeyRecord = PublicKeyRecord.builder()
                 .publicKey(publicKey)
                 .expiresAt(LocalDateTime.now().plusMinutes(KEY_VALIDITY_MINUTES))

@@ -92,9 +92,9 @@ public final class TokenResolver {
         return keyFactory.generatePublic(encodedKeySpec);
     }
 
-    private static Claims extractAllClaims(String token, Key signingKey){
+    private static Claims extractAllClaims(String token, Key key){
         return Jwts.parserBuilder()
-                .setSigningKey(signingKey)
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

@@ -25,6 +25,7 @@ import java.util.Set;
 public class AuthenticationFilterConfig extends OncePerRequestFilter {
     private static final String AUTH_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer";
+    private static final String CORS_PREFLIGHT_REQUEST = "OPTIONS";
     private static final Set<String> PUBLIC_ENDPOINTS = Set.of("/api/v1/public-key");
 
     private final ServiceTokenValidator serviceTokenValidator;
@@ -43,7 +44,7 @@ public class AuthenticationFilterConfig extends OncePerRequestFilter {
             return;
         }
 
-        if(request.getMethod().equals("OPTIONS")){
+        if(request.getMethod().equals(CORS_PREFLIGHT_REQUEST)){
             response.setStatus(HttpServletResponse.SC_OK);
             return;
         }

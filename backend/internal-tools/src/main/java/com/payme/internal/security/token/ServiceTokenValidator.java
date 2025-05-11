@@ -11,8 +11,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static io.jsonwebtoken.Jwts.claims;
-
 @RequiredArgsConstructor
 public class ServiceTokenValidator implements TokenValidator{
     private final String issuer;
@@ -78,7 +76,7 @@ public class ServiceTokenValidator implements TokenValidator{
 
         return extractedRoles.get()
                 .stream()
-                .anyMatch(role -> reqRoles.contains(role));
+                .anyMatch(reqRoles::contains);
     }
 
     private boolean hasValidSubject(

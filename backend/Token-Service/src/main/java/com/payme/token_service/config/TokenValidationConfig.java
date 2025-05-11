@@ -5,7 +5,7 @@ import com.payme.internal.security.constant.TokenRecipient;
 import com.payme.internal.security.constant.TokenType;
 import com.payme.internal.security.token.ServiceTokenValidator;
 import com.payme.token_service.component.token.properties.SharedTokenProperties;
-import com.payme.token_service.data_structure.PublicKeyHistory;
+import com.payme.token_service.util.data_structure.PublicKeyHistory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

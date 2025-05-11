@@ -109,8 +109,8 @@ public class TokenProvider {
         Instant issuedAt = Instant.now().plus(Duration.ofMinutes(issuedAtDelayMins));
         Instant expiresAt = issuedAt.plus(Duration.ofMinutes(validityInMins));
 
-        PrivateKey privateKey = signingKeyManager.getActivePrivateKey();
-        PublicKeyRecord publicKeyRecord = signingKeyManager.getActiveSigningKey();
+        PrivateKey privateKey = signingKeyManager.getActiveSigningKey();
+        PublicKeyRecord publicKeyRecord = signingKeyManager.getActivePublicKeyRecord();
 
         return Jwts.builder()
                 .setHeaderParam("kid", publicKeyRecord.getId())

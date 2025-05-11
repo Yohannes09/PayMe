@@ -35,7 +35,4 @@ public class TokenServiceClient {
                 .block();
     }
 
-    private PublicKeyResponseDto fetchTokenSigningKey(){
-        String publicKeyEndpoint = tokenServiceProperties.getEndpoints().
-    }
 }

@@ -1,4 +1,4 @@
-package com.payme.token_service.data_structure;
+package com.payme.token_service.util.data_structure;
 
 import lombok.RequiredArgsConstructor;
 

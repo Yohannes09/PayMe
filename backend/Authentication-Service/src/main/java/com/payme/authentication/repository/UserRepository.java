@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Query("""
-            SELECT user FROM SecurityUser user
+            SELECT user FROM User user
             WHERE LOWER(user.username) = LOWER(:usernameOrEmail)
             OR LOWER(user.email) = LOWER(:usernameOrEmail)
             """)
@@ -21,7 +21,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Query("""
             SELECT CASE WHEN COUNT(user) > 0 THEN true ELSE false END
-            FROM SecurityUser user
+            FROM User user
             WHERE (LOWER(user.username) = LOWER(:username))
             OR LOWER(user.email) = LOWER(:email)
             """)

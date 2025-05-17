@@ -1,6 +1,7 @@
 package com.payme.authentication.service.auth;
 
 import com.payme.authentication.components.TokenServiceClient;
+import com.payme.authentication.constant.DefaultRoles;
 import com.payme.authentication.entity.User;
 import com.payme.authentication.entity.Role;
 import com.payme.authentication.exception.DuplicateCredentialException;
@@ -9,7 +10,6 @@ import com.payme.authentication.components.RoleProvider;
 import com.payme.authentication.dto.AuthenticationResponseDto;
 import com.payme.authentication.dto.LoginDto;
 import com.payme.authentication.dto.RegisterDto;
-import com.payme.internal.security.constant.PaymeRoles;
 import com.payme.internal.security.dto.TokenPairResponseDto;
 import com.payme.internal.security.dto.UserTokenRequestDto;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +65,6 @@ public class JwtAuthenticationService implements AuthenticationService {
         String username = user.getUsername();
         Set<String> roles = user.getRoles().stream()
                 .map(Role::getRole)
-                .map(PaymeRoles::getRole)
                 .collect(Collectors.toSet());
 
         TokenPairResponseDto response = tokenServiceClient.fetchAccessAndRefreshTokens(
@@ -112,7 +111,7 @@ public class JwtAuthenticationService implements AuthenticationService {
 
     private Set<Role> fetchDefaultRoles(){
         Set<Role> defaultRoles = new HashSet<>();
-        Role userRole = roleProvider.findRole(PaymeRoles.USER);
+        Role userRole = roleProvider.findRole(DefaultRoles.USER.getRole());
         defaultRoles.add(userRole);
 
         return defaultRoles;

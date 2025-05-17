@@ -18,4 +18,10 @@ public class OAuthAuthenticationService implements AuthenticationService {
     public void register(RegisterDto registerDto) {
 
     }
+
+    @Override
+    public void logout(String token) {
+
+    }
+
 }

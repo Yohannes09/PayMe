@@ -1,6 +1,5 @@
 package com.payme.authentication.configuration;
 
-import com.payme.authentication.service.token.JwtService;
 import com.payme.internal.security.token.TokenResolver;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -9,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,8 +25,9 @@ import java.io.IOException;
  * of the authentication process.
  * Internally It calls {@code JwtService} to extract the information
  */
-@Slf4j
 @Component
+
+@Slf4j
 @RequiredArgsConstructor
 public class AuthenticationFilterConfig extends OncePerRequestFilter {
     private static final String AUTH_HEADER = "Authorization";
@@ -42,45 +43,45 @@ public class AuthenticationFilterConfig extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         // This allows pre-flight requests in-case client doesn't attach accessToken
-        if(request.getMethod().equals("OPTIONS")){
-            response.setStatus(HttpServletResponse.SC_OK);
-            return;
-        }
-
-        final String authHeader = request.getHeader(AUTH_HEADER);
-        final String token;
-        final String tokenSubject;
-
-        if(authHeader == null || !authHeader.startsWith("Bearer ")){
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        token = authHeader.substring(7);
-        tokenSubject = TokenResolver.resolveClaim(
-                token,
-
-                Claims::getSubject
-        );
-        boolean isNotAuthenticated = SecurityContextHolder.getContext().getAuthentication() == null;
-
-        if(tokenSubject != null && isNotAuthenticated){
-            UserDetails fetchedUser = userDetailsService.loadUserByUsername(tokenSubject);
-
-            if(jwtService.isTokenValid(token, fetchedUser)){
-
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                            fetchedUser,
-                            null,
-                            fetchedUser.getAuthorities()
-                        );
-
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-            }
-        }
+//        if(request.getMethod().equals("OPTIONS")){
+//            response.setStatus(HttpServletResponse.SC_OK);
+//            return;
+//        }
+//
+//        final String authHeader = request.getHeader(AUTH_HEADER);
+//        final String token;
+//        final String tokenSubject;
+//
+//        if(authHeader == null || !authHeader.startsWith("Bearer ")){
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
+//
+//        token = authHeader.substring(7);
+//        tokenSubject = TokenResolver.resolveClaim(
+//                token,
+//
+//                Claims::getSubject
+//        );tokenSubject != null &&
+//        boolean isNotAuthenticated = SecurityContextHolder.getContext().getAuthentication() == null;
+//
+//        if(isNotAuthenticated){
+//            UserDetails fetchedUser = userDetailsService.loadUserByUsername(tokenSubject);
+//
+//            if(jwtService.isTokenValid(token, fetchedUser)){
+//
+//                UsernamePasswordAuthenticationToken authToken =
+//                        new UsernamePasswordAuthenticationToken(
+//                            fetchedUser,
+//                            null,
+//                            fetchedUser.getAuthorities()
+//                        );
+//
+//                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//
+//                SecurityContextHolder.getContext().setAuthentication(authToken);
+//            }
+//        }
         filterChain.doFilter(request, response);
     }
 

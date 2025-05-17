@@ -1,10 +1,14 @@
 package com.payme.authentication.entity;
 
-import com.payme.internal.security.constant.PaymeRoles;
+import com.payme.authentication.constant.DefaultRoles;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 
 @Table(name = "role")
@@ -18,11 +22,25 @@ public class Role {
     @SequenceGenerator(name = "role_id_sequence", sequenceName = "role_id_sequence", initialValue = 3456)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(updatable = true, nullable = false)
-    private PaymeRoles role;
+    @Column(nullable = false)
+    private String role;
 
-    public Role(PaymeRoles role){
-        this.role = role;
+    private String description;
+
+    @Column(name = "created_at", updatable = false, nullable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
+    @Column(name = "is_system_role", nullable = false)
+    private boolean isSystemRole = false;
+
+    public Role(DefaultRoles defaultRole){
+        this.role = defaultRole.getRole();
+        this.description = defaultRole.getDescription();
     }
+
 }

@@ -17,7 +17,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Table(
-        name = "user",
+        name = "users",
         indexes = {
                 @Index(name = "idx_user_username", columnList = "username"),
                 @Index(name = "idx_user_email", columnList = "email")
@@ -64,7 +64,7 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getRole().name()))
+                .map(role -> new SimpleGrantedAuthority(role.getRole()))
                 .collect(Collectors.toSet());
     }
 

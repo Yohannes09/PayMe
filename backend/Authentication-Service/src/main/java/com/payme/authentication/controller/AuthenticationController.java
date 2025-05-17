@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5500"})
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/v1/auth")
 @Slf4j
 public class AuthenticationController {
     private final AuthenticationService authenticationService;

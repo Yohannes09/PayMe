@@ -1,7 +1,7 @@
 package com.payme.tests.service;
 
 import com.payme.authentication.PaymeApplication;
-import com.payme.authentication.service.token.JwtService;
+//import com.payme.authentication.service.token.JwtService;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.TestInstance;
@@ -32,7 +32,7 @@ public class JwtAuthenticationServiceTests {
 //
 //    @Test
 //    void testRegister() {
-//        Role mockRole = new Role(1L, PaymeRoles.USER);
+//        Role mockRole = new Role(1L, DefaultRoles.USER);
 //
 //        when(userRepository.isCredentialTaken(anyString(), anyString()))
 //                .thenReturn(false);
@@ -40,7 +40,7 @@ public class JwtAuthenticationServiceTests {
 //                .thenAnswer(invocation -> invocation.getArgument(0));
 //        when(passwordEncoder.encode(anyString()))
 //                .thenReturn("encodedPassword");
-//        when(roleRepository.findByRole(any(PaymeRoles.class)))
+//        when(roleRepository.findByRole(any(DefaultRoles.class)))
 //                .thenReturn(Optional.of(mockRole));
 //
 //        jwtAuthenticationService.register(dto);

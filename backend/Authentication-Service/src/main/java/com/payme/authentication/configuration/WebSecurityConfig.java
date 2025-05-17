@@ -3,6 +3,7 @@ package com.payme.authentication.configuration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,6 +26,7 @@ public class WebSecurityConfig {
 
 
     @Bean
+    @Profile("prod")
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationFilterConfig authenticationFilterConfig) throws Exception {
 
         http
@@ -39,6 +41,23 @@ public class WebSecurityConfig {
                 )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(authenticationFilterConfig, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+    @Bean
+    @Profile("dev")
+    public SecurityFilterChain noSecurityFilterChain(HttpSecurity http, AuthenticationFilterConfig authenticationFilterConfig) throws Exception {
+
+        http
+                .cors(cors-> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(request ->
+                        request.anyRequest().permitAll()
+                )
+                .sessionManagement(session->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                );
 
         return http.build();
     }

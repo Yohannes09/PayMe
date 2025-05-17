@@ -11,7 +11,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebClientConfig {
     private final TokenServiceProperties tokenServiceProperties;
 
-    @Bean
+    @Bean("tokenServiceWebClient")
     public WebClient tokenServiceClient(WebClient.Builder webclient){
         return WebClient.builder()
                 .baseUrl(tokenServiceProperties.getBaseUrl())

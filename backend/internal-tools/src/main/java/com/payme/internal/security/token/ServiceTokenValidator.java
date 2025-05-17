@@ -1,7 +1,6 @@
 package com.payme.internal.security.token;
 
 import com.payme.internal.security.constant.TokenRecipient;
-import com.payme.internal.security.constant.PaymeRoles;
 import com.payme.internal.security.constant.TokenType;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class ServiceTokenValidator implements TokenValidator{
@@ -17,7 +15,7 @@ public class ServiceTokenValidator implements TokenValidator{
     private final String audience;
     private final Set<TokenType> requiredTokenTypes;
     private final Set<TokenRecipient> requiredClaimTypes;
-    private final Set<PaymeRoles> requiredRoles;
+    private final Set<String> requiredRoles;
 
 
     @Override
@@ -55,7 +53,7 @@ public class ServiceTokenValidator implements TokenValidator{
     public boolean hasValidRoles(
             String token,
             String signingKey,
-            Set<PaymeRoles> requiredRoles,
+            Set<String> requiredRoles,
             String signingAlgorithm
     ) throws NoSuchAlgorithmException, InvalidKeySpecException {
 
@@ -70,9 +68,7 @@ public class ServiceTokenValidator implements TokenValidator{
             return false;
         }
 
-        Set<String> reqRoles = requiredRoles.stream()
-                .map(PaymeRoles::getRole)
-                .collect(Collectors.toSet());
+        Set<String> reqRoles = new HashSet<>(requiredRoles);
 
         return extractedRoles.get()
                 .stream()

@@ -41,16 +41,16 @@ public class RoleProvider {
                 .map(Role::new)
                 .toList();
 
-        if(!unsavedRoles.isEmpty()){
+        if(unsavedRoles.isEmpty()){
             roleRepository.saveAll(unsavedRoles);
             log.info("Saved all default roles. ");
         }
 
     }
 
-    //@Cacheable(cacheNames = "role", key = "#role")
+    @Cacheable(cacheNames = "role", key = "#role")
     public Role findRole(String role){
-        return roleRepository.findByRole(role)
+        return roleRepository.findByRoleIgnoreCase(role)
                 .orElseThrow(() -> new RoleNotFoundException("Could not find role: " + role));
     }
 

@@ -16,23 +16,40 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ErrorResponse> handleAuthenticationException(
-            AuthenticationException exception,
+    // Errors that should not be returned for the client for various reasons like
+    // security and UX.
+    @ExceptionHandler(RoleNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleInternalExceptions(
+            Exception e,
             HttpServletRequest request
     ){
-        log.error("Error during authentication: ", exception);
+        log.error("FATAL ERROR {}", e.getMessage());
+        return generateErrorResponse(
+                "Oops, something went wrong. Please try again later. ",
+                request,
+                HttpStatus.INTERNAL_SERVER_ERROR
+        );
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(
+            RuntimeException exception,
+            HttpServletRequest request
+    ){
+        log.error("Error during authentication: {}", exception.getMessage());
 
         return generateErrorResponse(
-                exception,
+                exception.getMessage(),
                 request,
                 HttpStatus.BAD_REQUEST
         );
     }
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleUserNotFoundException
-            (UserNotFoundException exception, HttpServletRequest request){
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFoundExceptions(
+             RuntimeException exception,
+            HttpServletRequest request
+    ){
         log.warn("User not found: {}", exception.getMessage());
 
         ErrorResponse userNotFoundErrorResponse = ErrorResponse.builder()
@@ -62,13 +79,13 @@ public class GlobalExceptionHandler {
     }
 
     private ResponseEntity<ErrorResponse> generateErrorResponse(
-            RuntimeException runtimeException,
+            String clientErrorResponse,
             HttpServletRequest request,
             HttpStatus status
     ){
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .errorTimestamp(LocalDateTime.now())
-                .message(runtimeException.getMessage())
+                .message(clientErrorResponse)
                 .statusCode(status.value())
                 .requestPath(request.getRequestURI())
                 .build();

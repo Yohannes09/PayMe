@@ -1,4 +1,4 @@
-package com.payme.authentication.dto.CredentialUpdate;
+package com.payme.authentication.dto.credentialupdate;
 
 import com.payme.authentication.constant.ValidationConstants;
 import jakarta.validation.constraints.NotBlank;

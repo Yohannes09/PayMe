@@ -14,7 +14,8 @@ public enum DefaultRoles {
     USER("USER", "Basic permissions"),
     SERVICE("SERVICE", "Inter-service communication permitted."),
     ADMIN("ADMIN", "Elevated Privileges. "),
-    SUPER_ADMIN("SUPER ADMIN", "All Privileges. ");
+    SUPER_ADMIN("SUPER ADMIN", "All Privileges. "),
+    DEV("DEV", "Access internal documentation. ");
 
     private final String role;
     private final String description;

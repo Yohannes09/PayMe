@@ -1,6 +1,8 @@
 package com.payme.authentication.configuration;
 
+import com.payme.authentication.constant.DefaultRoles;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -14,6 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.List;
 
@@ -33,8 +36,14 @@ public class WebSecurityConfig {
                 .cors(cors-> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request ->
-                        request.requestMatchers("/api/v1/auth/**").permitAll()
+                        request
+                                .requestMatchers("/api/v1/auth/**").permitAll()
                                 .anyRequest().authenticated()
+                                .requestMatchers("/swagger-ui/**","/v3/api-docs/**").hasAnyRole(
+                                        DefaultRoles.DEV.getRole(),
+                                        DefaultRoles.ADMIN.getRole(),
+                                        DefaultRoles.SUPER_ADMIN.getRole()
+                                )
                 )
                 .sessionManagement(session->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -57,11 +66,11 @@ public class WebSecurityConfig {
                 )
                 .sessionManagement(session->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                );
+                )
+                .addFilterBefore(authenticationFilterConfig, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource(){

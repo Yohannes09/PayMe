@@ -25,8 +25,8 @@ public class JwtAuthenticationServiceTests {
 //    @MockBean private RoleRepository roleRepository;
 //
 //    private MockedUsers mockedUsers = new MockedUsers();
-//    private RegisterDto dto = new RegisterDto("John", "Doe", "testUser", "test@example.com", "password");
-//    private LoginDto loginDto = new LoginDto("JohnDoe", "password");
+//    private RegisterRequest dto = new RegisterRequest("John", "Doe", "testUser", "test@example.com", "password");
+//    private LoginRequest loginDto = new LoginRequest("JohnDoe", "password");
 //    private User user = mockedUsers.getMockedUsers().get(0);
 //
 //

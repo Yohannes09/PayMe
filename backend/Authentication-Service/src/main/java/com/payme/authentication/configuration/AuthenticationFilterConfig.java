@@ -20,11 +20,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-/**
- * Recall, {@code AuthenticationFilterConfig} is the first part
- * of the authentication process.
- * Internally It calls {@code JwtService} to extract the information
- */
 @Component
 
 @Slf4j
@@ -41,7 +36,8 @@ public class AuthenticationFilterConfig extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-
+        log.info("Request method: {}\turi:{}", request.getMethod(), request.getRequestURI());
+        filterChain.doFilter(request, response);
         // This allows pre-flight requests in-case client doesn't attach accessToken
 //        if(request.getMethod().equals("OPTIONS")){
 //            response.setStatus(HttpServletResponse.SC_OK);
@@ -82,7 +78,7 @@ public class AuthenticationFilterConfig extends OncePerRequestFilter {
 //                SecurityContextHolder.getContext().setAuthentication(authToken);
 //            }
 //        }
-        filterChain.doFilter(request, response);
+
     }
 
 }

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
-@RequestMapping("/test")
+//@RequestMapping("/test")
 @RequiredArgsConstructor
 public class DummyController {
     private final RoleProvider roleProvider;

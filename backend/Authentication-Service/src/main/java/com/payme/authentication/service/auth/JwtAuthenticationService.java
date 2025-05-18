@@ -2,14 +2,14 @@ package com.payme.authentication.service.auth;
 
 import com.payme.authentication.components.TokenServiceClient;
 import com.payme.authentication.constant.DefaultRoles;
+import com.payme.authentication.dto.authentication.LoginRequest;
+import com.payme.authentication.dto.authentication.RegisterRequest;
 import com.payme.authentication.entity.User;
 import com.payme.authentication.entity.Role;
 import com.payme.authentication.exception.DuplicateCredentialException;
 import com.payme.authentication.service.UserService;
 import com.payme.authentication.components.RoleProvider;
-import com.payme.authentication.dto.AuthenticationResponseDto;
-import com.payme.authentication.dto.LoginDto;
-import com.payme.authentication.dto.RegisterDto;
+import com.payme.authentication.dto.authentication.AuthenticationResponse;
 import com.payme.internal.security.dto.TokenPairResponseDto;
 import com.payme.internal.security.dto.UserTokenRequestDto;
 import lombok.RequiredArgsConstructor;
@@ -39,16 +39,16 @@ public class JwtAuthenticationService implements AuthenticationService {
 
     @Override
     @Transactional
-    public void register(RegisterDto registerDto) {
+    public void register(RegisterRequest registerRequest) {
         try {
             userService.createNewUser(
-                    registerDto.username(),
-                    registerDto.email(),
-                    registerDto.password(),
+                    registerRequest.username(),
+                    registerRequest.email(),
+                    registerRequest.password(),
                     fetchDefaultRoles()
             );
 
-            log.info("User registered successfully: {}", registerDto.username());
+            log.info("User registered successfully: {}", registerRequest.username());
 
         } catch (DuplicateCredentialException e) {
             log.warn("Registration failed: {}", e.getMessage());
@@ -59,8 +59,8 @@ public class JwtAuthenticationService implements AuthenticationService {
 
 
     @Override
-    public AuthenticationResponseDto login(LoginDto loginDto) {
-        User user = authenticate(loginDto.usernameOrEmail(), loginDto.password());
+    public AuthenticationResponse login(LoginRequest loginRequest) {
+        User user = authenticate(loginRequest.usernameOrEmail(), loginRequest.password());
 
         String username = user.getUsername();
         Set<String> roles = user.getRoles().stream()
@@ -72,7 +72,7 @@ public class JwtAuthenticationService implements AuthenticationService {
         );
 
         log.info("Successful login for ID: {}", user.getId());
-        return AuthenticationResponseDto.builder()
+        return AuthenticationResponse.builder()
                 .accessToken(response.accessToken())
                 .refreshToken(response.refreshToken())
                 .userId(user.getId())

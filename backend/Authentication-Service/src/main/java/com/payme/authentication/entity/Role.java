@@ -1,5 +1,6 @@
 package com.payme.authentication.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.payme.authentication.constant.DefaultRoles;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 
 
 @Table(name = "role")
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 @Getter
 @NoArgsConstructor

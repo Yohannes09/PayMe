@@ -1,8 +1,8 @@
 package com.payme.authentication.components;
 
-import com.payme.authentication.dto.CredentialUpdate.EmailUpdateRequest;
-import com.payme.authentication.dto.CredentialUpdate.PasswordUpdateRequest;
-import com.payme.authentication.dto.CredentialUpdate.UsernameUpdateRequest;
+import com.payme.authentication.dto.credentialupdate.EmailUpdateRequest;
+import com.payme.authentication.dto.credentialupdate.PasswordUpdateRequest;
+import com.payme.authentication.dto.credentialupdate.UsernameUpdateRequest;
 import com.payme.authentication.entity.User;
 import com.payme.authentication.exception.BadRequestException;
 import com.payme.authentication.exception.CredentialUpdateException;

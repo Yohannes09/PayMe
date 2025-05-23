@@ -1,4 +1,4 @@
-package com.payme.token_service.util.data_structure;
+package com.payme.token.util.data_structure;
 
 import lombok.RequiredArgsConstructor;
 
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
- * PublicKeyHistory is a thread-safe data structure that stores a fixed-size history of public keys.
+ * PublicKeyHistory is a thread-safe data structure that stores a desired fixed-size history of public keys.
  */
 @RequiredArgsConstructor
 public class PublicKeyHistory {
@@ -26,4 +26,5 @@ public class PublicKeyHistory {
     public List<String> getKeyHistory(){
         return new ArrayList<>(keyHistory);
     }
+
 }

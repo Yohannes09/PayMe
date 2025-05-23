@@ -1,4 +1,4 @@
-package com.payme.token_service.config;
+package com.payme.token.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

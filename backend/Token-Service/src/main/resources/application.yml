@@ -10,23 +10,42 @@ spring:
       fail-on-unknown-properties: true # Prevents generating token if client sends invalid json properties.
 
 token:
-  issuer: token-provider
-  recipients:
+  signing:
+    algorithm: RSA
+    key-size: 2048
+    key-id: payme.auth.id
+    rotation-interval-minutes: 60
+
+  encoding:
+    type: JWT
+    compress: false
+
+  validation:
+    clock-skew-seconds: 60
+
+  default-claims:
+    audience: payme.internal
+    issuer: auth.payme.internal
+
+  templates:
+    short-lived:
+      validity-minutes: 15
+    standard:
+      validity-minutes: 60
+    long-lived:
+      validity-minutes: 120
+
+  profiles:
     user:
       access-token:
-        validity-mins: 30
-        issue-at-delay-mins: 10
+        template: short-lived
       refresh-token:
-        validity-mins: 150
-        issue-at-delay-mins: 0
+        template: standard
+
     service:
       access-token:
-        validity-mins: 90
-        issue-at-delay-mins: 0
+        template: short-lived
       refresh-token:
-        validity-mins: 150
-        issue-at-delay-mins: 0
+        template: standard
       initialization-token:
-        validity-mins: 1440
-        issue-at-delay-mins: 0
-
+        template: long-lived

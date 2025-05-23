@@ -1,6 +1,6 @@
-package com.payme.token_service.controller;
+package com.payme.token.controller;
 
-import com.payme.token_service.component.signing_key.SigningKeyManager;
+import com.payme.token.component.SigningKeyManager;
 import com.payme.internal.security.model.RecentPublicKeys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +18,6 @@ public class PublicKeyController {
 
     @GetMapping
     public ResponseEntity<RecentPublicKeys> publicKey(){
-        return ResponseEntity.ok(signingKeyManager.getCurrentAndPreviousPublicKeys());
+        return ResponseEntity.ok(signingKeyManager.getPublicKeyHistory());
     }
 }

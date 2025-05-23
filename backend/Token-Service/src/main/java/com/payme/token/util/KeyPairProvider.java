@@ -1,4 +1,4 @@
-package com.payme.token_service.util;
+package com.payme.token.util;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,7 +1,7 @@
-package com.payme.token_service.config;
+package com.payme.token.config;
 
 import com.payme.internal.security.token.ServiceTokenValidator;
-import com.payme.token_service.component.signing_key.SigningKeyManager;
+import com.payme.token.component.SigningKeyManager;
 import com.payme.internal.security.model.RecentPublicKeys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -65,7 +65,7 @@ public class AuthenticationFilterConfig extends OncePerRequestFilter {
     }
 
     private boolean hasValidClaims(String token){
-        RecentPublicKeys recentPublicKeys = signingKeyManager.getCurrentAndPreviousPublicKeys();
+        RecentPublicKeys recentPublicKeys = signingKeyManager.getPublicKeyHistory();
         List<String> publicKeys = List.of(
                 recentPublicKeys.currentPublicKey(),
                 recentPublicKeys.previousPublicKey()

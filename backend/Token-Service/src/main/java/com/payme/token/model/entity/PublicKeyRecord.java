@@ -1,6 +1,7 @@
-package com.payme.token_service.entity;
+package com.payme.token.model.entity;
 
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.payme.token.model.KeyRecord;
+import com.payme.token.repository.PublicKeyStore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -24,7 +25,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PublicKeyRecord {
+public class PublicKeyRecord implements KeyRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
@@ -33,9 +34,8 @@ public class PublicKeyRecord {
     @Column(nullable = false, updatable = false, unique = true)
     private String publicKey;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false, updatable = false)
-    private SignatureAlgorithm signatureAlgorithm;
+    private String signatureAlgorithm;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

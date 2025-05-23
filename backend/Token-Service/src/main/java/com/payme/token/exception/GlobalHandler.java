@@ -1,9 +1,10 @@
-package com.payme.token_service.exception;
+package com.payme.token.exception;
 
 import com.payme.internal.exception.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -24,8 +25,8 @@ public class GlobalHandler {
                 .getFieldErrors()
                 .stream()
                 .collect(Collectors.toMap(
-                        error -> error.getField(),
-                        error -> error.getDefaultMessage()
+                        FieldError::getField,
+                        FieldError::getDefaultMessage
                         )
                 );
         return ResponseEntity.badRequest().body(errors);

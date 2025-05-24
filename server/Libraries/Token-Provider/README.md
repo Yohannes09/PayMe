@@ -1,83 +1,91 @@
-# TokenService
+# Token-Provider
 
 ## Purpose
 
-This service is responsible for:
+The `Token-Provider` library provides a robust framework for:
 
-- Generating **JWT tokens** used to access internal or external resources.
-- Providing the **signing public key** used to validate those tokens.
+- Generating **JWT tokens** for secure access to internal and external resources.
+- Managing and rotating **signing keys** while maintaining a history of public keys for token validation.
+- Supporting stateless token issuance without storing user state or role-based access control.
 
-It does **not** store user state or role-based access. Instead, it focuses on stateless token issuance and signing key management.
+This library is designed for authentication and authorization in distributed systems, offering flexibility for various token recipients and use cases.
 
 ---
 
 ## Overview
 
-### Authentication Flow
+`Token-Provider` is a Spring-based library that issues signed JWT tokens and manages cryptographic keys. Key features include:
 
-- **Users** receive their JWTs via the **Authentication Service**, which:
-    - Requests tokens on the user's behalf.
-    - Retains responsibility for revoking access (e.g., deactivating users).
-- **Internal services** authenticate using a **bootstrap token** — a long-lived token used to fetch their initial access and refresh tokens.
-
-Token lifetimes and mechanisms vary depending on the recipient:
-- **User tokens** are shorter-lived, with roles embedded by the Authentication Service.
-- **Internal service tokens** are long-lived, under the assumption of mutual trust.
-
----
-
-## Token Recipients
-
-- Users (via Authentication Service)
-- Internal services (via bootstrap flow)
-- (Pluggable for future recipient types)
-
----
-
-## API Endpoints
-
-### Public Key
-
-- `GET /api/v1/public-key`  
-  Returns current and rotated signing public keys, token issuer, and signing algorithm.
-
-### User Token Endpoints
-
-- `POST /api/v1/user/access-refresh-token`
-- `POST /api/v1/user/access-token`
-- `POST /api/v1/user/refresh-token`
-
-### Service Token Endpoints
-
-- `POST /api/v1/service/access-refresh-token`
-- `POST /api/v1/service/access-token`
-- `POST /api/v1/service/refresh-token`
+- **Pluggable Recipients**: Tokens can be issued for users (via authentication services), internal services (via bootstrap flows), or extended to custom recipient types.
+- **Configurable Token Types**: Supports token templates for different use cases (e.g., access tokens, refresh tokens) with customizable validity periods.
+- **Secure Key Rotation**: Provides seamless key rotation with a configurable history of public keys to validate tokens issued with older keys.
+- **Spring Integration**: Leverages Spring's dependency injection and configuration properties for easy setup and customization.
 
 ---
 
 ## Key Components
 
 ### `SigningKeyManager`
-- Generates and manages signing key pairs (private/public).
-- Supports seamless key rotation.
+- **Purpose**: Generates and manages signing key pairs (private/public) for token signing and validation.
+- **Features**:
+  - Thread-safe key rotation with configurable intervals.
+  - Maintains an in-memory history of public keys (configurable size) and persists all keys to a `PublicKeyStore` for validating older tokens.
+  - Provides methods to check key initialization (`isKeyInitialized`) and rotation status (`isRotationDue`).
+- **Usage**: Consumers call `rotateSigningKey()` to initialize or rotate keys based on their security policy.
 
-### `PublicKeyController`
-- Exposes the current and previous public signing keys.
-- Includes metadata: signing algorithm and token issuer.
+### `TokenConfigurationProperties`
+- **Purpose**: Central configuration for token settings, mapped to the `token.*` prefix in application properties/YAML.
+- **Features**:
+  - Configures signing key properties (algorithm, key size, rotation interval).
+  - Defines token templates (e.g., validity periods) and profiles (e.g., user, service).
+  - Validates configuration at startup to ensure compatibility between key rotation and token validity.
+- **Validation**: Ensures key rotation intervals and history size support token lifetimes, preventing issues with refresh token validation.
 
-### `TokenProvider`
-- Issues signed JWTs with customizable claims.
-- Uses `SigningKeyManager` for cryptographic operations.
-
-### `UserTokenService` & `InternalTokenService`
-- Define token claims and structure for their respective recipients.
-- User roles and identity claims are injected by the **Authentication Service**.
+### `TokenFactory`
+- **Purpose**: Issues signed JWT tokens with customizable claims.
+- **Features**:
+  - Integrates with `SigningKeyManager` for cryptographic operations.
+  - Supports dynamic claims (e.g., roles, token type, recipient) via a flexible claims map.
+  - Uses configuration from `TokenConfigurationProperties` for default claims and signing settings.
 
 ---
 
-## Notes
+## Configuration Example
 
-- This service does not manage user identity or session state.
-- It is designed for **stateless token generation** and **public key distribution**.
-- Decoupling user state allows centralized access control through the **Authentication Service**.
-- Bootstrap tokens for services are long-lived and used during initialization or recovery scenarios.
+Below is an example YAML configuration for the library:
+
+```yaml
+token:
+  signing:
+    algorithm: RS256
+    key-id: auth-key-1
+    key-size: 2048
+    rotation-interval-minutes: 60
+  encoding:
+    type: JWT
+    compress: false
+  validation:
+    clock-skew-seconds: 60
+  default-claims:
+    audience: payme.internal
+    issuer: auth.payme.internal
+  templates:
+    short-lived:
+      validity-minutes: 15
+    standard:
+      validity-minutes: 60
+    long-lived:
+      validity-minutes: 10080  # 7 days for refresh tokens
+  profiles:
+    user:
+      access-token:
+        template: short-lived
+      refresh-token:
+        template: long-lived
+    service:
+      access-token:
+        template: short-lived
+      refresh-token:
+        template: long-lived
+      initialization-token:
+        template: long-lived

@@ -1,7 +1,7 @@
-package com.payme.token.config;
+package com.payme.token.deprecated;
 
 import com.payme.internal.security.token.ServiceTokenValidator;
-import com.payme.token.component.SigningKeyManager;
+import com.payme.token.producer.SigningKeyManager;
 import com.payme.internal.security.model.RecentPublicKeys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -1,20 +1,14 @@
-package com.payme.token.component;
+package com.payme.token.producer;
 
 import com.payme.token.model.KeyRecord;
 import com.payme.token.repository.PublicKeyStore;
 import com.payme.token.exception.KeyInitializationException;
-import com.payme.token.util.KeyPairProvider;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -35,16 +29,17 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  */
 @Component
 @Slf4j
-@Builder
 @RequiredArgsConstructor
 public class SigningKeyManager <T extends KeyRecord>{
-
     private final PublicKeyStore<T> publicKeyStore;
     private final KeyFactory<T> keyFactory;
     private final TokenConfigurationProperties configuration;
-    private final int publicKeyHistoryLength;
 
-    private final PublicKeyHistory publicKeyHistory = new PublicKeyHistory(publicKeyHistoryLength);
+    // CONCERN: If rotation happens frequently, validating tokens might become challenging.
+    //
+    // This should be injected, as the consumer should choose how long and what is storing the
+    // public keys. It'd be better for testing. Leaving as is for now.
+    private final PublicKeyHistory publicKeyHistory = new PublicKeyHistory();
 
     private volatile ActiveKeyPair activeKeyPair;
 
@@ -55,13 +50,12 @@ public class SigningKeyManager <T extends KeyRecord>{
      * Includes the current public key and previously used keys to allow clients
      * to verify tokens issued before a key rotation.
      *
-     * @return an immutable {@link Set} of base64-encoded public keys.
+     * @return an immutable {@link List} of base64-encoded public keys.
      * @throws KeyInitializationException if no signing key has been initialized.
      */
-    public Set<String> getPublicKeyHistory(){
+    public List<String> getPublicKeyHistory(){
         validateKeyIsInitialized();
-
-        return Set.copyOf(publicKeyHistory.getKeyHistory());
+        return Collections.unmodifiableList(publicKeyHistory.getKeyHistory());
     }
 
 
@@ -95,20 +89,24 @@ public class SigningKeyManager <T extends KeyRecord>{
 
 
     /**
-     * Generates a new key pair and updates the active signing key.
+     * Manages the signing keys used for token generation.
      * <p>
-     * The new public key is persisted using the provided {@link PublicKeyStore},
-     * and the corresponding private key is stored in memory for token signing.
-     * Previous public keys are preserved in a history to support token verification.
+     * Responsibilities:
+     * <ul>
+     *     <li>Generates and rotates the key pair used for signing and validating tokens.</li>
+     *     <li>Persists the public key and tracks historical keys for verification support.</li>
+     *     <li>Provides access to the currently active signing key and metadata.</li>
+     * </ul>
      * <p>
-     * This method is synchronized to prevent concurrent key rotations.
-     *
-     * @throws KeyInitializationException if key generation fails.
+     * Consumers are responsible for calling {@link #rotateSigningKey()} to initialize or rotate keys
+     * based on their security policy (e.g., after the configured rotation interval).
+     * The manager is thread-safe and supports pluggable key formats via {@link KeyFactory}.
      */
     public synchronized void rotateSigningKey(){
         try {
-            KeyPair keyPair = KeyPairProvider.generateKeyPair(
-                    configuration.getSigning().getKeySizeBits(),
+
+            KeyPair keyPair = generateKeyPair(
+                    configuration.getSigning().getKeySize(),
                     configuration.getSigning().getAlgorithm()
             );
 
@@ -118,17 +116,25 @@ public class SigningKeyManager <T extends KeyRecord>{
             String signingAlgorithm = configuration.getSigning().getAlgorithm();
             T keyRecord = persistPublicKey(publicKey, signingAlgorithm);
 
+            // Null the current KeyPair to ensure an old KeyPair in memory isn't used
+            this.activeKeyPair = null;
             this.activeKeyPair = new ActiveKeyPair(keyRecord, keyPair.getPrivate());
 
-            log.info("Rotating sigining key with algorithm {}", signingAlgorithm);
+            log.info("Rotating signing key with algorithm {}", signingAlgorithm);
 
-        } catch (NoSuchAlgorithmException e) {
-            log.error("Failed to rotate signing key. {}", e.getMessage());
-            throw new KeyInitializationException(e.getMessage());
+        } catch (Exception e) {
+            log.error("Failed to rotate signing key. {}", e.getMessage(), e);
+            throw new KeyInitializationException("Failed to rotate signing key. " + e.getMessage());
         }
 
     }
 
+    private KeyPair generateKeyPair(int sizeInBits, String algorithmType) throws NoSuchAlgorithmException {
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(algorithmType);
+        keyPairGenerator.initialize(sizeInBits);
+
+        return keyPairGenerator.generateKeyPair();
+    }
 
     /**
      * Creates and persists a new public key record with issued and expiry timestamps.
@@ -148,6 +154,7 @@ public class SigningKeyManager <T extends KeyRecord>{
         return publicKeyStore.save(
                 keyFactory.create(publicKey, signatureAlgorithm, issuedAt, expiresAt)
         );
+
     }
 
     /**
@@ -191,9 +198,12 @@ public class SigningKeyManager <T extends KeyRecord>{
      * @param <T> the type of {@link KeyRecord}.
      */
     @FunctionalInterface
-    public static interface KeyFactory<T> {
+    public interface KeyFactory<T> {
         T create(
-                String publicKey, String signingAlgorithm, LocalDateTime issuedAt, LocalDateTime expiresAt
+                String publicKey,
+                String signingAlgorithm,
+                LocalDateTime issuedAt,
+                LocalDateTime expiresAt
         );
 
     }
@@ -202,14 +212,13 @@ public class SigningKeyManager <T extends KeyRecord>{
     /**
      * PublicKeyHistory is a thread-safe data structure that stores a desired fixed-size history of public keys.
      */
-    @RequiredArgsConstructor
     public static class PublicKeyHistory {
-        private final int maxSize;
+        private static final int DEFAULT_MAX_SIZE = 5;
 
-        private Deque<String> keyHistory = new ConcurrentLinkedDeque<>();
+        private final Deque<String> keyHistory = new ConcurrentLinkedDeque<>();
 
         public void addKey(String key){
-            if(keyHistory.size() >= maxSize){
+            if(keyHistory.size() >= DEFAULT_MAX_SIZE){
                 keyHistory.pollFirst();
             }
             keyHistory.addLast(key);

@@ -1,4 +1,4 @@
-package com.payme.token.component;
+package com.payme.token.producer;
 
 import com.payme.internal.security.model.TokenSubject;
 import io.jsonwebtoken.Jwts;

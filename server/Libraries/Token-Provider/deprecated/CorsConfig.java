@@ -1,4 +1,4 @@
-package com.payme.token.config;
+package com.payme.token.deprecated;
 
 import org.springframework.context.annotation.Configuration;
 

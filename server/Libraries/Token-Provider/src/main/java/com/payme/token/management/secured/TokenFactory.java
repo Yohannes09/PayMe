@@ -1,6 +1,8 @@
-package com.payme.token.producer;
+package com.payme.token.management.secured;
 
 import com.payme.internal.security.model.TokenSubject;
+import com.payme.token.management.TokenConfigurationProperties;
+import com.payme.token.model.PublicKeyRecord;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
@@ -16,12 +18,11 @@ import java.util.Set;
 
 /**
  * Generates signed JWT tokens using the active signing key.
- * <p>Encapsulates token creation logic to decouple from token services, ensuring modularity and maintainability.</p>
  */
 @Component
 @RequiredArgsConstructor
-public class TokenFactory {
-    private final SigningKeyManager signingKeyManager;
+public class TokenFactory<T extends PublicKeyRecord> {
+    private final SigningKeyManager<T> signingKeyManager;
     private final TokenConfigurationProperties tokenConfigurationProperties;
 
 
@@ -40,13 +41,13 @@ public class TokenFactory {
             String tokenRecipient,
             int tokenValidityMinutes
     ){
-        Map<String,Object> claims = addClaims(
+        Map<String,Object> claims = createClaims(
                 tokenSubject.getRolesOrScope(),
                 tokenType,
                 tokenRecipient
         );
 
-        return buildTokenWithClaims(tokenSubject, claims, tokenValidityMinutes);
+        return signToken(tokenSubject, claims, tokenValidityMinutes);
     }
 
 
@@ -58,22 +59,20 @@ public class TokenFactory {
      * @param validityMinutes  the token's validity duration in minutes
      * @return a signed JWT token as a string
      */
-    private String buildTokenWithClaims(
+    private String signToken(
             TokenSubject tokenSubject,
             Map<String, Object> claims,
             int validityMinutes
     ){
         Instant issuedAt = Instant.now();
         Instant expiresAt = issuedAt.plus(Duration.ofMinutes(validityMinutes));
-
         PrivateKey privateKey = signingKeyManager.getActiveSigningKey();
-
         SignatureAlgorithm signatureAlgorithm = signatureAlgorithmResolver(
                 signingKeyManager.getActivePublicKey().getSignatureAlgorithm()
         );
 
         return Jwts.builder()
-                .setHeaderParam("kid", tokenConfigurationProperties.getSigning().getKeyId())
+                .setHeaderParam("kid", signingKeyManager.getActivePublicKey().getId())
                 .setClaims(claims)
                 .setSubject(tokenSubject.getUsernameOrId())
                 .setIssuedAt(Date.from(issuedAt))
@@ -92,7 +91,7 @@ public class TokenFactory {
      * @param tokenRecipient the intended recipient of the token
      * @return a map containing the token claims
      */
-    private Map<String, Object> addClaims(
+    private Map<String, Object> createClaims(
             Set<String> roles,
             String tokenType,
             String tokenRecipient

@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.payme</groupId>
-	<artifactId>token-service</artifactId>
+	<artifactId>token-provider</artifactId>
 	<version>1.0.0</version>
-	<name>token-service</name>
-	<description>Token provider used to authenticate requests. </description>
+	<name>token-provider</name>
+	<description>Provide signed JWT with claims. </description>
 	<url/>
 	<licenses>
 		<license/>
@@ -40,10 +40,6 @@
 	</repositories>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -75,11 +71,6 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
-		</dependency>
 
 		<!-- JWT Dependencies -->
 		<dependency>
@@ -103,7 +94,6 @@
 			<artifactId>internal-tools</artifactId>
 			<version>1.0.0</version>
 		</dependency>
-
 	</dependencies>
 
 	<build>

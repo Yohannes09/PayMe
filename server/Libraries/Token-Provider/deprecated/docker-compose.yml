@@ -14,7 +14,7 @@ services:
 #    Build an image from the Dockerfile found at this context path
 #    (in this case, the same directory .), and use it for this service.
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
     restart: always
     depends_on:

@@ -3,7 +3,7 @@ FROM maven:3.9.9 as builder
 
 WORKDIR /build
 
-COPY . .
+COPY .. .
 COPY settings.xml /root/.m2/settings.xml
 
 RUN mvn clean package -DskipTests

@@ -1,7 +1,5 @@
 package com.payme.token.model;
 
-import com.payme.token.model.KeyRecord;
-import com.payme.token.repository.PublicKeyStore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -25,7 +23,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PublicKeyRecord implements KeyRecord {
+public class PublicKeyRecordJpa implements PublicKeyRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;

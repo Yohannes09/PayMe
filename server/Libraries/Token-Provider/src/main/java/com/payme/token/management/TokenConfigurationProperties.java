@@ -1,4 +1,4 @@
-package com.payme.token.producer;
+package com.payme.token.management;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
@@ -46,7 +46,7 @@ import java.util.Map;
  *         template: access-token
  * </pre>
  */
-@Component
+@Component("tokenConfiguration")
 @ConfigurationProperties(prefix = "token")
 @Getter
 @Setter

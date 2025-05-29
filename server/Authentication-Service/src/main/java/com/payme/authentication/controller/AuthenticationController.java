@@ -1,7 +1,7 @@
 package com.payme.authentication.controller;
 
 import com.payme.authentication.dto.authentication.LoginRequest;
-import com.payme.authentication.dto.authentication.RegisterRequest;
+import com.payme.authentication.dto.authentication.RegististrationRequest;
 import com.payme.authentication.service.auth.AuthenticationService;
 import com.payme.authentication.dto.authentication.AuthenticationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,9 +54,9 @@ public class AuthenticationController {
                     @ApiResponse(responseCode = "", description = "Unauthorized - bad credentials")
             }
     )
-    public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest registerRequest){
+    public ResponseEntity<Void> register(@Valid @RequestBody RegististrationRequest regististrationRequest){
         log.info("New registration request received. ");
-        authenticationService.register(registerRequest);
+        authenticationService.register(regististrationRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

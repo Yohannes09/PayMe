@@ -1,17 +1,17 @@
 package com.payme.authentication.service.auth;
 
-import com.payme.authentication.components.TokenServiceClient;
+import com.payme.authentication.components.TokenProvider;
 import com.payme.authentication.constant.DefaultRoles;
 import com.payme.authentication.dto.authentication.LoginRequest;
-import com.payme.authentication.dto.authentication.RegisterRequest;
+import com.payme.authentication.dto.authentication.RegististrationRequest;
 import com.payme.authentication.entity.User;
 import com.payme.authentication.entity.Role;
 import com.payme.authentication.exception.DuplicateCredentialException;
 import com.payme.authentication.service.UserService;
 import com.payme.authentication.components.RoleProvider;
 import com.payme.authentication.dto.authentication.AuthenticationResponse;
-import com.payme.internal.security.dto.TokenPairResponseDto;
-import com.payme.internal.security.dto.UserTokenRequestDto;
+import com.payme.internal.security.constant.TokenRecipient;
+import com.payme.internal.security.model.UserTokenSubject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,24 +31,28 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Qualifier("JwtAuthenticationService")
 public class JwtAuthenticationService implements AuthenticationService {
+    /*
+    * TO DO:
+    *   POLISH ERROR HANDLING
+    *   */
     private final RoleProvider roleProvider;
     private final UserService userService;
-    private final TokenServiceClient tokenServiceClient;
+    private final TokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
 
 
     @Override
     @Transactional
-    public void register(RegisterRequest registerRequest) {
+    public void register(RegististrationRequest regististrationRequest) {
         try {
             userService.createNewUser(
-                    registerRequest.username(),
-                    registerRequest.email(),
-                    registerRequest.password(),
+                    regististrationRequest.username(),
+                    regististrationRequest.email(),
+                    regististrationRequest.password(),
                     fetchDefaultRoles()
             );
 
-            log.info("User registered successfully: {}", registerRequest.username());
+            log.info("User registered successfully: {}", regististrationRequest.username());
 
         } catch (DuplicateCredentialException e) {
             log.warn("Registration failed: {}", e.getMessage());
@@ -62,22 +66,17 @@ public class JwtAuthenticationService implements AuthenticationService {
     public AuthenticationResponse login(LoginRequest loginRequest) {
         User user = authenticate(loginRequest.usernameOrEmail(), loginRequest.password());
 
-        String username = user.getUsername();
-        Set<String> roles = user.getRoles().stream()
+        UUID userId = user.getId();
+        Set<String> userRoles = user.getRoles().stream()
                 .map(Role::getRole)
                 .collect(Collectors.toSet());
 
-        TokenPairResponseDto response = tokenServiceClient.fetchAccessAndRefreshTokens(
-                new UserTokenRequestDto(username, roles)
-        );
-
         log.info("Successful login for ID: {}", user.getId());
-        return AuthenticationResponse.builder()
-                .accessToken(response.accessToken())
-                .refreshToken(response.refreshToken())
-                .userId(user.getId())
-                .build();
+        return generateAuthenticationResponse(userId, userRoles);
+    }
 
+    public AuthenticationResponse refresh(){
+        return null;
     }
 
     @Override
@@ -98,8 +97,8 @@ public class JwtAuthenticationService implements AuthenticationService {
                 log.info("Login successful for ");
                 return user;
             }
-            log.error("Unexpected principle type: {}", principal.getClass());
-            throw new IllegalStateException("Incompatible types");
+
+            throw new IllegalStateException("Error - Incompatible types\n -Expected: User" + "\n -Returned: " + principal.getClass());
 
         }catch (BadCredentialsException e){
             throw new BadCredentialsException(usernameOrEmail + " provided bad credentials");
@@ -115,6 +114,22 @@ public class JwtAuthenticationService implements AuthenticationService {
         defaultRoles.add(userRole);
 
         return defaultRoles;
+    }
+
+    private AuthenticationResponse generateAuthenticationResponse(UUID id, Set<String> roles){
+        String accessToken = tokenProvider.generateAccessToken(
+                new UserTokenSubject(id.toString(), roles), TokenRecipient.USER
+        );
+
+        String refreshToken = tokenProvider.generateRefreshToken(
+                new UserTokenSubject(id.toString(), roles), TokenRecipient.USER
+        );
+
+        return AuthenticationResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .userId(id)
+                .build();
     }
 
 }

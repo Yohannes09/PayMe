@@ -1,22 +1,16 @@
 package com.payme.authentication.service;
 
-import com.payme.authentication.components.TokenServiceClient;
 import com.payme.authentication.entity.Role;
 import com.payme.authentication.entity.User;
-import com.payme.authentication.exception.BadRequestException;
 import com.payme.authentication.exception.DuplicateCredentialException;
 import com.payme.authentication.exception.UserNotFoundException;
 import com.payme.authentication.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.client.RestClient;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 

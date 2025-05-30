@@ -9,6 +9,8 @@ spring:
     deserialization:
       fail-on-unknown-properties: true
 
+
+
 token:
   signing:
     algorithm: RSA

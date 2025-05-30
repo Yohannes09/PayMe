@@ -1,4 +1,4 @@
-package com.payme.authentication.components;
+package com.payme.authentication.component;
 
 import com.payme.authentication.dto.credentialupdate.EmailUpdateRequest;
 import com.payme.authentication.dto.credentialupdate.PasswordUpdateRequest;

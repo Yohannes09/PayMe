@@ -1,24 +1,19 @@
 package com.payme.authentication.service.auth;
 
-import com.payme.authentication.components.TokenProvider;
+import com.payme.authentication.component.TokenProvider;
 import com.payme.authentication.constant.DefaultRoles;
 import com.payme.authentication.dto.authentication.LoginRequest;
 import com.payme.authentication.dto.authentication.RegististrationRequest;
 import com.payme.authentication.entity.User;
 import com.payme.authentication.entity.Role;
-import com.payme.authentication.exception.DuplicateCredentialException;
 import com.payme.authentication.service.UserService;
-import com.payme.authentication.components.RoleProvider;
+import com.payme.authentication.component.RoleProvider;
 import com.payme.authentication.dto.authentication.AuthenticationResponse;
 import com.payme.internal.security.constant.TokenRecipient;
 import com.payme.internal.security.model.UserTokenSubject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,15 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Service
+@Service("jwtAuthenticationService")
 @Slf4j
 @RequiredArgsConstructor
-@Qualifier("JwtAuthenticationService")
 public class JwtAuthenticationService implements AuthenticationService {
-    /*
-    * TO DO:
-    *   POLISH ERROR HANDLING
-    *   */
     private final RoleProvider roleProvider;
     private final UserService userService;
     private final TokenProvider tokenProvider;
@@ -44,69 +34,52 @@ public class JwtAuthenticationService implements AuthenticationService {
     @Override
     @Transactional
     public void register(RegististrationRequest regististrationRequest) {
-        try {
-            userService.createNewUser(
-                    regististrationRequest.username(),
-                    regististrationRequest.email(),
-                    regististrationRequest.password(),
-                    fetchDefaultRoles()
-            );
+        userService.createNewUser(
+                regististrationRequest.username(),
+                regististrationRequest.email(),
+                regististrationRequest.password(),
+                fetchDefaultRoles()
+        );
 
-            log.info("User registered successfully: {}", regististrationRequest.username());
-
-        } catch (DuplicateCredentialException e) {
-            log.warn("Registration failed: {}", e.getMessage());
-            throw new RuntimeException(e);
-        }
-
+        log.info("Successful registration: {}", regististrationRequest.username());
     }
 
 
     @Override
     public AuthenticationResponse login(LoginRequest loginRequest) {
-        User user = authenticate(loginRequest.usernameOrEmail(), loginRequest.password());
+        User user = null;
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.usernameOrEmail(), loginRequest.password()
+                )
+        );
 
-        UUID userId = user.getId();
-        Set<String> userRoles = user.getRoles().stream()
-                .map(Role::getRole)
-                .collect(Collectors.toSet());
+        if(authentication.getPrincipal() instanceof User u)
+            user =  u;
+        else
+            throw new IllegalStateException("Error - Incompatible types\n -Expected: User\n -Returned: " + authentication.getPrincipal().getClass());
 
-        log.info("Successful login for ID: {}", user.getId());
-        return generateAuthenticationResponse(userId, userRoles);
+
+        log.info("Successful login: {}", user.getId());
+        return generateAuthenticationResponse(user);
     }
 
-    public AuthenticationResponse refresh(){
-        return null;
+
+    @Override
+    public AuthenticationResponse refresh(UUID id){
+        User user = userService.findById(id);
+        validateUserAccount(user);
+
+        log.info("Token refresh: {}", user.getId());
+        return generateAuthenticationResponse(user);
     }
+
 
     @Override
     public void logout(String token){
         // No logic here yet.
     }
 
-
-    private User authenticate(String usernameOrEmail, String password){
-        try{
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(usernameOrEmail, password)
-            );
-
-            Object principal = authentication.getPrincipal();
-
-            if(principal instanceof User user){
-                log.info("Login successful for ");
-                return user;
-            }
-
-            throw new IllegalStateException("Error - Incompatible types\n -Expected: User" + "\n -Returned: " + principal.getClass());
-
-        }catch (BadCredentialsException e){
-            throw new BadCredentialsException(usernameOrEmail + " provided bad credentials");
-        }catch (DisabledException e){
-            throw new DisabledException(usernameOrEmail + " has been disabled");
-        }
-
-    }
 
     private Set<Role> fetchDefaultRoles(){
         Set<Role> defaultRoles = new HashSet<>();
@@ -116,7 +89,13 @@ public class JwtAuthenticationService implements AuthenticationService {
         return defaultRoles;
     }
 
-    private AuthenticationResponse generateAuthenticationResponse(UUID id, Set<String> roles){
+
+    private AuthenticationResponse generateAuthenticationResponse(User user){
+        UUID id = user.getId();
+        Set<String> roles = user.getRoles().stream()
+                .map(Role::getRole)
+                .collect(Collectors.toSet());
+
         String accessToken = tokenProvider.generateAccessToken(
                 new UserTokenSubject(id.toString(), roles), TokenRecipient.USER
         );
@@ -128,9 +107,28 @@ public class JwtAuthenticationService implements AuthenticationService {
         return AuthenticationResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .usernameOrEmail(user.getUsername())
                 .userId(id)
                 .build();
     }
+
+
+    private void validateUserAccount(User user) {
+        if (!user.isAccountNonLocked()) {
+            throw new LockedException("Account is locked");
+        }
+        if (!user.isEnabled()) {
+            throw new DisabledException("Account is disabled");
+        }
+        if (!user.isAccountNonExpired()) {
+            throw new AccountExpiredException("Account has expired");
+        }
+        if (!user.isCredentialsNonExpired()) {
+            throw new CredentialsExpiredException("Credentials have expired");
+        }
+
+    }
+
 
 }
 

@@ -1,6 +1,6 @@
 package com.payme.authentication.controller;
 
-import com.payme.authentication.components.RoleProvider;
+import com.payme.authentication.component.RoleProvider;
 import com.payme.authentication.entity.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
-//@RequestMapping("/test")
+@RequestMapping("/dummy")
 @RequiredArgsConstructor
 public class DummyController {
     private final RoleProvider roleProvider;
@@ -24,9 +24,4 @@ public class DummyController {
         return ResponseEntity.ok(roleProvider.findRole(role));
     }
 
-    @GetMapping("/hey")
-    public ResponseEntity<String> test(){
-        log.info("not sure");
-        return ResponseEntity.ok("Yo");
-    }
 }

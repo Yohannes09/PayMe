@@ -14,5 +14,15 @@ public record AuthenticationResponse(
         String refreshToken,
 
         @Schema(description = "ID of the authenticated user. ")
-        UUID userId
-){}
+        UUID userId,
+
+        @Schema
+        String usernameOrEmail
+){
+        public AuthenticationResponse trimmed(){
+                return AuthenticationResponse.builder()
+                        .userId(this.userId)
+                        .usernameOrEmail(this.usernameOrEmail)
+                        .build();
+        }
+}

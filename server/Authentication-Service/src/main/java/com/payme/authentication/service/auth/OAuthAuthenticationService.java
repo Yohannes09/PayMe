@@ -6,6 +6,8 @@ import com.payme.authentication.dto.authentication.RegististrationRequest;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @Qualifier("OAuthAuthenticationService")
 public class OAuthAuthenticationService implements AuthenticationService {
@@ -24,4 +26,8 @@ public class OAuthAuthenticationService implements AuthenticationService {
 
     }
 
+    @Override
+    public AuthenticationResponse refresh(UUID id) {
+        return null;
+    }
 }

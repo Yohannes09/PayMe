@@ -37,13 +37,13 @@ public class UserService {
      * @throws DuplicateCredentialException if the username or email already exists
      */
     @Transactional
-    public User createNewUser(String username, String email, String password, Set<Role> roles){
+    public void createNewUser(String username, String email, String password, Set<Role> roles){
 
         if(userRepository.existsByUsernameOrEmail(username, email)){
             throw new DuplicateCredentialException("Username or Email already registered. ");
         }
 
-        return userRepository.save(
+        userRepository.save(
                 User.builder()
                         .username(username)
                         .email(email)
@@ -55,6 +55,7 @@ public class UserService {
                         .enabled(false)
                         .build()
         );
+
     }
 
     // map to dto and return a dto

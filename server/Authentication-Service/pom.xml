@@ -158,7 +158,7 @@
         <dependency>
             <groupId>com.payme</groupId>
             <artifactId>token-provider</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
 
         <!-- Rate Limitting -->

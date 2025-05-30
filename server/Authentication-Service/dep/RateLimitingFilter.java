@@ -1,4 +1,4 @@
-package com.payme.authentication.components;
+package com.payme.authentication.component;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

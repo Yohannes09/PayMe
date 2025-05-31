@@ -35,7 +35,7 @@ public class CookieService {
     }
 
 
-    public String extractRefreshToken(HttpServletRequest request, String cookie){
+    public String extractCookie(HttpServletRequest request, String cookie){
         return Arrays.stream(request.getCookies())
                 .filter(c -> cookie.equals(c.getName()))
                 .map(Cookie::getValue)

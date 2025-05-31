@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
-public record RegististrationRequest(
+public record RegistrationRequest(
         @NotBlank(message = "Username cannot be blank.")
         @Pattern(
                 regexp = ValidationConstants.USERNAME_PATTERN,

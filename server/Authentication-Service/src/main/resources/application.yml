@@ -1,4 +1,9 @@
 spring:
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
   profiles:
     active: dev
   application:
@@ -9,7 +14,11 @@ spring:
     deserialization:
       fail-on-unknown-properties: true
 
-
+sentry:
+  dsn: https://6f39834fb7758b3febdbe15a42abad93@o4509417075900416.ingest.us.sentry.io/4509417078194176
+  # Add data like request headers and IP for users,
+  # see https://docs.sentry.io/platforms/java/guides/spring-boot/data-management/data-collected/ for more info
+  send-default-pii: true
 
 token:
   signing:

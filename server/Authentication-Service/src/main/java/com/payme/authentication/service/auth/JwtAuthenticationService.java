@@ -3,7 +3,7 @@ package com.payme.authentication.service.auth;
 import com.payme.authentication.component.TokenProvider;
 import com.payme.authentication.constant.DefaultRoles;
 import com.payme.authentication.dto.authentication.LoginRequest;
-import com.payme.authentication.dto.authentication.RegististrationRequest;
+import com.payme.authentication.dto.authentication.RegistrationRequest;
 import com.payme.authentication.entity.User;
 import com.payme.authentication.entity.Role;
 import com.payme.authentication.service.UserService;
@@ -33,15 +33,15 @@ public class JwtAuthenticationService implements AuthenticationService {
 
     @Override
     @Transactional
-    public void register(RegististrationRequest regististrationRequest) {
+    public void register(RegistrationRequest registrationRequest) {
         userService.createNewUser(
-                regististrationRequest.username(),
-                regististrationRequest.email(),
-                regististrationRequest.password(),
+                registrationRequest.username(),
+                registrationRequest.email(),
+                registrationRequest.password(),
                 fetchDefaultRoles()
         );
 
-        log.info("Successful registration: {}", regististrationRequest.username());
+        log.info("Successful registration: {}", registrationRequest.username());
     }
 
 
@@ -58,7 +58,6 @@ public class JwtAuthenticationService implements AuthenticationService {
             user =  u;
         else
             throw new IllegalStateException("Error - Incompatible types\n -Expected: User\n -Returned: " + authentication.getPrincipal().getClass());
-
 
         log.info("Successful login: {}", user.getId());
         return generateAuthenticationResponse(user);

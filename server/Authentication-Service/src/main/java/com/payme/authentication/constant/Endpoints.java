@@ -23,4 +23,9 @@ public final class Endpoints {
         public static final String UPDATE_PASSWORD = "/password";
     }
 
+    public static final class Developer{
+        public static final String SWAGGER_UI = "/swagger-ui.html";
+        public static final String OPEN_API_SPECIFICATION = "/v3/api-docs";
+    }
+
 }

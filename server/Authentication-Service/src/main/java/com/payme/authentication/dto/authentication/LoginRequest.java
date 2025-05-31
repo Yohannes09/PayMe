@@ -12,10 +12,11 @@ public record LoginRequest(
                 message = ValidationConstants.USERNAME_OR_EMAIL_VALIDATION_MESSAGE
         )
         @Schema(
-                description = "User authentication username. ",
+                description = "Username or email of the entity logging in. ",
                 example = "Username123 or user@example.com"
         )
         String usernameOrEmail,
+
 
         @NotBlank(message = "Password cannot be blank. ")
         @Pattern(

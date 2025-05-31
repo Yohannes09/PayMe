@@ -2,7 +2,7 @@ package com.payme.authentication.controller;
 
 import com.payme.authentication.constant.Endpoints;
 import com.payme.authentication.dto.authentication.LoginRequest;
-import com.payme.authentication.dto.authentication.RegististrationRequest;
+import com.payme.authentication.dto.authentication.RegistrationRequest;
 import com.payme.authentication.service.auth.AuthenticationService;
 import com.payme.authentication.dto.authentication.AuthenticationResponse;
 import com.payme.authentication.service.auth.CookieService;
@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5500"})
@@ -49,16 +52,10 @@ public class AuthenticationController {
             @Valid @RequestBody LoginRequest loginRequest,
             HttpServletResponse servletResponse
     ){
-        log.info("New login by user: {}", loginRequest.usernameOrEmail());
-
+        log.info("New login attempt: {}", loginRequest.usernameOrEmail());
         AuthenticationResponse  authResponse = authenticationService.login(loginRequest);
-        cookieService.setTokenCookies(
-                authResponse.refreshToken(),
-                authResponse.accessToken(),
-                servletResponse
-        );
 
-        return ResponseEntity.ok(authResponse.trimmed());
+        return buildAuthenticationResponse(authResponse, servletResponse);
     }
 
 
@@ -66,35 +63,60 @@ public class AuthenticationController {
     @Operation(
             summary = "Create a new user. ",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "User successfully registered. ",
-                            content = @Content(schema = @Schema(implementation = AuthenticationResponse.class)))
+                    @ApiResponse(responseCode = "201", description = "User successfully registered. ")
             }
     )
-    public ResponseEntity<Void> register(@Valid @RequestBody RegististrationRequest regististrationRequest){
+    public ResponseEntity<Void> register(@Valid @RequestBody RegistrationRequest registrationRequest){
         log.info("New registration request received. ");
-        authenticationService.register(regististrationRequest);
+        authenticationService.register(registrationRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 
-    @PostMapping(path = Endpoints.Auth.TOKEN_REFRESH)
+    @PostMapping(path = Endpoints.Auth.TOKEN_REFRESH + "/{id}")
     @Operation(
-            summary = "Issue new access and refresh tokens. Valid refresh token must come attached to request."
+            summary = "Issue new access and refresh tokens. Valid refresh token must come attached to request.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Token refresh successful. ",
+                            content = @Content(schema = @Schema(implementation = AuthenticationResponse.class)))
+            }
     )
-    public ResponseEntity<?> refresh(){
-        return ResponseEntity.ok(authenticationService.refresh(null));
+    public ResponseEntity<AuthenticationResponse> refresh(
+            @PathVariable UUID id, HttpServletResponse servletResponse
+    ){
+        AuthenticationResponse authResponse = authenticationService.refresh(null);
+
+        return buildAuthenticationResponse(authResponse, servletResponse);
     }
 
 
     @PostMapping(path = Endpoints.Auth.LOGOUT)
     @Operation(
-            summary = "Terminate the user's authenticated session by black-listing the refresh token. "
+            summary = "Terminate the user's authenticated session by black-listing the refresh token. ",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Token refresh successful. ")
+            }
     )
-    public ResponseEntity<Void> logout(){
-        authenticationService.logout("");
+    public ResponseEntity<Void> logout(HttpServletRequest servletRequest){
+        String refreshTokenCookie = cookieService.extractCookie(servletRequest, "refresh-token");
+        authenticationService.logout(refreshTokenCookie);
 
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
+    private ResponseEntity<AuthenticationResponse> buildAuthenticationResponse(
+            AuthenticationResponse authResponse,
+            HttpServletResponse servletResponse
+    ){
+        cookieService.setTokenCookies(
+                authResponse.refreshToken(),
+                authResponse.accessToken(),
+                servletResponse
+        );
+
+        return ResponseEntity.ok(authResponse.trimmed());
     }
 
 }

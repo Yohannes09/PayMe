@@ -15,8 +15,8 @@ public final class Endpoints {
         public static final String LOGOUT = "/logout";
     }
 
-    public static final class Users {
-        public static final String BASE = API_BASE + "/users";
+    public static final class CredentialUpdate {
+        public static final String BASE = API_BASE + "/credentials";
 
         public static final String UPDATE_USERNAME = "/username";
         public static final String UPDATE_EMAIL = "/email";

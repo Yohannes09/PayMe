@@ -1,3 +1,6 @@
+logging:
+  pattern:
+    console: "%d %-5level %logger{36} - %msg%n"
 spring:
   jpa:
     hibernate:

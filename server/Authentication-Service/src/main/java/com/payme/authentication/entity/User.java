@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class User implements UserDetails {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @Pattern(regexp = ValidationConstants.USERNAME_PATTERN)

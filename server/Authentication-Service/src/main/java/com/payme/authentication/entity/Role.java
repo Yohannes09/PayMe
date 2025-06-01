@@ -12,7 +12,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 
-@Table(name = "role")
+@Table(name = "roles")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 @Getter

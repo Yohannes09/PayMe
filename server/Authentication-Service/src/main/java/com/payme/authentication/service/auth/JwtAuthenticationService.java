@@ -6,7 +6,7 @@ import com.payme.authentication.dto.authentication.LoginRequest;
 import com.payme.authentication.dto.authentication.RegistrationRequest;
 import com.payme.authentication.entity.User;
 import com.payme.authentication.entity.Role;
-import com.payme.authentication.service.UserService;
+import com.payme.authentication.component.UserAccountManager;
 import com.payme.authentication.component.RoleProvider;
 import com.payme.authentication.dto.authentication.AuthenticationResponse;
 import com.payme.internal.security.constant.TokenRecipient;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class JwtAuthenticationService implements AuthenticationService {
     private final RoleProvider roleProvider;
-    private final UserService userService;
+    private final UserAccountManager userAccountManager;
     private final TokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
 
@@ -34,7 +34,7 @@ public class JwtAuthenticationService implements AuthenticationService {
     @Override
     @Transactional
     public void register(RegistrationRequest registrationRequest) {
-        userService.createNewUser(
+        userAccountManager.createNewUser(
                 registrationRequest.username(),
                 registrationRequest.email(),
                 registrationRequest.password(),
@@ -66,7 +66,7 @@ public class JwtAuthenticationService implements AuthenticationService {
 
     @Override
     public AuthenticationResponse refresh(UUID id){
-        User user = userService.findById(id);
+        User user = userAccountManager.findById(id);
         validateUserAccount(user);
 
         log.info("Token refresh: {}", user.getId());

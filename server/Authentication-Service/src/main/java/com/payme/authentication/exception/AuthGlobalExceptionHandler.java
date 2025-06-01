@@ -19,8 +19,7 @@ public class AuthGlobalExceptionHandler extends BaseGlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInternalExceptions(
             Exception exception, HttpServletRequest request
     ){
-        log.error("FATAL ERROR {}", exception.getMessage());
-
+        log.error("FATAL ERROR {}\nTrace:{}", exception.getMessage(), exception.getStackTrace());
         return generateErrorResponse(
                 "Oops, something went wrong. Please try again later.",
                 HttpStatus.INTERNAL_SERVER_ERROR,
@@ -34,7 +33,6 @@ public class AuthGlobalExceptionHandler extends BaseGlobalExceptionHandler {
             AuthenticationException exception, HttpServletRequest servletRequest
     ){
         log.error("Error during authentication: {}", exception.getMessage());
-
         return generateErrorResponse(
                 exception.getMessage(),
                 HttpStatus.UNAUTHORIZED,
@@ -48,12 +46,25 @@ public class AuthGlobalExceptionHandler extends BaseGlobalExceptionHandler {
              RuntimeException exception, HttpServletRequest request
     ){
         log.warn("User not found: {}", exception.getMessage());
-
         return generateErrorResponse(
                 "User not found.",
                 HttpStatus.NOT_FOUND,
                 request
         );
+    }
+
+
+    @ExceptionHandler(CredentialUpdateException.class)
+    public ResponseEntity<ErrorResponse> handleCredentialException(
+            CredentialUpdateException exception, HttpServletRequest request
+    ){
+        log.info("User credential update failed: {}", exception.getMessage());
+        return generateErrorResponse(
+                "User not found.",
+                HttpStatus.BAD_REQUEST,
+                request
+        );
+
     }
 
 }

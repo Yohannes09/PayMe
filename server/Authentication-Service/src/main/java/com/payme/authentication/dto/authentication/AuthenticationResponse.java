@@ -6,6 +6,7 @@ import lombok.*;
 import java.util.UUID;
 
 @Builder
+@Schema(description = "Response provided by the server containing the user's ID and username/email")
 public record AuthenticationResponse(
         @Schema(description = "Short-lived token used to access protected resources. ")
         String accessToken,
@@ -25,4 +26,5 @@ public record AuthenticationResponse(
                         .usernameOrEmail(this.usernameOrEmail)
                         .build();
         }
+
 }

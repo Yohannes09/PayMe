@@ -1,15 +1,18 @@
 package com.payme.authentication.component;
 
+import com.payme.authentication.dto.UserDto;
 import com.payme.authentication.entity.Role;
 import com.payme.authentication.entity.User;
 import com.payme.authentication.exception.DuplicateCredentialException;
 import com.payme.authentication.exception.UserNotFoundException;
 import com.payme.authentication.repository.UserRepository;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 import java.util.UUID;
@@ -50,17 +53,28 @@ public class UserAccountManager {
                         .accountNonExpired(true)
                         .accountNonLocked(true)
                         .credentialsNonExpired(true)
-                        .enabled(false)
+                        .enabled(true)
                         .build()
         );
 
     }
 
 
-    public User findById(UUID userId){
+    //@Cacheable(cacheNames = "user", key = "#userId")
+    public User findById(@NotNull UUID userId){
+
         return userRepository
                 .findById(userId)
                 .orElseThrow(()-> new UserNotFoundException("User not found: " + userId));
+    }
+
+
+    @Cacheable(cacheNames = "user", key = "#usernameOrEmail")
+    public UserDto findByUsernameOrEmail(@NotBlank String usernameOrEmail){
+        return userRepository
+                .findByUsernameOrEmail(usernameOrEmail)
+                .map(UserDto::entityToDto)
+                .orElseThrow(() -> new UserNotFoundException("User not found: " + usernameOrEmail));
     }
 
 
@@ -81,10 +95,7 @@ public class UserAccountManager {
     }
 
 
-    public boolean existsByEmail(String email){
-        if(email.isBlank())
-            throw new NullPointerException("Provided null/empty email parameter to existsByEmail()");
-
+    public boolean existsByEmail(@NotBlank String email){
         return userRepository.existsByEmailIgnoreCase(email);
     }
 

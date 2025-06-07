@@ -8,7 +8,6 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.repository.cdi.Eager;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -42,7 +41,7 @@ public class RoleProvider {
                 .map(Role::new)
                 .toList();
 
-        if(unsavedRoles.isEmpty()){
+        if(!unsavedRoles.isEmpty()){
             roleRepository.saveAll(unsavedRoles);
             log.info("Saved all default roles. ");
         }

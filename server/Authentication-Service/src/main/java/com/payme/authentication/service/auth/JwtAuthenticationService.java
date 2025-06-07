@@ -2,6 +2,7 @@ package com.payme.authentication.service.auth;
 
 import com.payme.authentication.component.TokenProvider;
 import com.payme.authentication.constant.DefaultRoles;
+import com.payme.authentication.dto.UserDto;
 import com.payme.authentication.dto.authentication.LoginRequest;
 import com.payme.authentication.dto.authentication.RegistrationRequest;
 import com.payme.authentication.entity.User;
@@ -9,10 +10,12 @@ import com.payme.authentication.entity.Role;
 import com.payme.authentication.component.UserAccountManager;
 import com.payme.authentication.component.RoleProvider;
 import com.payme.authentication.dto.authentication.AuthenticationResponse;
+import com.payme.authentication.entity.model.UserPrincipal;
 import com.payme.internal.security.constant.TokenRecipient;
 import com.payme.internal.security.model.UserTokenSubject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -29,6 +32,7 @@ public class JwtAuthenticationService implements AuthenticationService {
     private final UserAccountManager userAccountManager;
     private final TokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
+    private final ModelMapper modelMapper;
 
 
     @Override
@@ -47,20 +51,20 @@ public class JwtAuthenticationService implements AuthenticationService {
 
     @Override
     public AuthenticationResponse login(LoginRequest loginRequest) {
-        User user = null;
+        UserPrincipal user;
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.usernameOrEmail(), loginRequest.password()
                 )
         );
 
-        if(authentication.getPrincipal() instanceof User u)
+        if(authentication.getPrincipal() instanceof UserPrincipal u)
             user =  u;
         else
             throw new IllegalStateException("Error - Incompatible types\n -Expected: User\n -Returned: " + authentication.getPrincipal().getClass());
 
-        log.info("Successful login: {}", user.getId());
-        return generateAuthenticationResponse(user);
+        log.info("Successful login: {}", user.id());
+        return generateAuthenticationResponse(modelMapper.map(user, UserDto.class));
     }
 
 
@@ -70,7 +74,7 @@ public class JwtAuthenticationService implements AuthenticationService {
         validateUserAccount(user);
 
         log.info("Token refresh: {}", user.getId());
-        return generateAuthenticationResponse(user);
+        return generateAuthenticationResponse(modelMapper.map(User.class, UserDto.class));
     }
 
 
@@ -89,11 +93,9 @@ public class JwtAuthenticationService implements AuthenticationService {
     }
 
 
-    private AuthenticationResponse generateAuthenticationResponse(User user){
-        UUID id = user.getId();
-        Set<String> roles = user.getRoles().stream()
-                .map(Role::getRole)
-                .collect(Collectors.toSet());
+    private AuthenticationResponse generateAuthenticationResponse(UserDto user){
+        UUID id = user.id();
+        Set<String> roles = user.roles();
 
         String accessToken = tokenProvider.generateAccessToken(
                 new UserTokenSubject(id.toString(), roles), TokenRecipient.USER
@@ -106,7 +108,7 @@ public class JwtAuthenticationService implements AuthenticationService {
         return AuthenticationResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .usernameOrEmail(user.getUsername())
+                .usernameOrEmail(user.username())
                 .userId(id)
                 .build();
     }

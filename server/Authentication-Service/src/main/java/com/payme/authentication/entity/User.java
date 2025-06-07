@@ -1,5 +1,6 @@
 package com.payme.authentication.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.payme.authentication.constant.ValidationConstants;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
                 @Index(name = "idx_user_email", columnList = "email")
         }
 )
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 @Builder
 @Getter

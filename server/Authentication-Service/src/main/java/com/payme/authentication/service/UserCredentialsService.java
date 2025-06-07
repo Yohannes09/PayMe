@@ -8,6 +8,7 @@ import com.payme.authentication.entity.User;
 import com.payme.authentication.exception.CredentialUpdateException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class UserCredentialsService {
 
 
     @Transactional
+    @CacheEvict(cacheNames = "user", key = "#user.id")
     public void updateUsername(UsernameUpdateRequest usernameUpdateRequest){
         User user = userAccountManager.findById(usernameUpdateRequest.id());
         String newUsername = usernameUpdateRequest.newUsername();

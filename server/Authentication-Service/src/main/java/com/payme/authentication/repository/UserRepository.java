@@ -1,6 +1,7 @@
 package com.payme.authentication.repository;
 
 import com.payme.authentication.entity.User;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,6 +11,7 @@ import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
 
+    @EntityGraph(attributePaths = "roles")
     @Query("""
             SELECT user FROM User user
             WHERE LOWER(user.username) = LOWER(:usernameOrEmail)

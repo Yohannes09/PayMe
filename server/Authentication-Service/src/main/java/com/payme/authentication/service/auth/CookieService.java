@@ -18,11 +18,11 @@ public class CookieService {
 
     public void setTokenCookies(String refreshToken, String accessToken, HttpServletResponse response){
         addCookieToResponse(
-                response, ACCESS_TOKEN, refreshToken, Endpoints.Auth.TOKEN_REFRESH, 7 * 24 * 60 * 60
+                response, ACCESS_TOKEN, accessToken, Endpoints.Auth.TOKEN_REFRESH, 7 * 24 * 60 * 60
         );
 
         addCookieToResponse(
-                response, REFRESH_TOKEN, accessToken, Endpoints.Auth.TOKEN_REFRESH, 7 * 24 * 60 * 60
+                response, REFRESH_TOKEN, refreshToken, Endpoints.Auth.TOKEN_REFRESH, 7 * 24 * 60 * 60
         );
 
     }
@@ -51,7 +51,7 @@ public class CookieService {
 
         cookie.setHttpOnly(true);
         //cookie.setSecure(true); for https
-        cookie.setPath(path);
+        cookie.setPath("/");
         cookie.setMaxAge(maxAge);
 
         response.addCookie(cookie);

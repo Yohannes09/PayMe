@@ -5,13 +5,29 @@ services:
     ports:
       - 5433:5432
     environment:
-      MYSQL_DATABASE: auth_service_db
-      MYSQL_USER: user
-      MYSQL_PASSWORD: 1234
-      MYSQL_ROOT_PASSWORD: 1234
+      POSTGRES_DB: auth_service_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: 1234
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   authentication-service:
       image: .
       restart: always
       ports:
         - 8081:8080
+      depends_on:
+        - authentication-db
+        - redis
+
+  redis:
+    image: "redis:7-alpine"
+    restart: always
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:

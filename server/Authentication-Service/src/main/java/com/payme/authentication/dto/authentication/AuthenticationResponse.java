@@ -1,11 +1,11 @@
 package com.payme.authentication.dto.authentication;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-
-import java.util.UUID;
+import lombok.Builder;
 
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(description = "Response provided by the server containing the user's ID and username/email")
 public record AuthenticationResponse(
         @Schema(description = "Short-lived token used to access protected resources. ")
@@ -15,7 +15,7 @@ public record AuthenticationResponse(
         String refreshToken,
 
         @Schema(description = "ID of the authenticated user. ")
-        UUID userId,
+        Long userId,
 
         @Schema
         String usernameOrEmail

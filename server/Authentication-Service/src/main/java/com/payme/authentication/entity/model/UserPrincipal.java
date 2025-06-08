@@ -1,50 +1,45 @@
 package com.payme.authentication.entity.model;
 
-import com.payme.authentication.dto.UserDto;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import net.minidev.json.annotate.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Set;
-import java.util.UUID;
 
 @Builder
-public record UserPrincipal(
-        UUID id,
-        String username,
-        String password,
-        String email,
-        Set<String> roles,
-        boolean accountNonExpired,
-        boolean accountNonLocked,
-        boolean credentialsNonExpired,
-        boolean enabled
-) implements UserDetails {
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+public class UserPrincipal implements UserDetails {
 
-    public static UserPrincipal dtoToPrincipal(UserDto user){
-        return UserPrincipal.builder()
-                .id(user.id())
-                .username(user.username())
-                .email(user.email())
-                .password(user.password())
-                .roles(user.roles())
-                .accountNonExpired(user.accountNonExpired())
-                .enabled(user.enabled())
-                .accountNonLocked(user.accountNonLocked())
-                .credentialsNonExpired(user.credentialsNonExpired())
-                .build();
-    }
+    private Long id;
+    private String username;
+    private String password;
+    private String email;
+    private Set<String> roles;
+    private boolean accountNonExpired;
+    private boolean accountNonLocked;
+    private boolean credentialsNonExpired;
+    private boolean enabled;
 
 
     /**
      * @return
      */
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream().map(SimpleGrantedAuthority::new).toList();
+        return roles.stream()
+                .map(SimpleGrantedAuthority::new)
+                .toList();
     }
+
 
     /**
      * @return

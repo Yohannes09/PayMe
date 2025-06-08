@@ -1,11 +1,11 @@
 package com.payme.authentication.service.auth;
 
 import com.payme.authentication.component.TokenProvider;
+import com.payme.authentication.component.util.Mapper;
 import com.payme.authentication.constant.DefaultRoles;
 import com.payme.authentication.dto.UserDto;
 import com.payme.authentication.dto.authentication.LoginRequest;
 import com.payme.authentication.dto.authentication.RegistrationRequest;
-import com.payme.authentication.entity.User;
 import com.payme.authentication.entity.Role;
 import com.payme.authentication.component.UserAccountManager;
 import com.payme.authentication.component.RoleProvider;
@@ -15,14 +15,12 @@ import com.payme.internal.security.constant.TokenRecipient;
 import com.payme.internal.security.model.UserTokenSubject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service("jwtAuthenticationService")
 @Slf4j
@@ -32,7 +30,6 @@ public class JwtAuthenticationService implements AuthenticationService {
     private final UserAccountManager userAccountManager;
     private final TokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
-    private final ModelMapper modelMapper;
 
 
     @Override
@@ -58,23 +55,24 @@ public class JwtAuthenticationService implements AuthenticationService {
                 )
         );
 
-        if(authentication.getPrincipal() instanceof UserPrincipal u)
+        Object principal = authentication.getPrincipal();
+        if(principal instanceof UserPrincipal u)
             user =  u;
         else
-            throw new IllegalStateException("Error - Incompatible types\n -Expected: User\n -Returned: " + authentication.getPrincipal().getClass());
+            throw new IllegalStateException("Error - Incompatible types\n -Expected: User\n -Returned: " + principal.getClass());
 
-        log.info("Successful login: {}", user.id());
-        return generateAuthenticationResponse(modelMapper.map(user, UserDto.class));
+        log.info("Successful login: {}", user.getId());
+        return generateAuthenticationResponse(Mapper.principalToDto(user));
     }
 
 
     @Override
     public AuthenticationResponse refresh(UUID id){
-        User user = userAccountManager.findById(id);
+        UserDto user = userAccountManager.findById(id);
         validateUserAccount(user);
 
         log.info("Token refresh: {}", user.getId());
-        return generateAuthenticationResponse(modelMapper.map(User.class, UserDto.class));
+        return generateAuthenticationResponse(user);
     }
 
 
@@ -94,8 +92,8 @@ public class JwtAuthenticationService implements AuthenticationService {
 
 
     private AuthenticationResponse generateAuthenticationResponse(UserDto user){
-        UUID id = user.id();
-        Set<String> roles = user.roles();
+        Long id = user.getId();
+        Set<String> roles = user.getRoles();
 
         String accessToken = tokenProvider.generateAccessToken(
                 new UserTokenSubject(id.toString(), roles), TokenRecipient.USER
@@ -108,13 +106,13 @@ public class JwtAuthenticationService implements AuthenticationService {
         return AuthenticationResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .usernameOrEmail(user.username())
+                .usernameOrEmail(user.getUsername())
                 .userId(id)
                 .build();
     }
 
 
-    private void validateUserAccount(User user) {
+    private void validateUserAccount(UserDto user) {
         if (!user.isAccountNonLocked()) {
             throw new LockedException("Account is locked");
         }

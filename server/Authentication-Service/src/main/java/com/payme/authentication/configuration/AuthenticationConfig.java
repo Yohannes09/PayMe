@@ -1,11 +1,10 @@
 package com.payme.authentication.configuration;
 
 import com.payme.authentication.component.UserAccountManager;
+import com.payme.authentication.component.util.Mapper;
 import com.payme.authentication.dto.UserDto;
-import com.payme.authentication.entity.model.UserPrincipal;
-import com.payme.authentication.repository.UserRepository;
-import com.payme.authentication.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -13,16 +12,15 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
-@RequiredArgsConstructor
 @Component
+@Slf4j
+@RequiredArgsConstructor
 public class AuthenticationConfig {
     private final UserAccountManager userAccountManager;
+
 
     /**
      * Defines a {@link UserDetailsService} bean that retrieves user details for authentication.
@@ -38,12 +36,11 @@ public class AuthenticationConfig {
      */
     @Bean
     public UserDetailsService userDetailsService(){
-        return usernameOrEmail -> Optional.ofNullable(userAccountManager.findByUsernameOrEmail(usernameOrEmail))
-                    .map(UserPrincipal::dtoToPrincipal)
-                    .orElseThrow(() -> new UserNotFoundException(""));
-
+        return usernameOrEmail -> {
+            UserDto user = userAccountManager.findByUsernameOrEmail(usernameOrEmail);
+            return Mapper.dtoToPrincipal(user);
+        };
     }
-
 
 
     /**
@@ -69,9 +66,12 @@ public class AuthenticationConfig {
      * If the user is not found, it throws a UsernameNotFoundException.
      */
     @Bean
-    public AuthenticationProvider authenticationProvider(PasswordEncoder passwordEncoder){
+    public AuthenticationProvider authenticationProvider(
+            PasswordEncoder passwordEncoder,
+            UserDetailsService userDetailsService
+    ){
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService());
+        authenticationProvider.setUserDetailsService(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder);
         return authenticationProvider;
     }

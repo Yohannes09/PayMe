@@ -1,5 +1,6 @@
 package com.payme.authentication.component;
 
+import com.payme.authentication.component.util.Mapper;
 import com.payme.authentication.dto.UserDto;
 import com.payme.authentication.entity.Role;
 import com.payme.authentication.entity.User;
@@ -60,11 +61,11 @@ public class UserAccountManager {
     }
 
 
-    //@Cacheable(cacheNames = "user", key = "#userId")
-    public User findById(@NotNull UUID userId){
-
+    @Cacheable(cacheNames = "user", key = "#userId")
+    public UserDto findById(@NotNull UUID userId){
         return userRepository
                 .findById(userId)
+                .map(Mapper::entityToDto)
                 .orElseThrow(()-> new UserNotFoundException("User not found: " + userId));
     }
 
@@ -73,10 +74,16 @@ public class UserAccountManager {
     public UserDto findByUsernameOrEmail(@NotBlank String usernameOrEmail){
         return userRepository
                 .findByUsernameOrEmail(usernameOrEmail)
-                .map(UserDto::entityToDto)
+                .map(Mapper::entityToDto)
                 .orElseThrow(() -> new UserNotFoundException("User not found: " + usernameOrEmail));
     }
 
+
+    public User findEntityById(@NotNull UUID userId){
+        return userRepository
+                .findById(userId)
+                .orElseThrow(()-> new UserNotFoundException("User not found: " + userId));
+    }
 
     public User persistUserUpdate(User user){
         if (user.getId() == null)

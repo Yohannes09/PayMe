@@ -1,21 +1,15 @@
 package com.payme.authentication.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.payme.authentication.constant.ValidationConstants;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Table(
         name = "users",
@@ -24,17 +18,25 @@ import java.util.stream.Collectors;
                 @Index(name = "idx_user_email", columnList = "email")
         }
 )
-@JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements UserDetails {
+public class User{
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "user_id_sequence"
+    )
+    @SequenceGenerator(
+            name = "user_id_sequence",
+            sequenceName = "user_id_sequence",
+            initialValue = 11_957_103,
+            allocationSize = 9
+    )
+    private Long id;
 
     @Pattern(regexp = ValidationConstants.USERNAME_PATTERN)
     @Column(unique = true, nullable = false)
@@ -55,49 +57,23 @@ public class User implements UserDetails {
     )
     private Set<Role> roles;
 
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "account_non_expired", nullable = false)
     private boolean accountNonExpired;
+
+    @Column(name = "account_non_locked", nullable = false)
     private boolean accountNonLocked;
+
+    @Column(name = "credentials_non_expired", nullable = false)
     private boolean credentialsNonExpired;
+
+    @Column(name = "enabled", nullable = false)
     private boolean enabled;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getRole()))
-                .collect(Collectors.toSet());
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return accountNonExpired;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return accountNonLocked;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return credentialsNonExpired;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return enabled;
-    }
 }

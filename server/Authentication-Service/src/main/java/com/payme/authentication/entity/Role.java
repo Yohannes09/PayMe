@@ -13,15 +13,22 @@ import java.time.LocalDateTime;
 
 
 @Table(name = "roles")
-@JsonIgnoreProperties(ignoreUnknown = true)
+//@JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Role {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "role_id_sequence")
-    @SequenceGenerator(name = "role_id_sequence", sequenceName = "role_id_sequence", initialValue = 3456)
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "role_id_sequence"
+    )
+    @SequenceGenerator(
+            name = "role_id_sequence",
+            sequenceName = "role_id_sequence",
+            initialValue = 3456
+    )
     private Long id;
 
     @Column(nullable = false)

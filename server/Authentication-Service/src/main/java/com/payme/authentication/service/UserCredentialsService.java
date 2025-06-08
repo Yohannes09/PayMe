@@ -29,7 +29,7 @@ public class UserCredentialsService {
     @Transactional
     @CacheEvict(cacheNames = "user", key = "#user.id")
     public void updateUsername(UsernameUpdateRequest usernameUpdateRequest){
-        User user = userAccountManager.findById(usernameUpdateRequest.id());
+        User user = userAccountManager.findEntityById(usernameUpdateRequest.id());
         String newUsername = usernameUpdateRequest.newUsername();
 
         validateCredential(user.getUsername(), newUsername, userAccountManager::existsByUsername);
@@ -41,7 +41,7 @@ public class UserCredentialsService {
 
     @Transactional
     public void updateEmail(EmailUpdateRequest emailUpdateRequest){
-        User user = userAccountManager.findById(emailUpdateRequest.id());
+        User user = userAccountManager.findEntityById(emailUpdateRequest.id());
         String newEmail = emailUpdateRequest.newEmail();
 
         validateCredential(user.getEmail(), newEmail, userAccountManager::existsByEmail);
@@ -53,7 +53,7 @@ public class UserCredentialsService {
 
     @Transactional
     public void updatePassword(PasswordUpdateRequest passwordUpdateRequest){
-        User user = userAccountManager.findById(passwordUpdateRequest.id());
+        User user = userAccountManager.findEntityById(passwordUpdateRequest.id());
         String newPassword = passwordEncoder.encode(passwordUpdateRequest.newPassword());
 
         validateCredential(user.getPassword(), newPassword, null);

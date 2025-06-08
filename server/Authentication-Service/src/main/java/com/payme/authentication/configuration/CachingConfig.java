@@ -44,7 +44,10 @@ public class CachingConfig {
      * @return a configured RedisCacheManager
      */
     @Bean
-    public RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory){
+    public RedisCacheManager redisCacheManager(
+            RedisConnectionFactory redisConnectionFactory,
+            RedisSerializer<Object> redisSerializer
+    ){
         RedisCacheWriter redisCacheWriter = RedisCacheWriter
                 .nonLockingRedisCacheWriter(redisConnectionFactory);
 
@@ -52,7 +55,7 @@ public class CachingConfig {
                 .entryTtl(Duration.ofMinutes(10))
                 .prefixCacheNameWith("authentication:")
                 .serializeValuesWith(
-                        RedisSerializationContext.SerializationPair.fromSerializer(redisSerializer())
+                        RedisSerializationContext.SerializationPair.fromSerializer(redisSerializer)
                 );
 
         Map<String, RedisCacheConfiguration> perCacheConfig = Map.of(
@@ -103,7 +106,13 @@ public class CachingConfig {
      *
      * @return a {@link GenericJackson2JsonRedisSerializer} with a custom-configured {@link com.fasterxml.jackson.databind.ObjectMapper}
      */
-    public RedisSerializer<Object> redisSerializer(){
+    @Bean
+    public RedisSerializer<Object> redisSerializer(ObjectMapper objectMapper){
+        return new GenericJackson2JsonRedisSerializer(objectMapper);
+    }
+
+    @Bean
+    public ObjectMapper objectMapper(){
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -114,7 +123,7 @@ public class CachingConfig {
                 JsonTypeInfo.As.PROPERTY
         );
 
-        return new GenericJackson2JsonRedisSerializer(objectMapper);
+        return objectMapper;
     }
 
     // IN THE EVENT, I WANT FINER CONTROL OF REDIS OPERATIONS.

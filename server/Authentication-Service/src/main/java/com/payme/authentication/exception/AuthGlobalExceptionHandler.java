@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -32,9 +33,19 @@ public class AuthGlobalExceptionHandler extends BaseGlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAuthenticationException(
             AuthenticationException exception, HttpServletRequest servletRequest
     ){
-        log.error("Error during authentication: {}", exception.getMessage());
+        log.error("Authentication failed: {}", exception.getMessage());
+
+        String message = switch (exception){
+            case DisabledException _ -> "Account is disabled.";
+            case LockedException _ -> "Account is locked.";
+            case BadCredentialsException _ -> "Invalid username or password.";
+            case AccountExpiredException _ -> "Account has expired.";
+            case CredentialsExpiredException _ -> "Your password has expired.";
+            default -> "Authentication failed.";
+        };
+
         return generateErrorResponse(
-                exception.getMessage(),
+                message,
                 HttpStatus.UNAUTHORIZED,
                 servletRequest
         );
@@ -58,9 +69,24 @@ public class AuthGlobalExceptionHandler extends BaseGlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleCredentialException(
             CredentialUpdateException exception, HttpServletRequest request
     ){
-        log.info("User credential update failed: {}", exception.getMessage());
+        log.warn("User credential update failed: {}", exception.getMessage());
         return generateErrorResponse(
-                "User not found.",
+                "Your credential does not meet requirements.",
+                HttpStatus.BAD_REQUEST,
+                request
+        );
+
+    }
+
+
+    @ExceptionHandler(DuplicateCredentialException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateCredentialException(
+            DuplicateCredentialException exception, HttpServletRequest request
+    ){
+        log.warn("Credential conflict detected: {}", exception.getMessage());
+
+        return generateErrorResponse(
+                "Username/Email taken.",
                 HttpStatus.BAD_REQUEST,
                 request
         );

@@ -76,4 +76,10 @@ public class User{
 
     @Column(name = "enabled", nullable = false)
     private boolean enabled;
+
+    // Suggested improvement for concurrency. Prevents another thread from
+    // overriding.
+    @Version
+    private Long version;
+
 }

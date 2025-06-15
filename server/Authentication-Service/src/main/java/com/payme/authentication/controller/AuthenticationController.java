@@ -19,8 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 @RestController
 @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5500"})
 @RequestMapping(Endpoints.Auth.BASE)
@@ -83,9 +81,9 @@ public class AuthenticationController {
             }
     )
     public ResponseEntity<AuthenticationResponse> refresh(
-            @PathVariable UUID id, HttpServletResponse servletResponse
+            @PathVariable Long id, HttpServletResponse servletResponse
     ){
-        AuthenticationResponse authResponse = authenticationService.refresh(null);
+        AuthenticationResponse authResponse = authenticationService.refresh(id);
 
         return buildAuthenticationResponse(authResponse, servletResponse);
     }

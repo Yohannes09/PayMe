@@ -8,14 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 
 import java.util.Set;
 
 @Configuration
 @Profile("dev")
-@Lazy
 @Slf4j(topic = "DEFAULT_USER_GENERATOR")
 public class DefaultUserGenerator {
 

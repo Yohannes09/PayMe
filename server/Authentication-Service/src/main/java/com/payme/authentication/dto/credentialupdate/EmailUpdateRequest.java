@@ -2,12 +2,11 @@ package com.payme.authentication.dto.credentialupdate;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-
-import java.util.UUID;
+import jakarta.validation.constraints.NotNull;
 
 public record EmailUpdateRequest(
-        @NotBlank
-        UUID id,
+        @NotNull
+        Long id,
 
         @NotBlank
         @Email

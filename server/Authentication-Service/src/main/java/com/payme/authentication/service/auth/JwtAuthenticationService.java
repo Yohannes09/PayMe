@@ -1,7 +1,8 @@
 package com.payme.authentication.service.auth;
 
+import com.payme.authentication.component.LoginAttemptManager;
 import com.payme.authentication.component.TokenProvider;
-import com.payme.authentication.component.util.Mapper;
+import com.payme.authentication.util.Mapper;
 import com.payme.authentication.constant.DefaultRoles;
 import com.payme.authentication.dto.UserDto;
 import com.payme.authentication.dto.authentication.LoginRequest;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,11 +28,10 @@ import java.util.*;
 @Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationService implements AuthenticationService {
-    private final RoleProvider roleProvider;
     private final UserAccountManager userAccountManager;
     private final TokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
-
+    private final LoginAttemptManager loginAttemptManager;
 
     @Override
     @Transactional
@@ -38,8 +39,7 @@ public class JwtAuthenticationService implements AuthenticationService {
         userAccountManager.createNewUser(
                 registrationRequest.username(),
                 registrationRequest.email(),
-                registrationRequest.password(),
-                fetchDefaultRoles()
+                registrationRequest.password()
         );
 
         log.info("Successful registration: {}", registrationRequest.username());
@@ -48,26 +48,38 @@ public class JwtAuthenticationService implements AuthenticationService {
 
     @Override
     public AuthenticationResponse login(LoginRequest loginRequest) {
-        UserPrincipal user;
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.usernameOrEmail(), loginRequest.password()
-                )
-        );
+        String identifier = loginRequest.usernameOrEmail();
+        if(loginAttemptManager.isBlocked(identifier)){
+            throw new LockedException("User account temporarily locked due to multiple failed login attempts.");
+        }
 
-        Object principal = authentication.getPrincipal();
-        if(principal instanceof UserPrincipal u)
-            user =  u;
-        else
-            throw new IllegalStateException("Error - Incompatible types\n -Expected: User\n -Returned: " + principal.getClass());
+        try {
+            UserPrincipal user;
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.usernameOrEmail(), loginRequest.password()
+                    )
+            );
 
-        log.info("Successful login: {}", user.getId());
-        return generateAuthenticationResponse(Mapper.principalToDto(user));
+            Object principal = authentication.getPrincipal();
+            if(principal instanceof UserPrincipal u)
+                user =  u;
+            else
+                throw new IllegalStateException("Error - Incompatible types\n -Expected: User\n -Returned: " + principal.getClass());
+
+            log.info("Successful login: {}", user.getId());
+            loginAttemptManager.loginSucceeded(identifier);
+            return generateAuthenticationResponse(Mapper.principalToDto(user));
+        } catch (AuthenticationException e) {
+            loginAttemptManager.loginFailed(identifier);
+            throw e;
+        }
+
     }
 
 
     @Override
-    public AuthenticationResponse refresh(UUID id){
+    public AuthenticationResponse refresh(Long id){
         UserDto user = userAccountManager.findById(id);
         validateUserAccount(user);
 
@@ -79,15 +91,6 @@ public class JwtAuthenticationService implements AuthenticationService {
     @Override
     public void logout(String token){
         // No logic here yet.
-    }
-
-
-    private Set<Role> fetchDefaultRoles(){
-        Set<Role> defaultRoles = new HashSet<>();
-        Role userRole = roleProvider.findRole(DefaultRoles.USER.getRole());
-        defaultRoles.add(userRole);
-
-        return defaultRoles;
     }
 
 

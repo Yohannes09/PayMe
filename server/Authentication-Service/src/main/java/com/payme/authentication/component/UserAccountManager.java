@@ -1,31 +1,34 @@
 package com.payme.authentication.component;
 
-import com.payme.authentication.component.util.Mapper;
+import com.payme.authentication.constant.DefaultRoles;
+import com.payme.authentication.dto.privileged.RoleAssignmentRequest;
+import com.payme.authentication.util.Mapper;
 import com.payme.authentication.dto.UserDto;
 import com.payme.authentication.entity.Role;
 import com.payme.authentication.entity.User;
 import com.payme.authentication.exception.DuplicateCredentialException;
 import com.payme.authentication.exception.UserNotFoundException;
 import com.payme.authentication.repository.UserRepository;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
-@Service
+@Component
 @Slf4j
 @RequiredArgsConstructor
 public class UserAccountManager {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RoleProvider roleProvider;
 
-    //* @return the created {@link User} entity
+
     /**
      * Creates and persists a new {@link User} with the provided credentials and roles.
      * <p>
@@ -36,9 +39,34 @@ public class UserAccountManager {
      * @param username the desired username for the new user; must be unique
      * @param email the user's email address; must be unique
      * @param password the raw password to be encoded and stored securely
-     * @param roles a set of roles to assign to the new user
      * @throws DuplicateCredentialException if the username or email already exists
      */
+    public void createNewUser(String username, String email, String password){
+
+        if(userRepository.existsByUsernameOrEmail(username, email)){
+            throw new DuplicateCredentialException("Username or Email already registered. ");
+        }
+
+        Set<Role> defaultRoles = new HashSet<>();
+        Role userRole = roleProvider.findRole(DefaultRoles.USER.getRole());
+        defaultRoles.add(userRole);
+
+        userRepository.save(
+                User.builder()
+                        .username(username)
+                        .email(email)
+                        .password(passwordEncoder.encode(password))
+                        .roles(defaultRoles)
+                        .accountNonExpired(true)
+                        .accountNonLocked(true)
+                        .credentialsNonExpired(true)
+                        .enabled(true)
+                        .build()
+        );
+
+    }
+
+    // Not for production use, just to easily create default profiles.
     public void createNewUser(String username, String email, String password, Set<Role> roles){
 
         if(userRepository.existsByUsernameOrEmail(username, email)){
@@ -62,7 +90,7 @@ public class UserAccountManager {
 
 
     @Cacheable(cacheNames = "user", key = "#userId")
-    public UserDto findById(@NotNull UUID userId){
+    public UserDto findById(Long userId){
         return userRepository
                 .findById(userId)
                 .map(Mapper::entityToDto)
@@ -71,7 +99,7 @@ public class UserAccountManager {
 
 
     @Cacheable(cacheNames = "user", key = "#usernameOrEmail")
-    public UserDto findByUsernameOrEmail(@NotBlank String usernameOrEmail){
+    public UserDto findByUsernameOrEmail(String usernameOrEmail){
         return userRepository
                 .findByUsernameOrEmail(usernameOrEmail)
                 .map(Mapper::entityToDto)
@@ -79,17 +107,17 @@ public class UserAccountManager {
     }
 
 
-    public User findEntityById(@NotNull UUID userId){
+    public User findEntityById(Long userId){
         return userRepository
                 .findById(userId)
                 .orElseThrow(()-> new UserNotFoundException("User not found: " + userId));
     }
 
-    public User persistUserUpdate(User user){
+    public void persistUserUpdate(User user){
         if (user.getId() == null)
             throw new RuntimeException("A user must be persisted before being updated. ");
 
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
 
@@ -100,10 +128,40 @@ public class UserAccountManager {
 
         return userRepository.existsByUsernameIgnoreCase(username);
     }
-
-
-    public boolean existsByEmail(@NotBlank String email){
+    public boolean existsByEmail(String email){
         return userRepository.existsByEmailIgnoreCase(email);
+    }
+
+
+    @Transactional
+    public void addRoles(RoleAssignmentRequest request){
+        User user = findEntityById(request.userId());
+
+        Set<Role> roles = request.roleNames().stream()
+                .map(roleProvider::findRole)
+                .collect(Collectors.toSet());
+
+        boolean changed = user.getRoles().addAll(roles);
+        if (changed) {
+            userRepository.save(user);
+            log.info("Role(s) successfully added. ID: {}, New roles: {}", user.getId(), user.getRoles());
+        }
+
+    }
+
+    @Transactional
+    public void removeRoles(RoleAssignmentRequest request){
+        User user = findEntityById(request.userId());
+
+        boolean changed = user.getRoles().removeIf(role ->
+                !request.roleNames().contains(role.getRole()) && !role.getRole().equals(DefaultRoles.USER.name())
+        );
+
+        if (changed) {
+            userRepository.save(user);
+            log.info("Role(s) successfully removed. ID: {}, New roles: {}", user.getId(), user.getRoles());
+        }
+
     }
 
 }

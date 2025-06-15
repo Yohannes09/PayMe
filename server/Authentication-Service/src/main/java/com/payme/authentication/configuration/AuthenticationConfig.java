@@ -1,7 +1,7 @@
 package com.payme.authentication.configuration;
 
 import com.payme.authentication.component.UserAccountManager;
-import com.payme.authentication.component.util.Mapper;
+import com.payme.authentication.util.Mapper;
 import com.payme.authentication.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

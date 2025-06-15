@@ -1,4 +1,4 @@
-package com.payme.authentication.component.util;
+package com.payme.authentication.util;
 
 import com.payme.authentication.dto.UserDto;
 import com.payme.authentication.entity.Role;

@@ -14,9 +14,11 @@ import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
 import java.util.Map;
@@ -126,32 +128,16 @@ public class CachingConfig {
         return objectMapper;
     }
 
-    // IN THE EVENT, I WANT FINER CONTROL OF REDIS OPERATIONS.
-//    @Bean
-//    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
-//        RedisTemplate<String, Object> template = new RedisTemplate<>();
-//        template.setConnectionFactory(connectionFactory);
-//
-//        // Use same serializer as cache manager
-//        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper());
-//        template.setDefaultSerializer(serializer);
-//        template.setKeySerializer(new StringRedisSerializer());
-//        template.setValueSerializer(serializer);
-//        template.afterPropertiesSet();
-//
-//        return template;
-//    }
-//
-//    private ObjectMapper objectMapper() {
-//        ObjectMapper mapper = new ObjectMapper();
-//        mapper.registerModule(new JavaTimeModule());
-//        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-//        mapper.activateDefaultTyping(
-//                LaissezFaireSubTypeValidator.instance,
-//                ObjectMapper.DefaultTyping.NON_FINAL,
-//                JsonTypeInfo.As.PROPERTY
-//        );
-//        return mapper;
-//    }
+
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper()));
+        template.afterPropertiesSet();
+
+        return template;
+    }
 
 }

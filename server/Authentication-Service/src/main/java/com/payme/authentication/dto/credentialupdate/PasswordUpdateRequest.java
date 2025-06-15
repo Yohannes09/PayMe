@@ -2,13 +2,12 @@ package com.payme.authentication.dto.credentialupdate;
 
 import com.payme.authentication.constant.ValidationConstants;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
-import java.util.UUID;
-
 public record PasswordUpdateRequest(
-        @NotBlank
-        UUID id,
+        @NotNull
+        Long id,
 
         @NotBlank(message = ValidationConstants.PASSWORD_VALIDATION_MESSAGE)
         @Pattern(

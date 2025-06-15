@@ -28,4 +28,15 @@ public final class Endpoints {
         public static final String OPEN_API_SPECIFICATION = "/v3/api-docs";
     }
 
+    public static final class SigningKey{
+        public static final String BASE = "/signing-key";
+    }
+
+    public static final class Role{
+        public static final String BASE = "/roles";
+
+        public static final String DomainRole = "/";
+        public static final String AddUserRoles = "/user";
+    }
+
 }
